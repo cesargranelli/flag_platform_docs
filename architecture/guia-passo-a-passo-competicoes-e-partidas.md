@@ -41,15 +41,27 @@ Este guia estabelece as fases, tarefas e critérios de aceite para a construçã
 
 ---
 
-## 📌 FASE 2: Inscrições & Homologação de Equipes (Desacoplamento)
+## 📌 FASE 2: Filiações & Inscrições de Equipes (Desacoplamento)
+
+### 2.0 Filiação de Agremiações a Organizações (Governança & Temporada)
+- [ ] Modelagem e endpoints de `institution_affiliations`:
+  - `POST /api/v1/institutions/{id}/affiliations` (solicitação do clube com `season`).
+  - `GET /api/v1/organizations/{id}/affiliations` (gestão da federação).
+  - Endpoints de workflow: `approve` e `reject` (com justificativa).
+- [ ] **Painel do Clube (`InstitutionDetailScreen`)**:
+  - Modal para solicitar filiação a uma Liga/Federação na temporada vigente.
+  - Exibição das filiações ativas e histórico com status (`PENDING`, `APPROVED`, `REJECTED`).
+- [ ] **Painel da Federação (`OrganizationDetailScreen`)**:
+  - Seção "Agremiações Filiadas & Pedidos de Filiação" com filtro por temporada.
+  - Ações de homologação rápida: *Aprovar* ou *Recusar com Justificativa*.
 
 ### 2.1 Gestão de Equipes e Elencos (Clube/Agremiação)
-- [ ] Cadastro e listagem de Atletas e Comissão Técnica da Agremiação.
-- [ ] Cadastro do Time (`platform.teams`) vinculado à Agremiação.
-- [ ] Definição do Elenco (`platform.roster` / `platform.team_roster`) associado à temporada/competição.
+- [x] Cadastro e listagem de Atletas e Comissão Técnica da Agremiação.
+- [x] Cadastro do Time (`platform.teams`) vinculado à Agremiação (`club_id`).
+- [x] Definição do Elenco-Base (`platform.roster` / `platform.team_roster`) com ViewModel e tela dedicada.
 
-### 2.2 Central de Inscrições (`platform.competition_team`)
-- [ ] Submissão da inscrição do Time + Elenco pelo Clube.
+### 2.2 Central de Inscrições em Competições (`platform.competition_team`)
+- [ ] Submissão da inscrição do Time + Elenco pelo Clube em uma Competição da Organização.
 - [ ] Tela do Organizador para homologação das inscrições:
   - Status: *Pendente*, *Homologado*, *Rejeitado* (com justificativa).
   - Atribuição a Grupos/Conferências/Divisões se aplicável.

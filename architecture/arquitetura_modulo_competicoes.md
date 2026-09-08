@@ -1,27 +1,28 @@
-# Arquitetura e Fluxo de Domínio: Módulo de Competições & Torneios
+# Arquitetura e Fluxo de Domínio: Módulo de Competições & Torneios (Kickster Platform)
 
-Este documento estabelece o modelo de dados, desacoplamento de entidades e o fluxo operacional de **Competições, Inscrições e Confrontos** no ecossistema Kickster.
+Este documento estabelece o modelo de dados, desacoplamento de entidades e o fluxo operacional de **Competições, Inscrições, Agrupamentos (Conferências / Divisões / Grupos) e Confrontos** no ecossistema Kickster.
 
 ---
 
 ## 1. Visão Geral do Domínio
 
-O sistema opera de forma desacoplada entre os dois atores principais:
+O sistema opera de forma desacoplada entre os atores principais:
 
-1. **Organização Promotora (Entidade Organizadora / Federação / Liga):**
-   - Cria e administra a **Competição / Torneio** (definindo modalidade, gênero, faixa etária, formato de disputa e temporada).
-   - Gerencia locais/praças esportivas (**Venues**).
-   - Homologa inscrições de equipes.
-   - Gera rodadas (**Rounds**) e agenda partidas (**Games/Confrontos**) com data, hora e local.
+1. **Organização Promotora (Federação / Liga Esportiva):**
+   - Cria e administra a **Competição / Campeonato** (definindo modalidade de Futebol Americano, gênero, faixa etária, formato de disputa e temporada).
+   - Define se a competição adota **Agrupamento Opcional** de times (`none`, `conferences`, `divisions`, `groups`).
+   - Gerencia praças esportivas / campos de jogo (**Venues**).
+   - Homologa inscrições de times e aloca as equipes nas respectivas **Conferências, Divisões ou Grupos** (opcionais).
+   - Monta rodadas (**Rounds**) e agenda partidas (**Games / Confrontos**) com data, hora e campo.
 
 2. **Agremiação (Clube / Associação Esportiva):**
    - Mantém seu cadastro institucional e base de **Atletas** e **Comissão Técnica**.
    - Cria seus **Times (Equipes)** vinculados à agremiação.
-   - Monta o **Elenco (Roster)** específico para cada temporada/torneio.
+   - Monta o **Elenco (Roster)** específico com numerações e posições para cada temporada/torneio.
 
-3. **Elo de Inscrição (Central de Inscrições / Registration):**
+3. **Elo de Inscrição & Agrupamento (Competition Team):**
    - O Clube inscreve o seu **Time + Roster** na **Competição**.
-   - A Promotora avalia/homologa o time na competição (atribuindo chave/conferência/divisão se houver).
+   - A Promotora avalia/homologa o time na competição e **opcionalmente atribui o time a uma Conferência, Divisão ou Grupo** para fins de classificação, chaveamento e tabelamento de confrontos.
 
 ---
 
@@ -30,9 +31,9 @@ O sistema opera de forma desacoplada entre os dois atores principais:
 ```mermaid
 erDiagram
     ORGANIZATION ||--o{ COMPETITION : "promove / organiza"
-    ORGANIZATION ||--o{ VENUE : "cadastra locais"
+    ORGANIZATION ||--o{ VENUE : "cadastra locais/campos"
     
-    COMPETITION ||--o{ COMPETITION_TEAM : "possui inscritos"
+    COMPETITION ||--o{ COMPETITION_TEAM : "possui times homologados"
     COMPETITION ||--o{ ROUND : "possui rodadas"
     
     CLUB_AGREMIACAO ||--o{ TEAM : "mantém times"
@@ -47,27 +48,23 @@ erDiagram
 
     ROUND ||--o{ GAME : "contém partidas"
     
-    TEAM ||--o{ GAME : "mandante (Home Team)"
-    TEAM ||--o{ GAME : "visitante (Away Team)"
+    COMPETITION_TEAM ||--o{ GAME : "mandante (Home Team)"
+    COMPETITION_TEAM ||--o{ GAME : "visitante (Away Team)"
     VENUE ||--o{ GAME : "sedia partida"
 
     COMPETITION {
         uuid id PK
         uuid organization_id FK
-        string name "nome_torneio"
-        string modality "Futebol, Basquete, eSports"
+        string name "ex: Copa Brasil Flag Football"
+        string modality "Flag 5x5, Flag 7x7, Flag 8x8, Tackle, etc."
         string gender "Masculino, Feminino, Misto"
-        string age_group "Sub-20, Adulto, etc."
-        string format "Pontos Corridos, Mata-Mata, Misto"
-        string status "DRAFT, REGISTRATION_OPEN, ONGOING, FINISHED"
-        string season "ex: 2026/1"
-    }
-
-    TEAM {
-        uuid id PK
-        uuid club_id FK "agremiação proprietária"
-        string name "ex: Flamengo Sub-20"
-        string modality "Futebol"
+        string age_group "Adulto, Sub-20, Sub-17, etc."
+        string tournament_format "Pontos Corridos, Playoffs, Grupos + Playoffs"
+        string grouping_type "NONE, CONFERENCES, DIVISIONS, GROUPS"
+        string status "DRAFT, REGISTRATION_OPEN, ONGOING, FINISHED, DISABLED"
+        string season "ex: 2026"
+        date start_date
+        date end_date
     }
 
     COMPETITION_TEAM {
@@ -75,23 +72,42 @@ erDiagram
         uuid competition_id FK
         uuid team_id FK
         string status "PENDING, APPROVED, REJECTED"
+        string conference "opcional (ex: Conferência Leste / Conferência Oeste)"
+        string division "opcional (ex: Divisão Norte / Divisão Sul)"
+        string group_name "opcional (ex: Grupo A / Grupo B)"
+        int seed_number "número de cabeça de chave / ranking"
         datetime registered_at
+    }
+
+    TEAM {
+        uuid id PK
+        uuid club_id FK "agremiação proprietária"
+        string name "ex: América Football Flag"
+        string modality "Flag 5x5"
     }
 
     ROSTER {
         uuid id PK
         uuid team_id FK
         uuid competition_id FK
-        string season
+        string season "2026"
+    }
+
+    ROUND {
+        uuid id PK
+        uuid competition_id FK
+        int round_number "1, 2, 3..."
+        string phase "FASE_REGULAR, WILDCARD, SEMIFINAL, BOWL_FINAL"
+        string name "ex: Semana 1, Wild Card, Final"
     }
 
     GAME {
         uuid id PK
         uuid round_id FK
-        uuid home_team_id FK
-        uuid away_team_id FK
-        uuid venue_id FK "localidade"
-        datetime scheduled_at "data e hora"
+        uuid home_team_id FK "competition_team_id mandante"
+        uuid away_team_id FK "competition_team_id visitante"
+        uuid venue_id FK "praça esportiva / campo"
+        datetime scheduled_at "data e hora do kickoff"
         int home_score
         int away_score
         string status "SCHEDULED, LIVE, FINISHED, POSTPONED"
@@ -100,61 +116,66 @@ erDiagram
 
 ---
 
-## 3. Fluxo Operacional de Negócio (Desacoplado)
+## 3. Conceito e Uso dos Agrupamentos Opcionais
+
+No futebol americano (Flag e Tackle), o agrupamento não é uma entidade separada com tabelas complexas de banco, mas sim **aspectos e atributos da competição e do time inscrito**, permitindo modularidade e flexibilidade:
+
+| Nível de Agrupamento | Quando Utilizar | Exemplo Prático | Atributo em `COMPETITION_TEAM` |
+| :--- | :--- | :--- | :--- |
+| **Nenhum (Tabela Única)** | Torneios tiro-curto em pontos corridos ou eliminatória direta. | Copa Regional Tiro Curto (8 times em pontos corridos) | `conference = null`, `division = null`, `group_name = null` |
+| **Grupos (Groups)** | Competições com fase de grupos seguida de playoffs. | Grupo A, Grupo B, Grupo C | `group_name: "Grupo A"` |
+| **Conferências (Conferences)** | Ligas divididas geograficamente ou por chave regional. | Conferência Leste e Conferência Oeste | `conference: "Leste"` |
+| **Conferências + Divisões** | Ligas maiores estruturadas no formato clássico de Futebol Americano. | Conferência Leste (Divisão Norte / Divisão Sul) | `conference: "Leste"`, `division: "Norte"` |
+
+### Vantagens dessa Modelagem:
+1. **Sem tabelas intermediárias desnecessárias:** elimina a complexidade de manter CRUDs de conferências/divisões como entidades isoladas.
+2. **Cálculo de Classificação Simplificado:** as tabelas de classificação (standings) filtram diretamente `WHERE competition_id = :id AND conference = :conf AND division = :div`.
+3. **Flexibilidade Total:** a promotora pode renomear ou reorganizar os times em divisões sem quebrar chaves estrangeiras rígidas.
+
+---
+
+## 4. Fluxo Operacional de Negócio
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Org as Organizador (Federação)
+    actor Org as Organizador (Federação / Liga)
     actor Clube as Agremiação (Clube)
     participant Sys as Kickster Platform
 
-    Note over Org,Clube: Fase 1: Configuração Prévia e Independente
+    Note over Org,Clube: Fase 1: Cadastro da Competição
     Org->>Sys: Cadastra Competição (Modalidade, Categoria, Gênero, Formato)
-    Org->>Sys: Cadastra Praças Esportivas / Locais (Venues)
+    Org->>Sys: Define Agrupamento Opcional (Nenhum, Grupos, Conferências ou Divisões)
+    Org->>Sys: Cadastra Praças / Campos Esportivos (Venues)
     Clube->>Sys: Cadastra Atletas e Comissão Técnica
-    Clube->>Sys: Cadastra Times e Monta o Elenco (Roster)
+    Clube->>Sys: Cadastra Time e Elenco (Roster com números)
 
-    Note over Org,Clube: Fase 2: Inscrição / Homologação
-    Org->>Sys: Abre período de inscrições no Torneio
-    Clube->>Sys: Solicita inscrição do Time + Elenco no Torneio
-    Org->>Sys: Homologa a inscrição (status: Aprovado)
+    Note over Org,Clube: Fase 2: Inscrição & Homologação dos Times
+    Org->>Sys: Abre período de inscrições
+    Clube->>Sys: Inscreve Time + Elenco na Competição
+    Org->>Sys: Homologa a inscrição
+    Opt Agrupamento Ativo
+        Org->>Sys: Aloca time na Conferência / Divisão / Grupo correspondente
+    End
 
     Note over Org,Clube: Fase 3: Tabelamento e Partidas
-    Org->>Sys: Gera Tabela / Rodadas (Chaveamento ou Pontos Corridos)
-    Org->>Sys: Aloca Confrontos (Time A x Time B) definindo Local, Data e Hora
-    Clube->>Sys: Consulta Tabela, Confrontos e Escalações
+    Org->>Sys: Gera Rodadas / Semanas de Jogos (Fase Regular ou Playoffs)
+    Org->>Sys: Cria Confrontos alocando Campo (Venue), Data e Hora do Kickoff
+    Clube->>Sys: Acompanha tabela, classificação agrupada e confrontos
 ```
 
 ---
 
-## 4. Proposta de Telas e Navegação no Painel Admin Kickster
+## 5. Implementação no Frontend (`flag_admin_web`)
 
-### A. Módulo Competições (Visão Organizador)
-- **Menu Lateral:** `Competições`
-- **Lista de Competições:**
-  - Cards com filtros rápidos por status (*Inscrições Abertas*, *Em Andamento*, *Finalizado*), Modalidade e Temporada.
-  - Badges visuais Kickster: Gênero, Faixa Etária, Formato.
-  - Ações: Editar, Configurar Rodadas, Ver Inscritos, Encerrar.
-- **Formulário de Cadastro/Edição de Competição:**
-  - Seção 1: **Identificação:** Nome do Torneio, Temporada, Edição.
-  - Seção 2: **Classificação Esportiva:** Modalidade (Dropdown), Gênero (Chips/Dropdown), Faixa Etária (Dropdown).
-  - Seção 3: **Regulamento e Formato:** Formato de Disputa (Pontos Corridos, Mata-Mata, Fase de Grupos + Eliminatória), Quantidade de Classificados.
-  - Seção 4: **Configuração de Inscrição:** Período de inscrições, limite de equipes, taxa (opcional).
-
-### B. Módulo Gestão de Jogos & Tabela (Visão Organizador)
-- **Tela de Chaveamento / Tabela de Jogos:**
-  - Seletor de Rodada (*Rodada 1, Quartas, Semifinal, etc.*).
-  - Cards de Confronto Kickster: `[Time Mandante]` vs `[Time Visitante]`.
-  - Seletor de **Local (Venue)**, **Data** e **Horário**.
-  - Registro de Placar / Súmula.
-
-### C. Módulo Agremiações & Times (Visão Clube)
-- **Menu Lateral:** `Minha Agremiação` -> `Times & Elencos`.
-- Criação de Time e vinculação dos Atletas/Comissão ao torneio vigente.
-- Tela **"Inscrições em Torneios"**: lista de competições abertas disponíveis para submeter a equipe.
-
----
-
-> [!NOTE]
-> As tabelas correspondentes no banco de dados (`platform.competitions`, `platform.team`, `platform.roster`, `platform.competition_team`, `platform.rounds`, `platform.games`, `platform.venues`) já existem em `ddl_data_base_main_v1.sql`. O modelo acima espelha e respeita fielmente essa estrutura existente.
+1. **Configuração na Competição (`CompetitionCreateScreen` / `CompetitionEditScreen`):**
+   - Campo seletor de tipo de agrupamento da competição:
+     - `Sem Agrupamento (Tabela Única)`
+     - `Grupos (Grupo A, Grupo B...)`
+     - `Conferências (Leste, Oeste...)`
+     - `Conferências e Divisões`
+2. **Tela de Homologação de Times Inscritos (`CompetitionTeamsScreen`):**
+   - Lista de times inscritos com ação de homologação.
+   - Atribuição direta dos campos opcionais de agrupamento: *Conferência*, *Divisão* e/ou *Grupo*.
+3. **Tabela de Classificação (`CompetitionStandingsWidget`):**
+   - Filtros ou abas automáticas por Conferência / Divisão / Grupo de acordo com o que foi configurado.
