@@ -56,4 +56,21 @@ layout: home
 
 ## Como ler esta documentação
 
-Comece pelo [overview](architecture/overview.md) para o contexto geral e siga para [fluxos lógicos](architecture/logical-flows.md) para os diagramas de ponta a ponta. Consulte os [ADRs](adr/) para entender as decisões de arquitetura e as issues do GitHub para o planejamento.
+Comece pelo [overview](architecture/overview.md) para o contexto geral e siga para [fluxos lógicos](architecture/logical-flows.md) para os diagramas de ponta a ponta. Consulte os [ADRs](adr/) para entender as decisões de arquitetura.
+
+### Fluxo de Trabalho (Gitflow Docs)
+
+A documentação segue fluxo gitflow, sem exigência de issues formais no GitHub:
+
+1. **Need → Feature Branch**: Necessidade de novo documento ou atualização é criada em branch `feature/doc-<tipo>-<assunto>` (ex: `feature/doc-adr-hierarquia`, `feature/doc-design-tokens-v2`)
+2. **Pull Request para `develop`**: O PR serve como rastreamento e revisão — não é criada issue separada
+3. **Desenvolvimento em `develop`**: Documentos em revisão ou desenvolvimento ficam nesta branch
+4. **Release Branch**: Quando houver conjunto de mudanças pronto, cria-se `release/v1.0-docs`, `release/v1.1-docs`, etc.
+5. **`main` + Tag**: Merge para `main` com tag de versionamento (ex: `v1.0-docs`, `v1.1-adr`) que determina a versão publicada no site Jekyll
+6. **Hotfix**: Correções críticas a partir de `main` apenas para documentos com links quebrados ou dados desatualizados
+
+**Critério de aceitação do PR**: documentação segue convenções, links verificados, consistência com ADRs existentes. O próprio PR substitui o rastreamento que antes seria feito via issues formais.
+
+### ADRs como Documentos Vivos
+
+Consulte os [ADRs](adr/) para entender as decisões de arquitetura. Lembre-se de que ADRs são documentos vivos — quando uma diretriz muda, a própria ADR é reescrita (ver [ADR-014](adr/ADR-014-atualizacao-diretivas.md) sobre atualização de diretivas).
