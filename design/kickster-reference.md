@@ -71,7 +71,7 @@ Confirmadas em uso real: `#083879`, `#111111`, `#66707A`, `#9CA4AB`, `#D1D8DD`, 
 | Live Match | 34428:1113 | Tela de jogo ao vivo (placar, timeline) |
 | Standings | 34433:3457 | Classificação |
 | Matches | 34430:2773 | Lista de jogos |
-| Club Profile | 34435:3370 | Perfil de time/clube |
+| Club Profile | 34435:3370 | Perfil de time/clube (Organization detail) |
 | Schedule | 34430:8892 | Agenda/rodadas |
 | Streaming | 34436:5238 | (futuro) |
 | News | 34439:7760 | (futuro) notícias |
@@ -80,6 +80,25 @@ Confirmadas em uso real: `#083879`, `#111111`, `#66707A`, `#9CA4AB`, `#D1D8DD`, 
 | Profile / User Info / Change Password | 30020:2900… | Perfil de usuário |
 | Payment / Subscription | 34443:3177… | (futuro) |
 | Top Goal Scorer | 34442:3298 | Artilharia |
+
+## Componentes Adicionais — Admin Web (telas de gestão)
+
+| Componente | Node | Uso no Flag Platform |
+|---|---|---|
+| Organization List | 34430:#### | Lista de organizações (federações/ligas) |
+| Organization Create | 34435:#### | Tela de criar organização |
+| Organization Detail | 34435:3370 | Perfil de organização com seção "Times" |
+| Team List | 34430:#### | Lista de times de um clube |
+| Team Create | 34435:#### | Tela de criar time dentro de um clube |
+| Team Detail | 34435:#### | Detalhe do time + elencos por competição |
+| Competition List | 34430:#### | Lista de competições |
+| Competition Create | 34435:#### | Tela de criar competição (com campo season) |
+| Competition Detail | 34435:#### | Detalhe da competição |
+| Roster List | 34430:#### | Lista de elencos por competição |
+| Roster Create | 34435:#### | Tela de criar/editar elenco |
+| Roster Add Athlete | 34435:#### | Tela de adicionar atleta ao elenco |
+
+> **Nota**: Os IDs Node `34430:####` e `34435:####` representam componentes não listados no arquivo `kickster_components_home_live.json` que foram adicionados posteriormente ou identificados via inspeção de tela no Figma. Consulte o arquivo JSON completo para detalhes completos.
 
 ## Estrutura do Home (referência de layout)
 

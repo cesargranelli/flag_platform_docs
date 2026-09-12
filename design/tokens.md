@@ -7,6 +7,7 @@ Fonte da verdade visual para os apps (Flutter). Reflete `frontend/packages/core/
 - **Arquivo**: [Kickster — Live Score & News Sport (Community)](https://www.figma.com/design/bXGRAtra3DkMAPGKLLLaCQ/Kickster---Live-Score---News-Sport-Apps-UI-Kits--Community-?node-id=65-400)
 - Referência completa em `docs/design/kickster-reference.md` (issue #431).
 - Usar como referência visual de componentes ao avaliar/propor layouts (ex.: calendário, inputs, chips).
+- **Última sincronização**: 2026-09-11 — tokens e componentes atualizados para consistência com o `flag_admin_web` v2.1.
 
 ## Cores
 

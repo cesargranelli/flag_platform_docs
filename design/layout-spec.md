@@ -16,6 +16,19 @@ Referência espacial para todas as telas do admin_web. Baseado no padrão **shad
 
 ---
 
+## 0. Fonte da Verdade Visual — Kickster Design System
+
+Esta especificação de layout baseia-se no **Kickster - Live Score & News Sport Apps UI Kits (Community)** do Figma, que é a fonte da verdade visual do Flag Platform (substitui a paleta Shifty).
+
+- **Cores**: mapeadas em `docs/design/tokens.md` — paleta Kickster (primário azul royal `#083879`, secundário `#17153B`, etc.)
+- **Tipografia**: Plus Jakarta Sans — definida em `docs/design/kickster-reference.md` (tamanhos, pesos, line-height, letter-spacing)
+- **Componentes**: docs/design/kickster-reference.md — todos os componentes mapeados com IDs Figma
+- **Migração**: aplicar tela a tela, começando pela home do `admin_web`. Nada hardcoded: tudo via tokens/ThemeExtension.
+
+Essa abordagem garante consistência entre o design (Figma) e o código (Flutter widgets em `frontend/packages/core/lib/src/widgets/kickster_*.dart`).
+
+---
+
 ## 2. Shell — Desktop (≥ 960px)
 
 ```
