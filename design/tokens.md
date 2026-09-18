@@ -69,7 +69,24 @@ Constantes em `frontend/packages/core/lib/src/theme/app_text_styles.dart`, com l
 
 ## Espaçamento
 
-Escala: `4, 8, 12, 16, 24, 32`. Uso típico: padding de tela `16`, espaçamento entre cards `12`, entre grupos `24`.
+Escala base (grid de 4): `space.xs` **4** · `space.sm` **8** · `space.md` **12** · `space.lg` **16** · `space.xl` **24** · `space.xxl` **32**.
+
+Uso típico: padding de tela `space.lg` (16), gap entre cards `space.md` (12), entre grupos/seções `space.xl` (24).
+
+### Paddings internos de componente (Figma)
+
+Valores próprios de cada componente — podem furar o grid e são tokens de componente:
+
+| Token | Valor | Uso |
+|---|---|---|
+| `space.card` | 16 | padding interno de cards de conteúdo/módulo/jogo |
+| `space.chip.h` / `space.chip.v` | 16 / 8 | chip selecionável (`KicksterChip`) |
+| `space.badge.h` / `space.badge.v` | 10 / 5 | badge de status (`KicksterBadge`) |
+| `space.status.h` | 10 | chip de status compacto (`KicksterStatusChip`, altura 28) |
+| `space.field.h` / `space.field.v` | 16 / 14 | campo de formulário (altura ~52px) |
+| `space.dialog` | 24 | padding de modal (`KicksterDialog`) |
+| `space.dialog.gap` | 20 | gap antes das ações do modal |
+| `space.hitTarget` | 48 | alvo de toque mínimo (ícones acionáveis) |
 
 ## Formas e elevação
 
