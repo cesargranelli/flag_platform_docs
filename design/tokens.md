@@ -51,6 +51,9 @@ Família da marca: **Plus Jakarta Sans**, aplicada via pacote `google_fonts` (fe
 | `type.body` | 16 / 24 | regular | Body Large |
 | `type.body.md` | 14 / 22 | regular | Body Medium — corpo |
 | `type.body.sm` | 12 / 20 | regular | Body Small — corpo secundário |
+| `type.body.xs` | 10 / 18 | regular | Body X-Small — micro-texto |
+
+> Implementação canônica: a escala é aplicada em `Theme.textTheme` (`displayLarge`, `headlineMedium`, `headlineSmall`, `titleLarge`, `titleMedium`, `titleSmall`, `bodyLarge`, `bodyMedium`, `bodySmall`, `labelSmall`) e os estilos nomeados ficam em `AppTextStyles`. **Não usar `fontSize`/`fontWeight` literais** nos componentes — sempre referenciar `AppTextStyles.*` ou `Theme.of(context).textTheme.*`.
 
 ### Estilos nomeados (`AppTextStyles`)
 
