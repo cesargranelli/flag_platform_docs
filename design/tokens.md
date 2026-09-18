@@ -183,6 +183,20 @@ Biblioteca de widgets no `frontend/packages/core/lib/src/widgets/` (prefixo `Kic
 - **`KicksterDialog`** (`kickster_dialog.dart`): modal de confirmação com raio **24** (`radius.modal`), largura 343px (mobile) / 480px (web), padding 24.
 - **`KicksterBadge`**: o conteúdo usa uma variação **escura** da cor (`foregroundFor`) para garantir contraste AA sobre o fundo @12%.
 
+## Estados (vazio / erro / carregando)
+
+Padrão único para os estados de tela (`flag_core`):
+
+| Estado | Widget | Especificação |
+|---|---|---|
+| Carregando | `AppLoading` | `CircularProgressIndicator` `primary` centralizado; mensagem opcional 14px `textSecondary`; gap 12 |
+| Vazio | `KicksterEmptyState` | quadro 88px `primary`@8% raio 28 + ícone 40px `primary`@40%; título 16px w600 `textPrimary`; descrição 14px `textSecondary`; ação opcional; gap 20 |
+| Erro | `KicksterErrorState` | ícone `error_outline` 56px `danger`; mensagem 16px w600 `textPrimary`; botão `KicksterButton` outline "Tentar novamente" (ícone `refresh`); gaps 16 / 20 |
+
+Tokens: `space.state.padding` 32 · `space.state.gap` 20 · `size.emptyState.frame` 88 · `size.emptyState.icon` 40 · `size.errorState.icon` 56 · `radius.emptyState.frame` 28.
+
+> **Regra**: `AppEmptyState` e `AppErrorState` (legados) devem **delegar** aos widgets `Kickster*` — nunca reimplementar o layout do estado.
+
 ## Layout responsivo
 
 | Breakpoint | Comportamento |
