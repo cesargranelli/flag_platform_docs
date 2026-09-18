@@ -148,6 +148,29 @@ Valores próprios de cada componente — podem furar o grid e são tokens de com
 | `size.hitTarget` | 48 | alvo de toque mínimo |
 | `size.dialog.mobile` / `size.dialog.web` | 343 / 480 | largura de modal |
 
+## Movimento (transições)
+
+Transições padrão do app (todas as plataformas), sempre respeitando **reduce motion** (duração `0`):
+
+| Contexto | Transição | Duração | Curva |
+|---|---|---|---|
+| **Push** (abrir detalhe: jogo / time / play-by-play) | slide entrando pela direita + fade | `motion.duration.medium` (300) | `motion.curve.standard` |
+| **Pop** (voltar) | reverso do push | `motion.duration.medium` | `motion.curve.standard` |
+| **Troca de aba** (navigation menu) | slide direcional + fade | `motion.duration.medium` | `motion.curve.standard` |
+| **Modais / diálogos** | fade + scale (padrão Material) | `motion.duration.short` | `motion.curve.standard` |
+
+### Tokens
+
+| Token | Valor |
+|---|---|
+| `motion.duration.short` | 200ms |
+| `motion.duration.medium` | 300ms |
+| `motion.duration.long` | 400ms |
+| `motion.curve.standard` | `easeOutCubic` |
+| `motion.curve.emphasized` | `easeInOutCubic` |
+
+**Implementação**: `PageTransitionsTheme` global (`FlagPageTransitionsBuilder`) no `AppTheme` — aplica-se ao push/pop de todas as rotas; a **troca de aba** usa o `_TabTransition` do shell. Código dos tokens: `AppMotion` (`lib/src/core/theme/app_motion.dart`).
+
 ## Modais (padrão Kickster — Popup 343px, issue ADR-009)
 
 Referência: [Figma — Popup "Share this Match" 34430:8519](https://www.figma.com/design/bXGRAtra3DkMAPGKLLLaCQ/Kickster---Live-Score---News-Sport-Apps-UI-Kits--Community-?node-id=34430-8519&t=4VvSQu6LIHJAB1cW-4): container **343px** (mobile) / **480px** web, padding **24**, gap **20**, fundo `surface`, raio `24`, sombra `elevation.modal`, header `Body Large Bold` + close circular 24px `surface.muted`, divider `Grayscale 20 (#ECF1F6)` 1px, conteúdo gap 16. Usar `Dialog` com `shape: RoundedRectangleBorder(borderRadius: 24)` e `insetPadding: 24`.
