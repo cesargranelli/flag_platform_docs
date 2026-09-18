@@ -108,6 +108,24 @@ Valores próprios de cada componente — podem furar o grid e são tokens de com
 
 > **Flutter**: cards usam `elevation: 1` com `shadowColor: Color(0x14000000)`. No modal, a sombra CSS (`x 0 / y 8 / blur 32`) não tem equivalente exato no Material — aproximar com `elevation: 8` + `shadowColor: Color(0x0F121933)`.
 
+## Tamanhos (densidade de componentes)
+
+| Token | Valor | Uso |
+|---|---|---|
+| `size.button.height` | 56 | altura de botão |
+| `size.field.height` | 52 | altura de campo de formulário |
+| `size.chip.height` | 34 | chip selecionável (compacto) |
+| `size.statusChip.height` | 28 | chip de status |
+| `size.topbar.height` | 64 | topbar (telas autenticadas) |
+| `size.appbar.height` | 64 | topbar do Public App |
+| `size.avatar.sm` | 32 | avatar em topbar/lista |
+| `size.avatar.md` | 40 | avatar padrão |
+| `size.icon.sm` | 16 | ícones inline |
+| `size.icon.md` | 20 | ícones de ação |
+| `size.icon.lg` | 24 | ícones de destaque |
+| `size.hitTarget` | 48 | alvo de toque mínimo |
+| `size.dialog.mobile` / `size.dialog.web` | 343 / 480 | largura de modal |
+
 ## Modais (padrão Kickster — Popup 343px, issue ADR-009)
 
 Referência: [Figma — Popup "Share this Match" 34430:8519](https://www.figma.com/design/bXGRAtra3DkMAPGKLLLaCQ/Kickster---Live-Score---News-Sport-Apps-UI-Kits--Community-?node-id=34430-8519&t=4VvSQu6LIHJAB1cW-4): container **343px** (mobile) / **480px** web, padding **24**, gap **20**, fundo `surface`, raio `24`, sombra `elevation.modal`, header `Body Large Bold` + close circular 24px `surface.muted`, divider `Grayscale 20 (#ECF1F6)` 1px, conteúdo gap 16. Usar `Dialog` com `shape: RoundedRectangleBorder(borderRadius: 24)` e `insetPadding: 24`.
