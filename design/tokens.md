@@ -123,6 +123,9 @@ Valores próprios de cada componente — podem furar o grid e são tokens de com
 |---|---|---|
 | `size.button.height` | 56 | altura de botão |
 | `size.field.height` | 52 | altura de campo de formulário |
+| `size.control` | 24 | checkbox / radio / thumb do toggle |
+| `size.radio.dot` | 16 | círculo interno do radio |
+| `size.toggle.track` | 44 × 24 | trilho do toggle (pill) |
 | `size.chip.height` | 34 | chip selecionável (compacto) |
 | `size.statusChip.height` | 28 | chip de status |
 | `size.topbar.height` | 64 | topbar (telas autenticadas) |
