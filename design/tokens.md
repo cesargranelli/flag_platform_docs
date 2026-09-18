@@ -106,6 +106,7 @@ Valores próprios de cada componente — podem furar o grid e são tokens de com
 |---|---|---|
 | `radius.button` | 24 (pill) |
 | `radius.input` | 24 (pill) |
+| `radius.surface` | 16 |
 | `radius.card` | 12 |
 | `radius.chip` | 10 |
 | `radius.chip.status` | 4 |
