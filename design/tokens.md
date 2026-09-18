@@ -75,10 +75,11 @@ Escala: `4, 8, 12, 16, 24, 32`. Uso típico: padding de tela `16`, espaçamento 
 
 | Token | Valor |
 |---|---|---|
-| `radius.button` | 16 |
-| `radius.input` | 16 |
-| `radius.card` | 16 |
+| `radius.button` | 24 (pill) |
+| `radius.input` | 24 (pill) |
+| `radius.card` | 12 |
 | `radius.chip` | 10 |
+| `radius.chip.status` | 4 |
 | `radius.status` | 30 |
 | `radius.checkbox` | 2 |
 | `radius.modal` | 24 |
@@ -91,10 +92,10 @@ Referência: [Figma — Popup "Share this Match" 34430:8519](https://www.figma.c
 
 ## Componentes (padrões do Kickster)
 
-- **Inputs** (`InputDecorationTheme`): preenchidos (`surface`), `OutlineInputBorder` raio 16, conteúdo vertical ~64px, **rótulo sempre visível** (12/16 ls−0.2 @40% — `fieldLabel`); estados **Normal / Focado / Disabled / Error** (borda `text.primary` 1px Main/Dark / `primary` / `disabled` / `danger`)
-- **Botões** (`FilledButton`/`ElevatedButton`/`OutlinedButton`): altura mínima **56px**, raio 16; variantes **Main** (fundo `primary`), **Disable** (fundo `disabled`, texto `textPrimary`), **Ghost** (borda `primary`)
+- **Inputs** (`InputDecorationTheme`): preenchidos (`surface`), `OutlineInputBorder` raio **24 (pill)**, conteúdo vertical ~52px, **rótulo sempre visível** (12/16 ls−0.2 @40% — `fieldLabel`); estados **Normal / Focado / Disabled / Error** (borda de repouso `field.border` `#DADADA` / `primary` 2px / `disabled` / `danger`)
+- **Botões** (`FilledButton`/`ElevatedButton`/`OutlinedButton`): altura mínima **56px**, raio **24 (pill)**; variantes **Main** (fundo `primary`), **Disable** (fundo `disabled`, texto `textPrimary`), **Ghost** (borda `primary`)
 - **Chip**: raio 10; selecionado com fundo `primary`; não selecionado com borda `black`
-- **SelectableCard** (`widgets/selectable_card.dart`, padrão final #300): card de seleção única (comportamento de rádio por grupo) — interação IDÊNTICA aos cards de lista: `Card` (raio 16, elevação 1, clipBehavior) + `InkWell` com tinta PADRÃO do tema; proibido hover/splash/foco customizados (causam cintilação no web). Padding interno 16, **altura mín. 120px (único — substitui os 96px padrão e os 72px compactos)**, grid gap 12. Layout vertical: **ícone (28px) acima do rótulo acima da descrição**, com `maxLines: 1` (ellipsis) na descrição, e conteúdo **centralizado verticalmente** (`mainAxisAlignment.center`) para o card "só rótulo" preencher os 120px sem espaço vazio no rodapé. Cards sem descrição (ex.: Gênero) mantêm a **simetria com um ícone representativo** (`Icons.male`/`Icons.female`/`Icons.transgender`). Seleção por `Container` interno: não selecionado = card `surface` padrão · **selecionado** = fundo `primary` SÓLIDO + label/descrição/ícone BRANCOS + badge invertido no canto superior direito (círculo branco 24px, ícone `primary`) (#294) · desabilitado 55% de opacidade. Tipografia: label `titleSmall` (14/24 w700), descrição 13/17 w500
+- **SelectableCard** (`widgets/selectable_card.dart`, padrão final #300): card de seleção única (comportamento de rádio por grupo) — interação IDÊNTICA aos cards de lista: `Card` (raio 12, elevação 1, clipBehavior) + `InkWell` com tinta PADRÃO do tema; proibido hover/splash/foco customizados (causam cintilação no web). Padding interno 16, **altura mín. 120px (único — substitui os 96px padrão e os 72px compactos)**, grid gap 12. Layout vertical: **ícone (28px) acima do rótulo acima da descrição**, com `maxLines: 1` (ellipsis) na descrição, e conteúdo **centralizado verticalmente** (`mainAxisAlignment.center`) para o card "só rótulo" preencher os 120px sem espaço vazio no rodapé. Cards sem descrição (ex.: Gênero) mantêm a **simetria com um ícone representativo** (`Icons.male`/`Icons.female`/`Icons.transgender`). Seleção por `Container` interno: não selecionado = card `surface` padrão · **selecionado** = fundo `primary` SÓLIDO + label/descrição/ícone BRANCOS + badge invertido no canto superior direito (círculo branco 24px, ícone `primary`) (#294) · desabilitado 55% de opacidade. Tipografia: label `titleSmall` (14/24 w700), descrição 13/17 w500
 - **SelectableChip** (#290/#292/#300): variação compacta (raio 10) para grupos com muitas opções (ex.: faixa etária), gap 8 em wrap; altura ~34px (padding 16×8), peso fixo w500, tipografia 13/17 (`footerLink`). **Padrão SEM bordas e SEM overrides de splash** — `InkWell` padrão do tema sobre `AnimatedContainer` (120ms): não selecionado = fundo `gray.fill` + texto `textPrimary` · **selecionado** = fundo `primary` + texto **BRANCO**
 - **Regra de conteúdo sobre primário (#294/#431)**: conteúdo (**texto e ícone**) sobre preenchimento `primary` (#083879) usa **BRANCO** — contraste branco/azul royal ≈ 7,7:1 (WCAG AA ok). Sobre `success` (#00C566) também usa branco, aceito conscientemente para estados de seleção (≈ 2,3:1, abaixo de AA). **`warning` (#FACC15) nunca recebe conteúdo branco** — usar texto/ícone escuro (`text.primary` #171725).
 - **Navegação por sessões (#323/#332) — indicador de passos `AppStepIndicator` (`flag_core`)**: círculos de 28px (`radius 14`), um por etapa, distribuídos em `Row`/`Expanded` pela largura, com rótulo abaixo (14px, negrito se ativo) e toque via `InkWell` padrão (#300). Dois modos:
@@ -103,9 +104,9 @@ Referência: [Figma — Popup "Share this Match" 34430:8519](https://www.figma.c
   Conteúdo **BRANCO** sobre `primary`/`success` (#294). Na tela de detalhe, tocar em uma etapa troca a sessão ativa exibida — a tela mostra **apenas** o conteúdo da sessão ativa. A variante em cards (`AppSessionNav`) permanece disponível no `flag_core` como alternativa.
 - **Interação de cards/chips selecionáveis (#300)**: usar sempre `Card`/`InkWell`/tinta padrão do tema, como nos cards de listagem — NÃO implementar hover via `setState`/`MouseRegion` custom nem desabilitar splash com overlays próprios (flash branco e cintilação no web)
 - **Checkbox**: 24px, raio 2; checado `primary`, não checado `gray.fill`
-- **Card**: `surface`, raio 16, elevação 1
+- **Card**: `surface`, raio 12, elevação 1
 - **Card de conteúdo (`AppInfoCard`, `flag_core` — `widgets/app_info_card.dart`, #328)**: padrão dos cards de conteúdo das telas de detalhe. `Card` com `margin: EdgeInsets.zero`; `minHeight` padrão **144**; título `titleSmall` (14/24 w700) com **gap 12** para o conteúdo; linhas `AppInfoRow` (rótulo fixo **120px/13px `textSecondary`** + valor **14px**, padding bottom 8) e `AppInfoColorRow` (swatch 18×18 raio 4 + hex em maiúsculas). Largura via `AppLayout.detail` (720). Opcional `icon` (20px `primary`) ao lado do título.
-- **AppBar**: fundo `primary`, texto branco, título centralizado
+- **AppBar**: telas autenticadas (admin) usam a topbar `primary` com texto branco e título centralizado (`KicksterTopBar`). O **Public App** usa a topbar clara (token `topbar.surface`): fundo `surface`, borda inferior `line` 1px, marca/título `textPrimary` à esquerda, ações em botões circulares `grayFill` (alvo 48px).
 - **Estados**: `AppLoading` (carregando), `AppEmptyState` (vazio com ícone), `AppErrorState` (erro com "Tentar novamente")
 - **Alvos de toque**: mín. 48px (ícones acionáveis); botões 56px
 
@@ -120,11 +121,15 @@ Biblioteca de widgets no `frontend/packages/core/lib/src/widgets/` (prefixo `Kic
 | `KicksterBadge` | `kickster_badge.dart` | Badge de status: fundo `color`@12%, texto/ícone na cor do badge, raio 10, `Semantics`; **`warning` → conteúdo escuro `textPrimary` (#294)** |
 | `KicksterChip` | `kickster_chip.dart` | Chip selecionável (raio 10, ~34px compacto): não selecionado `grayFill`/`textPrimary`; selecionado `primary`/**branco**; `InkWell` padrão (#300) |
 | `KicksterButton` | `kickster_button.dart` | Wrapper tipado dos botões do tema (variantes `primary`/`outline`/`text` — `FilledButton`/`OutlinedButton`/`TextButton`), com `icon?` e `loading?` |
-| `KicksterInput` | `kickster_input.dart` | Wrapper de `TextFormField` sobre o `InputDecorationTheme` (raio 16, rótulo visível) — não sobrescreve bordas |
+| `KicksterInput` | `kickster_input.dart` | Wrapper de `TextFormField` sobre o `InputDecorationTheme` (raio 24 (pill), rótulo visível) — não sobrescreve bordas |
 | `KicksterSectionTitle` | `kickster_section_title.dart` | Título de seção ("Ao vivo"/"Próximos"): `titleMedium` `textPrimary`, ícone `primary` opcional, `action?` à direita |
 | `KicksterNavBar` | `kickster_nav_bar.dart` | Barra de navegação inferior mobile: `NavigationBar` com fundo `surface` e indicador `primary`@12% |
 
 - **Mapeamento de status do `KicksterScoreCard`**: `inProgress` → `success` · `finished` → `danger` · `scheduled` → `textSecondary` · `cancelled` → `disabled`
+- **`MatchStatusBadge` / `MatchScoreCard`**: seguem o MESMO mapeamento acima (ao vivo = `success` verde; fim de partida = `danger` vermelho), garantindo consistência entre os cards de jogo.
+- **`KicksterStatusChip`** (`kickster_status_chip.dart`): chip de status compacto, raio **4** (`radius.chip.status`), altura 28px, fundo `chip*Bg` + texto `chip*Fg` (tom escuro da cor — contraste AA).
+- **`KicksterDialog`** (`kickster_dialog.dart`): modal de confirmação com raio **24** (`radius.modal`), largura 343px (mobile) / 480px (web), padding 24.
+- **`KicksterBadge`**: o conteúdo usa uma variação **escura** da cor (`foregroundFor`) para garantir contraste AA sobre o fundo @12%.
 
 ## Layout responsivo
 
