@@ -135,6 +135,8 @@ Valores próprios de cada componente — podem furar o grid e são tokens de com
 | `size.nav.dock.height` | 56 | dock de navegação inferior |
 | `size.nav.item` | 44 | área de toque do item do dock |
 | `size.nav.item.selected` | 52 | círculo de marcação do item selecionado |
+| `size.nav.icon` | 20 | ícone do item não selecionado |
+| `size.nav.icon.selected` | 40 | ícone do item selecionado |
 | `size.avatar.sm` | 32 | avatar em topbar/lista |
 | `size.avatar.md` | 40 | avatar padrão |
 | `size.icon.xs` | 14 | ícone em badge/metadados |
