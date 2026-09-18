@@ -205,6 +205,7 @@ Biblioteca de widgets no `frontend/packages/core/lib/src/widgets/` (prefixo `Kic
 | `KicksterScoreCard` | `kickster_score_card.dart` | Card de jogo com placar (Live Match): confronto Time A × Time B, placar central em `headlineSmall`, badge de status (`GameStatus.label`) |
 | `KicksterBadge` | `kickster_badge.dart` | Badge de status: fundo `color`@12%, texto/ícone na cor do badge, raio 10, `Semantics`; **`warning` → conteúdo escuro `textPrimary` (#294)** |
 | `KicksterChip` | `kickster_chip.dart` | Chip selecionável (raio 10, ~34px compacto): não selecionado `grayFill`/`textPrimary`; selecionado `primary`/**branco**; `InkWell` padrão (#300) |
+| `KicksterPillTab` | `kickster_pill_tab.dart` | Aba em **pílula** (grupo de seleção — ex.: modalidades, filtros de categoria): raio **24**, padding **12×8**, tipografia `labelMedium` (14/22 w500); **selecionada** = fundo `primary` + texto branco; **não selecionada** = fundo `surface.muted` (`#F6F8FE`) + borda `line` 1px + texto `grayLabel` (`#78828A`) |
 | `KicksterButton` | `kickster_button.dart` | Wrapper tipado dos botões do tema (variantes `primary`/`outline`/`text` — `FilledButton`/`OutlinedButton`/`TextButton`), com `icon?` e `loading?` |
 | `KicksterInput` | `kickster_input.dart` | Wrapper de `TextFormField` sobre o `InputDecorationTheme` (raio 24 (pill), rótulo visível) — não sobrescreve bordas |
 | `KicksterSectionTitle` | `kickster_section_title.dart` | Título de seção ("Ao vivo"/"Próximos"): `titleMedium` `textPrimary`, ícone `primary` opcional, `action?` à direita |
