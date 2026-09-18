@@ -32,9 +32,18 @@ Marca única adotada (2026-08-29, issue #431): paleta do UI Kit **Kickster** (pr
 | `color.field.border` | `#DADADA` | Borda de repouso dos campos do kit (inputs/dropdowns) |
 | `color.surface.muted` | `#F6F8FE` | BG secundário — fundo azulado de cards/áreas |
 
-### Semântica esportiva
-- **Ao vivo / sucesso**: verde (`#00C566` / `#24D173`)
-- **Fim de partida / negativo**: vermelho (`#E53935`)
+### Semântica esportiva (`GameStatus`)
+
+| Status | Significado | Cor | Token |
+|---|---|---|---|
+| `inProgress` | Ao vivo | verde | `color.success` (`#00C566`) |
+| `finished` | Finalizado | vermelho | `color.danger` (`#E53935`) |
+| `scheduled` | Agendado | cinza | `color.text.secondary` |
+| `open` | Abertura | cinza | `color.text.secondary` |
+| `conference` | Conferência | cinza | `color.text.secondary` |
+| `cancelled` | Cancelado | cinza | `color.disabled` |
+
+Fonte única no código: extensão **`GameStatusColors.statusColor`** (`flag_core`) — badges, placares e ícones de status devem consumir esse mapeamento, nunca redefinir cores por status.
 
 ## Tipografia
 
