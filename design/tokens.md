@@ -132,9 +132,9 @@ Valores próprios de cada componente — podem furar o grid e são tokens de com
 | `size.statusChip.height` | 28 | chip de status |
 | `size.topbar.height` | 64 | topbar (telas autenticadas) |
 | `size.appbar.height` | 64 | topbar do Public App |
-| `size.nav.dock.height` | 64 | dock de navegação inferior |
+| `size.nav.dock.height` | 56 | dock de navegação inferior |
 | `size.nav.item` | 44 | área de toque do item do dock |
-| `size.nav.item.selected` | 60 | círculo de marcação do item selecionado |
+| `size.nav.item.selected` | 52 | círculo de marcação do item selecionado |
 | `size.avatar.sm` | 32 | avatar em topbar/lista |
 | `size.avatar.md` | 40 | avatar padrão |
 | `size.icon.xs` | 14 | ícone em badge/metadados |
