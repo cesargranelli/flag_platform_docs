@@ -114,6 +114,7 @@ Valores próprios de cada componente — podem furar o grid e são tokens de com
 | `radius.modal` | 24 |
 | `elevation.card` | 1 · sombra `#14000000` (preto 8%) |
 | `elevation.modal` | `0 8 32 rgba(18,25,51,0.06)` → Flutter: `elevation: 8`, `shadowColor: #1219330F` |
+| `elevation.nav` | `0 -4 16 #0F000000` (sombra superior do dock inferior) |
 
 > **Flutter**: cards usam `elevation: 1` com `shadowColor: Color(0x14000000)`. No modal, a sombra CSS (`x 0 / y 8 / blur 32`) não tem equivalente exato no Material — aproximar com `elevation: 8` + `shadowColor: Color(0x0F121933)`.
 
@@ -130,6 +131,8 @@ Valores próprios de cada componente — podem furar o grid e são tokens de com
 | `size.statusChip.height` | 28 | chip de status |
 | `size.topbar.height` | 64 | topbar (telas autenticadas) |
 | `size.appbar.height` | 64 | topbar do Public App |
+| `size.nav.dock.height` | 56 | dock de navegação inferior |
+| `size.nav.item` | 44 | item/ícone circular do dock |
 | `size.avatar.sm` | 32 | avatar em topbar/lista |
 | `size.avatar.md` | 40 | avatar padrão |
 | `size.icon.xs` | 14 | ícone em badge/metadados |
