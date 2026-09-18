@@ -129,9 +129,12 @@ Valores próprios de cada componente — podem furar o grid e são tokens de com
 | `size.appbar.height` | 64 | topbar do Public App |
 | `size.avatar.sm` | 32 | avatar em topbar/lista |
 | `size.avatar.md` | 40 | avatar padrão |
+| `size.icon.xs` | 14 | ícone em badge/metadados |
 | `size.icon.sm` | 16 | ícones inline |
-| `size.icon.md` | 20 | ícones de ação |
-| `size.icon.lg` | 24 | ícones de destaque |
+| `size.icon.md` | 18 | ícone em botão/campo/topbar |
+| `size.icon.lg` | 20 | ícones de ação |
+| `size.icon.xl` | 24 | ícones de destaque |
+| `size.icon.xxl` | 28 | ícone em card de módulo |
 | `size.hitTarget` | 48 | alvo de toque mínimo |
 | `size.dialog.mobile` / `size.dialog.web` | 343 / 480 | largura de modal |
 
