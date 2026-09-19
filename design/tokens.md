@@ -102,6 +102,7 @@ Valores próprios de cada componente — podem furar o grid e são tokens de com
 | `space.sheet.gap` | 24 | gap header → conteúdo → ações do bottom sheet |
 | `space.sheet.contentGap` | 20 | gap entre itens do conteúdo do bottom sheet |
 | `space.sheet.handleTop` / `space.sheet.handleGap` | 12 / 16 | respiro do puxador (handle bar) — acima / abaixo |
+| `space.stat.gap` | 20 | gap entre linhas de estatística (`KicksterStatComparison`) |
 | `space.hitTarget` | 48 | alvo de toque mínimo (ícones acionáveis) |
 
 ## Formas e elevação
@@ -122,6 +123,7 @@ Valores próprios de cada componente — podem furar o grid e são tokens de com
 | `elevation.card` | 1 · sombra `#14000000` (preto 8%) |
 | `elevation.modal` | `0 8 32 rgba(18,25,51,0.06)` → Flutter: `elevation: 8`, `shadowColor: #1219330F` |
 | `elevation.nav` | `0 -4 16 #0F000000` (sombra superior do dock inferior) |
+| `elevation.timeline.badge` | `2 2 20 rgba(40,42,60,0.06)` → `#0F282A3C` (badge da timeline) |
 
 > **Flutter**: cards usam `elevation: 1` com `shadowColor: Color(0x14000000)`. No modal, a sombra CSS (`x 0 / y 8 / blur 32`) não tem equivalente exato no Material — aproximar com `elevation: 8` + `shadowColor: Color(0x0F121933)`.
 
@@ -155,6 +157,8 @@ Valores próprios de cada componente — podem furar o grid e são tokens de com
 | `size.dialog.mobile` / `size.dialog.web` | 343 / 480 | largura de modal |
 | `size.sheet.icon` | 40 | botão de ícone do header do bottom sheet |
 | `size.sheet.handle` | 40 × 4 | puxador (handle bar) do bottom sheet |
+| `size.timeline.badge` | 40 | badge circular de evento na timeline |
+| `size.timeline.line` | 1 | espessura do eixo central da timeline |
 
 ## Movimento (transições)
 
@@ -219,12 +223,19 @@ Biblioteca de widgets no `frontend/packages/core/lib/src/widgets/` (prefixo `Kic
 | `KicksterSectionTitle` | `kickster_section_title.dart` | Título de seção ("Ao vivo"/"Próximos"): `titleMedium` `textPrimary`, ícone `primary` opcional, `action?` à direita |
 | `KicksterNavBar` | `kickster_nav_bar.dart` | Barra de navegação inferior mobile: `NavigationBar` com fundo `surface` e indicador `primary`@12% |
 | `KicksterFilterSheet` | `kickster_filter_sheet.dart` | Filtro **multi-seleção** em bottom sheet (base `KicksterBottomSheet`): grupos (`KicksterFilterSection`) com opções em `KicksterPillTab`; ações **Limpar** (outline, desabilitado sem seleção) e **Aplicar** (primary). Chaves `grupo:valor`; semântica **OR dentro do grupo / AND entre grupos** (`KicksterFilterSelection.matches`). `show()` retorna as chaves aplicadas ou `null` (fechado sem aplicar). Trigger: `KicksterFilterButton` (pílula raio 24, `tune` + contador, `primary` quando ativo) |
+| `KicksterPillTabs` | `kickster_pill_tabs.dart` | Container de abas em pílula (Figma "Statistic/Formation/Timeline/Fouls"): linha com scroll horizontal, índice selecionado controlado; compõe `KicksterPillTab` |
+| `KicksterGameHeader` | `kickster_game_header.dart` | Cabeçalho **compacto** de um jogo: time (avatar 40 + nome) — centro (placar 22 w700 + status ou pill `AO VIVO` `danger` + linha auxiliar) — time. Compartilhado entre abas; times tocáveis (`onHomeTeamTap`/`onAwayTeamTap`) |
+| `KicksterStatComparison` | `kickster_stat_comparison.dart` | Linha de estatística (Figma "Statistic"): **valor da casa** (`primary`) · **rótulo** centralizado (`textSecondary`) · **valor do visitante** (`textPrimary`) + duas **lanes proporcionais** (6px, raio 12) — `primary` (casa) e **`warning` apenas na lane** (decorativo; amarelo como texto reprova AA). `homeLabel`/`awayLabel` aceitam valores formatados (ex.: `54%`) |
+| `KicksterTimeline` | `kickster_timeline.dart` | Linha do tempo com **eixo central** (1px `line`): badges circulares 40px `surface` com borda `line` e sombra `elevation.timeline.badge`; eventos **casa à esquerda / visitante à direita** com tempo (`success` 12 w500) + título (14) + tipo (12) + descrição (10). Cada evento vira **um nó de acessibilidade** quando `semanticLabel` é informado (eixo/lado são decorativos) |
 | `KicksterBottomSheet` | `kickster_bottom_sheet.dart` | Bottom sheet padrão Kickster (Figma "Actions" `34442:3789`): fundo `surface`, **raio topo 20** (`radius.sheet`), padding **24**, gap **24** entre header/conteúdo/ações e **20** entre itens do conteúdo; header com título centralizado (`labelMedium` 14/22 w600) e botões de ícone **40×40** (raio 16, `KicksterSheetIconButton`) nos extremos — fechar por padrão. **Puxador (handle bar) 40×4** `line` raio 2 no topo (mesmo padrão do Referee App / `PlayDialog`), com respiro 12 acima e 16 abaixo. `KicksterBottomSheet.show()` abre como modal com **arrastar-para-baixo** e **toque fora** para fechar (retorna `null` = fechar sem aplicar) |
 
 - **Mapeamento de status do `KicksterScoreCard`**: `inProgress` → `success` · `finished` → `danger` · `scheduled` → `textSecondary` · `cancelled` → `disabled`
 - **Card de campeonato (`CompetitionCard`, `flag_public_app`)**: card branco (`surface`), raio **12** (`radius.card`), `elevation.card` + borda `line` 1px; emblema `emoji_events` 24px `primary` em círculo 40px `primary`@10% (raio 10); nome 16/22 w600 `textPrimary` (2 linhas, ellipsis); organização `textSecondary`; `KicksterBadge` de status à direita.
   - **Atributos** (formato "ícone + rótulo + valor"): `Wrap` (spacing 24 / run 12) com, por item, ícone 20px `primary` + coluna `rótulo` (**12/20** `textSecondary`) sobre `valor` (**14/22 w600** `textPrimary`). Ordem: **Modalidade** (`sports_football`) · **Gênero** (`people_alt_outlined`) · **Categoria** (`cake_outlined`) · **Temporada** (`event_outlined`).
 - **Public App − competições**: só são **listadas** as competições **em andamento** (`status = PUBLISHED`) — via `ongoingCompetitionsProvider`. Rascunhos, encerradas e desativadas não aparecem nas listagens (a lista de campeonatos e a home).
+- **Public App − tela de Jogo (`GameDetailScreen`)**: hub do confronto com **duas abas** — **Estatísticas** (`KicksterStatComparison`, métricas derivadas dos lances via `gameStatisticsProvider`/`buildGameStatistics`) e **Lances** (`KicksterTimeline`); cabeçalho `KicksterGameHeader` compartilhado e **troca de aba in-place** (não empilha rotas).
+  - Deep links: `/game/:id` → Estatísticas · `/game/:id/stats` · `/game/:id/plays` → Lances · `/live/:id/plays` (legado) → Lances.
+  - Os CTAs "Lance a Lance" abrem `/game/:id` com `GameDetailArgs.initialTab = 1` (1 toque, sem duplicar tela); ao vivo o placar/lances são atualizados a cada 10s.
 - **Rótulos de domínio**: `genderLabelFromValue` (`MALE`→Masculino) e `ageGroupLabelFromValue` (`SUB17`→Sub-17, `ADULT`→Adulto, `OPEN`→Livre) em `enum_labels.dart` — usados por cards e filtros.
 - **`MatchStatusBadge` / `MatchScoreCard`**: seguem o MESMO mapeamento acima (ao vivo = `success` verde; fim de partida = `danger` vermelho), garantindo consistência entre os cards de jogo.
 - **`KicksterStatusChip`** (`kickster_status_chip.dart`): chip de status compacto, raio **4** (`radius.chip.status`), altura 28px, fundo `chip*Bg` + texto `chip*Fg` (tom escuro da cor — contraste AA).
