@@ -33,6 +33,7 @@ Documentação transversal que rege todo o ecossistema e suas integrações:
 
 | Documento | Conteúdo |
 |-----------|----------|
+| [Governança e Estrutura da Documentação](architecture/governanca-documentacao.md) | **Regra Mandatória:** Proibição de docs órfãos em `.gemini`, divisão Hub Global vs. Repositórios. |
 | [Visão Geral da Solução](architecture/overview.md) | Apresentação da plataforma, arquitetura de camadas e jornada ponta a ponta. |
 | [Mapa de Componentes](architecture/components.md) | Catálogo de todos os serviços de backend, clientes web/mobile e infraestrutura. |
 | [Fluxos Lógicos e Sequência](architecture/logical-flows.md) | Diagramas Mermaid de autenticação, check-in, scoring em tempo real e chaveamento. |

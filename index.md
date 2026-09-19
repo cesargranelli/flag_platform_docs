@@ -30,6 +30,7 @@ Portal unificado de documentação técnica, decisões de arquitetura e especifi
 
 | Documento | Conteúdo |
 |-----------|----------|
+| [Governança e Estrutura da Documentação](architecture/governanca-documentacao.html) | **Regra Mandatória:** Proibição de docs órfãos em `.gemini`, divisão Hub Global vs. Repositórios. |
 | [Visão Geral da Solução](architecture/overview.html) | Apresentação da plataforma, arquitetura de camadas e jornada ponta a ponta. |
 | [Mapa de Componentes](architecture/components.html) | Catálogo de todos os serviços de backend, clientes web/mobile e infraestrutura. |
 | [Fluxos Lógicos e Sequência](architecture/logical-flows.html) | Diagramas Mermaid de autenticação, check-in, scoring em tempo real e chaveamento. |
