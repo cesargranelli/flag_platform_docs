@@ -98,6 +98,9 @@ Valores próprios de cada componente — podem furar o grid e são tokens de com
 | `space.field.h` / `space.field.v` | 16 / 14 | campo de formulário (altura ~52px) |
 | `space.dialog` | 24 | padding de modal (`KicksterDialog`) |
 | `space.dialog.gap` | 20 | gap antes das ações do modal |
+| `space.sheet` | 24 | padding do bottom sheet (`KicksterBottomSheet`) |
+| `space.sheet.gap` | 24 | gap header → conteúdo → ações do bottom sheet |
+| `space.sheet.contentGap` | 20 | gap entre itens do conteúdo do bottom sheet |
 | `space.hitTarget` | 48 | alvo de toque mínimo (ícones acionáveis) |
 
 ## Formas e elevação
@@ -113,6 +116,7 @@ Valores próprios de cada componente — podem furar o grid e são tokens de com
 | `radius.status` | 30 |
 | `radius.checkbox` | 2 |
 | `radius.modal` | 24 |
+| `radius.sheet` | 20 (cantos superiores; base reta) |
 | `elevation.card` | 1 · sombra `#14000000` (preto 8%) |
 | `elevation.modal` | `0 8 32 rgba(18,25,51,0.06)` → Flutter: `elevation: 8`, `shadowColor: #1219330F` |
 | `elevation.nav` | `0 -4 16 #0F000000` (sombra superior do dock inferior) |
@@ -147,6 +151,7 @@ Valores próprios de cada componente — podem furar o grid e são tokens de com
 | `size.icon.xxl` | 28 | ícone em card de módulo |
 | `size.hitTarget` | 48 | alvo de toque mínimo |
 | `size.dialog.mobile` / `size.dialog.web` | 343 / 480 | largura de modal |
+| `size.sheet.icon` | 40 | botão de ícone do header do bottom sheet |
 
 ## Movimento (transições)
 
@@ -210,6 +215,7 @@ Biblioteca de widgets no `frontend/packages/core/lib/src/widgets/` (prefixo `Kic
 | `KicksterInput` | `kickster_input.dart` | Wrapper de `TextFormField` sobre o `InputDecorationTheme` (raio 24 (pill), rótulo visível) — não sobrescreve bordas |
 | `KicksterSectionTitle` | `kickster_section_title.dart` | Título de seção ("Ao vivo"/"Próximos"): `titleMedium` `textPrimary`, ícone `primary` opcional, `action?` à direita |
 | `KicksterNavBar` | `kickster_nav_bar.dart` | Barra de navegação inferior mobile: `NavigationBar` com fundo `surface` e indicador `primary`@12% |
+| `KicksterBottomSheet` | `kickster_bottom_sheet.dart` | Bottom sheet padrão Kickster (Figma "Actions" `34442:3789`): fundo `surface`, **raio topo 20** (`radius.sheet`), padding **24**, gap **24** entre header/conteúdo/ações e **20** entre itens do conteúdo; header com título centralizado (`labelMedium` 14/22 w600) e botões de ícone **40×40** (raio 16, `KicksterSheetIconButton`) nos extremos — fechar por padrão. `KicksterBottomSheet.show()` abre como modal sem drag handle |
 
 - **Mapeamento de status do `KicksterScoreCard`**: `inProgress` → `success` · `finished` → `danger` · `scheduled` → `textSecondary` · `cancelled` → `disabled`
 - **`MatchStatusBadge` / `MatchScoreCard`**: seguem o MESMO mapeamento acima (ao vivo = `success` verde; fim de partida = `danger` vermelho), garantindo consistência entre os cards de jogo.
