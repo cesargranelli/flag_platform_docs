@@ -84,7 +84,7 @@ Diretrizes visuais obrigatórias para todas as interfaces da Flag Platform:
 |-----------|----------|
 | [Mapeamento FlagStats](research/flagstats-mapeamento.md) | Levantamento de recursos do ecossistema FlagStats (FlagStat Go / StatHawk). |
 | [Comparativo FlagStats](research/comparativo-flagstats.md) | Análise comparativa das telas de súmula e registro de jogadas ao vivo. |
-| [Análise Competitiva de Mercado](research/market-analysis-restructured.md) | Estudo comparativo com GameChanger, TeamSnap, FlagRoster e Flag50. |
+| [Análise Competitiva de Mercado](research/market-analysis.md) | Estudo comparativo com GameChanger, TeamSnap, FlagRoster e Flag50. |
 
 ---
 

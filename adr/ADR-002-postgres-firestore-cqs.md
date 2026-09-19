@@ -3,14 +3,14 @@
 ## Contexto
 
 A Flag Platform possui um domínio de gestão esportiva (flag football) com:
-- Estrutura hierárquica profunda: Organization → Club → Team → Roster → Athlete
+- Estrutura hierárquica bem definida: Organization → Institution → Team → Roster → Athlete (Person)
 - Necessidade de integridade referencial, transações e consultas complexas (leaderboards, estatísticas)
-- Volume de dados baixo (10-20 TPS), mas consultas complexas são frequentes
-- Existing PostgreSQL schema com 37+ migrations Flyway
+- Volume de dados moderado (10-20 TPS de escrita em picos de rodadas), com consultas públicas massivas
+- Existing PostgreSQL schema evoluído via migrations Java Flyway
 
 ## Decisão
 
-**Manter PostgreSQL como banco de dados primário** (sem mudança de backend) e **implementar Firestore como espelho CQRS leve** para consultas de leitura e casos de uso específicos.
+**Manter PostgreSQL como banco de dados primário** (fonte da verdade transacional ACID) e **implementar Firestore como espelho CQRS leve** para consultas de leitura e casos de uso de tempo real.
 
 ### Por quê?
 
@@ -19,7 +19,7 @@ A Flag Platform possui um domínio de gestão esportiva (flag football) com:
 | Integridade referencial | ✅ Garantida | ❌ Manual |
 | Transações (scores, limites) | ✅ Suportado | ❌ Não |
 | Consultas complexas (join, agregações) | ✅ Nativo | ⚠️ Lenta/Não escalável |
-| Auditoria e histórico | ✅ Trácil | ⚠️ Limitado |
+| Auditoria e histórico | ✅ Trátil | ⚠️ Limitado |
 | Custo operacional | ✅ Baixo | ✅ Baixo |
 | Tempo de implementação | ✅ Já feito | ⚠️ Reestruturação necessária |
 
@@ -45,19 +45,19 @@ A Flag Platform possui um domínio de gestão esportiva (flag football) com:
 
 | Entidade | Tabela PostgreSQL | Firestore Collection | Observações |
 |----------|-------------------|----------------------|-------------|
-| Organization | `organizations` | `organizations` | 1:N com Clubs |
-| Competition | `competitions` | `competitions` | 1:N com Rounds |
-| Category | `categories` | `categories` | 1:N com Rounds |
-| Team | `teams` | `teams` | 1:N com RosterEntries |
-| Round | `rounds` | `rounds` | 1:N com Games |
-| Game | `games` | `games` | 1:N com ScoreEvents |
-| ScoreEvent | `score_events` | `score_events` | 1:N com Games (agregado) |
-| Standing | `standing` | `standings` | 1:N com Teams/Categories |
-| Athlete | `athletes` | `athletes` | 1:N com RosterEntries |
-| RosterEntry | `team_roster` | `roster_entries` | 1:N com Games (check-in) |
-| CheckIn | `checkins` | `checkins` | 1:N com Games (real-time) |
-| User | `users` | `users` | 1:N com Roles |
-| PasswordResetToken | `password_reset_tokens` | `password_reset_tokens` | 1:N com Users |
+| Organization | `organizations` | `organizations` | Federações e Ligas organizadoras |
+| Institution | `institutions` | `institutions` | 1:N com Teams |
+| Affiliation | `institution_affiliations` | `affiliations` | Filiação formal da agremiação à organização |
+| Competition | `competitions` | `competitions` | 1:N com Rounds e Categorias |
+| Category | `categories` | `categories` | Modalidade, gênero e faixa etária |
+| Team | `teams` | `teams` | Equipe vinculada à Instituição |
+| Person | `persons` | `persons` | Pessoa física unificada (CPF único) |
+| RosterEntry | `team_roster` | `roster_entries` | Inscrição de atleta em elenco por temporada |
+| Game | `games` | `games` | Partida oficial com placar agregado |
+| GameParticipant | `game_participants` | `game_participants` | Árbitros e delegados na mesa |
+| ScoreEvent | `score_events` | `score_events` | Lances e pontuações da partida |
+| CheckIn | `checkins` | `checkins` | Presença confirmada de atletas em campo |
+| Standing | `standings` | `standings` | Tabela de classificação projetada |
 
 ### Benefícios
 

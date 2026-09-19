@@ -1,144 +1,287 @@
-# Flag Platform — Análise de Mercado e Comparativo (Set/2026)
+# 📊 Análise de Mercado e Recomendações — Flag Platform vs Concorrentes
 
-> Documento gerado a partir de pesquisas web sobre concorrentes e oportunidades de simplificação/otimização do Flag Platform.
-
-## 📋 Visão Geral
-
-A Flag Platform já possui **fundação sólida** em gestão de campeonato (org → competition → categories → teams → games → standings), diferencial frente a concorrentes que focam em stats ou league management isoladamente.
-
-As maiores oportunidades são:
-1. Preencher gaps de **statistics atleta** e **scouting guiado** (requests #1 da pesquisa)
-2. Não tentar copiar tudo dos concorrentes — focar no que as 3 apps já fazem bem (public/referee/admin)
-3. **Simplificar** — modular monolith atual é vantagem, não migre prematuramente
-4. **Etapas graduais** — releases 0.2, 0.3, 0.4 ao invés de resolver tudo de uma vez
+> **Data:** Setembro 2026  
+> **Fontes:** FlagRoster.com, Flag50.com, TeamStats, Ankored, Lumin Sports, pesquisa prévia
 
 ---
 
-## 🔍 Pesquisa de Mercado (Fontes: web search deep, setembro 2026)
+## 🎯 Visão Geral: Onde o Flag Platform está hoje
 
-### Principais Concorrentes Identificados
+### Estrutura Atual do Backend
 
-| Concorrente | Focus | Principais Features | Preço/Modalidade |
-|-------------|-------|---------------------|------------------|
-| **Flag50** | Ligas/torneios flag football | Registro com pagamentos por jogador, agendamento AI, live scoring por play, perfis de jogadores compartilhados | Platform/SaaS |
-| **FlagStat** | Stat tracking & league management | Live scoring, NFHS/NFL FLAG/NIRSA rulesets, tournament brackets, film scoring, compliance dashboards, MaxPreps partner | Web + iPhone app |
-| **StatHawk** | Stat tracking focused | Free iPhone app, MaxPreps partner, AI season summaries (Pro), points per drive (free) | Annual subscription |
-| **GameChanger** | Multi-sport originally baseball | Scorekeeping, box scores, auto-video clips (Live), fan feed | Free for coaches, $9.99/mês pais |
-| **Breakaway Data** | Web platform flag football | Live scoring, player stats, league scheduling, standings, tournament brackets, online registration, parent/player portal | SaaS |
-| **SquadDeck** | All-in-one club management | Free club website, event/league management, real-time comm (SMS/email), team management, attendance tracking | Free small leagues; premium $9.10/mês |
-| **LeagueApps** | All-in-one sports org | Registration management, payment processing, team management, communication tools, scheduling, reporting/analytics | Tiered pricing |
-| **SportLoMo** | Competition management | Fixtures/scheduling, referee assignment, realtime scores/tables/stats, team/individual registration, payments/fees, communication, dashboards | Custom pricing |
-| **The Flag Football App** | Social networking | 409 competitors indicated market need | — |
-| **QwikCut** | Video analysis | Playbook manager, player grading, video storage/sharing | Demo-based |
+```
+br.com.flagplatform
+├── athlete/        → Módulo Atleta
+├── checkin/        → Módulo Check-in
+├── common/         → Utils compartilhados
+├── competition/    → Módulo Campeonato
+├── conference/     → Módulo Conferência
+├── division/       → Módulo Divisão
+├── game/           → Módulo Jogo
+├── organization/   → Módulo Organização
+├── play/           → Módulo Jogada
+├── roster/         → Módulo Elenco
+├── round/          → Módulo Rodada
+├── security/       → Autenticação JWT
+├── standing/       → Módulo Classificação
+├── team/           → Módulo Time
+├── venue/          → Módulo Campo
+├── user/           → Módulo Usuário (ADMIN, ORGANIZER, MESA - 3 roles)
+└── FlagPlatformApplication.java
+```
 
----
+### Apps Existentes
 
-## 📊 Comparativo Direto: Flag Platform vs Mercado
+| App | Tecnologia | Propósito | Usuários |
+|-----|------------|-----------|----------|
+| **flag_admin_web** | Flutter Web | Gestão de entidades, cadastros, organização | Organizadores |
+| **flag_referee_app** | Flutter Mobile | Operação de jogos, check-in, placar | Mesa/Delegado |
+| **flag_public_app** | Flutter Mobile | Acompanhamento público, standings, stats | Atletas/Torcedores |
 
-| Feature | Flag Platform | Principais Concorrentes | Gap/Oportunidade |
-|---------|---------------|------------------------|------------------|
-| **Gestão completa de campeonato** | ✅ Org → Competition → Category → Venue → Team → Round → Game → Standing | ✅ Flag50, ✅ LeagueApps, ✅ SportLoMo | FlagPlatform já tem isso coberto |
-| **Rulesets específicos (NFHS/NFL FLAG/NIRSA)** | ⚠️ Implementado via módulos | ✅ FlagStat, ✅ StatHawk | FlagPlatform pode expandir |
-| **Live scoring play-by-play** | ✅ Via Referee App | ✅ FlagStat, ✅ Breakaway Data | Implementar mais visualização |
-| **Stat tracking por atleta** | ⚠️ Roster básico | ✅ FlagStat, ✅ StatHawk, ✅ Breakaway | **Oportunidade key** - adicionar histórico de atleta |
-| **Escouting guiado de jogadas** | ❌ Gap identificado | ❌ Todos os concorrentes | **Oportunidade key** - novo módulo |
-| **Integração MaxPreps/exportação** | ❌ Não implementado | ✅ FlagStat (partner desde mar/2026), ✅ StatHawk | **Oportunidade** - parceria ou implementação |
-| **Perfis de atleta com histórico** | ⚠️ Apenas roster atual | ⚠️ Limitado em todos | **Oportunidade** - módulo de histórico |
-| **Treinos como categoria de coleta** | ❌ Não implementado | ❌ Gap geral | **Oportunidade** - expandir domínio |
-| **Comunidade/social** | ⚠️ Public app sem login | ✅ The Flag Football App (409 competitors), ✅ SquadDeck | **Oportunidade** - features sociais leves |
-| **Video highlights/film** | ❌ Não implementado | ✅ QwikCut, ✅ GameChanger (video clips) | **Oportunidade** - parceria ou módulo |
+### Arquitetura
 
----
-
-## 🎯 Principais Oportunidades de Simplificação & Otimização
-
-### 1. Focar no "Core Value" — Gestão de Campeonato
-- FlagPlatform já executa bem: org → competition → categories → teams → games → standings
-- **Simplificar**: reduzir complexidade desnecessária nos módulos laterais
-- **Priorizar**: experiência integrada 3 apps (public/referee/admin)
-
-### 2. Módulo de Estatísticas Atletas (Gap Crítico)
-- Concorrentes: FlagStat, StatHawk focam nisso
-- **O que agregar**: integrar com a estrutura existente (athlete → roster → competition)
-- **Etapas**:
-  - Fase 1: stats básicas por jogo (check-in já existente)
-  - Fase 2: histórico por campeonato/amistoso/treino
-  - Fase 3: comparação e ranking
-
-### 3. Scouting/Guiado de Jogadas (Gap Identificado)
-- Pesquisa #1 dos usuários (do research/flagstats-mapeamento.md)
-- **Simplificar**: não tentar copiar FlagStat totalmente
-- **Abordagem own**: fluxo simplificado de "play registration" vs complexo scouting
-- **Etapas**:
-  - Wizard de jogadas por pergunta (como identificado no research)
-  - Tipos básicos: corrida, passe, penalty, touchdown
-  - Dados mínimos: yards, flags pulled, resultado
-
-### 4. Exportação/Integração com MaxPreps/Entidades
-- Concorrentes têm isso como differentiator key
-- **Simplificar**: implementar o mínimo viable (formato CSV básico)
-- **Prioridade**: dependente do público-alvo (schools/colleges vs ligas comunitárias)
-
-### 5. Features Sociais Leves
-- The Flag Football App tem 409 competitors, indicating market need
-- **O que FlagPlatform pode fazer diferente**: integrar com as 3 apps já existentes
-- **Não tentar ser rede social completa** — features pontuais de compartilhamento
+- **Backend:** Java Spring Boot 4.2+, Modular Monolith
+- **Banco:** PostgreSQL + Flyway (migrations)
+- **Auth:** JWT custom (não Firebase)
+- **Frontend:** Flutter 3.x com Riverpod/GoRouter
 
 ---
 
-## 📈 Roadmap de Simplificação (Recomendado)
+## 🔍 Comparativo com Concorrentes
 
-| Release | Foco | Status |
-|---------|------|--------|
-| **0.1 — Championship Foundation** | Org, Competition, Category, Venue, Team, Round, Game, Standing | ✅ Já existente |
-| **0.2 — Statistics Basic** | Stat tracking básico por atleta por jogo; check-in validation | 🔜 Planejado |
-| **0.3 — Scout Simplificado** | Fluxo de registro de jogadas por pergunta; tipos simplificados | 🔜 Planejado |
-| **0.4 — Historian Athlete** | Histórico por atleta por campeonato; comparação simples; exportação CSV básica | 🔜 Planejado |
-| **1.0 — Market Fit** | Todos os gaps cobertos de forma simplificada; APIs documentadas; deploy estável | 📅 Futuro |
+### 1. FlagRoster — A Plataforma "Todo em Um"
+
+| Aspecto | Flag Platform | FlagRoster | Análise |
+|---------|---------------|------------|---------|
+| **Foco** | Gestão completa de campeonato | Sazão competitiva completa + regras federação | Flag Platform tem apps separados, FlagRoster integra tudo |
+| **Rulesets** | Via módulos | Sim (LFF, NFHS, NFL FLAG) | FlagRoster vence por especialização total |
+| **Tiebreakers** | A calcula | Sim (automático) | Diferencial FlagRoster |
+| **Walkover/Penalties** | Manuais | Automáticos | Diferencial FlagRoster |
+| **Referee Rotation** | Não implementado | Sim | Diferencial FlagRoster |
+| **Roster Eligibility** | Manual | Automático | Diferencial FlagRoster |
+| **Preço** | Open source? | $499/saison | FlagRoster paga mas completo |
+| **Public View** | App separado | Páginas públicas sem login | Similar, mas FlagRoster mais integrado |
+
+**Recomendação:** FlagRoster é a maior ameaça direta para Flag Platform. Se queremos competir, precisamos:
+1. Implementar cálculo automático de standings com tiebreakers avançados
+2. Adicionar regras específicas (walkover, penalties, referee rotation)
+3. Melhorar integração entre apps (hierarquia clara org→clube→time→elenco→atleta)
+
+### 2. Flag50 — Especialista em Game-Day Operations
+
+| Aspecto | Flag Platform | Flag50 | Análise |
+|---------|---------------|--------|---------|
+| **Live Scoring** | Via Referee App (tap) | Via app árbitro (phone/Apple Watch) + voice scoring | Flag50 mais avançado (Apple Watch + voice) |
+| **Per-play Stats** | Parcial | Sim (passer, rusher, receiver) | Flag50 vence |
+| **Player Profiles** | Roster básico | Perfil compartilhável com highlights | Flag50 vence |
+| **AI Scheduling** | Não | Sim | Diferencial Flag50 |
+| **Live Streaming** | Não | Sim (GameChanger integration) | Flag50 vence |
+| **Coaching Tools** | Não | Playbook 6v6, scheme finder, AI play builder | Flag50 vence |
+| **Age Verification** | Não | Sim (rolling out) | Flag50 tem roadmap |
+| **Streaming/Overlays** | Não | Sim | Flag50 tem integração com GameChanger |
+
+**Recomendação:** Flag50 domina o lado "game-day". O Flag Platform deve:
+1. Implementar Apple Watch/voice scoring no Referee App
+2. Adicionar per-play stat attribution
+3. Criar playbook/coach tools dedicados
+4. Integrar live streaming simples
+
+### 3. TeamSnap — General Team Admin (Genérico)
+
+| Aspecto | Flag Platform | TeamSnap | Análise |
+|---------|---------------|----------|---------|
+| **Multi-esporte** | Flag Football apenas | Sim (100+ esportes) | TeamSnap vence por alcance |
+| **Schedule** | Custom (divisão/rodadas) | Simples (calendário compartilhado) | Similar |
+| **Messages** | Não implementado | Sim (chat por equipe) | TeamSnap vence |
+| **Availability** | Não | Sim | TeamSnap vence |
+| **Payments** | Não | Sim | TeamSnap vence |
+| **Rosters** | Módulo específico | Genérico | Flag Platform vence por especialização |
+
+**Recomendação:** TeamSnap é fraco para flag football específico. Podemos usar ideias de UX (como o sistema de mensagens) mas manter nosso foco especializado.
+
+### 4. GameChanger — Scorekeeping + Fan Streaming
+
+| Aspecto | Flag Platform | GameChanger | Análise |
+|---------|---------------|-------------|---------|
+| **Fan Experience** | App público simples | Muito avançado (streaming, clips) | GameChanger vence |
+| **Live Clips** | Não | Sim (auto-gerados) | Diferencial GameChanger |
+| **Box Scores** | Parcial | Sim | GameChanger vence |
+| **Parent Access** | Sim (público) | Sim (pago) | Similar |
+| **Scorekeeping** | Referee App | App móvel otimizado | Similar qualidade |
+
+**Recomendação:** Para o público, podemos inspirar-nos em GameChanger para:
+1. Melhorar design do Public App
+2. Adicionar compartilhamento de resultados
+3. Integrar clips automáticos (via parceria ou Firebase)
 
 ---
 
-## 💡 Recomendações de Arquitetura
+## 🎨 Gap Analysis — O que falta implementar?
 
-### Manter o Modular Monolith (ADR-003)
-- **Vantagem**: simplicidade vs microsserviços
-- **Manter boundaries claros** entre módulos (domain-driven design)
-- **Não migrar para Firebase agora** — complexidade desnecessária
+### Gaps Técnicos (maiores):
 
-### Por que NÃO migrar para Firebase agora?
+| Gap | Concorrente | Impacto | Complexidade |
+|-----|-------------|---------|--------------|
+| **Tiebreakers automáticos** | FlagRoster | Alto | Média |
+| **Walkover/Roster Eligibility** | FlagRoard | Alto | Média |
+| **Referee Rotation** | FlagRostar | Médio | Baixa |
+| **Per-play stat attribution** | Flag50 | Alto | Baixa |
+| **Apple Watch/voice scoring** | Flag50 | Alto | Alta |
+| **Playbook tools** | Flag50 | Médio | Alta |
+| **Live streaming** | Flag50 | Baixo | Muito Alta |
 
-1. **Complexidade desnecessária**: projeto já complexo, Firebase adiciona camada nova
-2. **Lock-in**: dados Firebase difíceis migrar depois
-3. **Features atuais já atendem**: PostgreSQL + Flyway já funcional
-4. **Roadmap phase 0.1-0.4 já definidas** — focar nisso primeiro
+### Gaps Arquiteturais:
 
-### Migração gradual recomendada (se decidir depois)
-
-1. Phase 1: Extração de domínios críticos (athlete, competition) para serviço separado
-2. Phase 2: API layer que suporta ambos (PostgreSQL + Firebase)
-3. Phase 3: Gradual migration de usuários/novos projetos
-
----
-
-## 🏁 Próximos Passos Sugeridos
-
-1. **Criar issue formalizada** sobre análise de mercado e oportunidades
-2. **Planejar Release 0.2** — statistics básicas (foco no gap atleta)
-3. **Planejar Release 0.3** — scout simplificado (fluxo por pergunta)
-4. **Definir critérios de aceitação** para cada release
-5. **Manter foco** nas 3 apps (public/referee/admin) em vez de tentar ser tudo para todos
+| Gap | Problema | Solução |
+|-----|----------|---------|
+| **Hierarquia confusa** | Time vs Clube | Implementar nova hierarquia org→clube→time→elenco→atleta |
+| **Roles limitados** | Apenas ADMIN/ORGANIZER/MESA | Expandir para SUPER_ADMIN, ADMIN, MANAGER, USER |
+| **Auth não centralizado** | JWT custom separado | Migrar para Firebase Auth com custom claims |
+| **Dados fragmentados** | App separado do backend | Usar Firebase Functions para sync |
 
 ---
 
-## 📝 Conclusão
+## 🛠️ Recomendações de Reestruturação
 
-O Flag Platform tem **fundação sólida** em gestão de campeonato (diferencial vs concorrentes que focam em stats ou league management isoladamente). As maiores oportunidades são:
+### 📐 Arquitetura Recomendada
 
-1. **Preencher gaps de statistics atleta** e **scouting guiado** — são os #1 requests da pesquisa
-2. **Não tentar copiar tudo** dos concorrentes — focar no que as 3 apps já fazem bem
-3. **Simplificar** — o modular monolith atual é vantagem, não migre prematuramente
-4. **Etapas graduais** — releases 0.2, 0.3, 0.4 ao invés de tentar resolver tudo de uma vez
+```
+                    ┌─────────────────────────────────────┐
+                    │       FLAG PLATFORM 2.0             │
+                    │   (Arquitetura orientada a serviços)│
+                    └─────────────────┬───────────────────┘
+                                      │
+              ┌───────────────────────┼───────────────────────┐
+              │                       │                       │
+      Firebase Auth          Spring Boot Modular        Flutter Apps
+    (Custom Claims)          (Domínios por módulo)     (3 apps + coach tools)
+              │                       │                       │
+              ├───────────────────────┤                       │
+              │                       ├───────────────────────┤
+              ▼                       ▼                       ▼
+    ┌──────────────────┐    ┌─────────────────┐    ┌──────────────────┐
+    │ Custom Claims   │    │ athletics       │    │ admin_web        │
+    │ (roles, skills) │◄──►│ - organization  │◄──►│ - org mgmt        │
+    └──────────────────┘    │ - competition │    │ - team mgmt       │
+              │             │ - category    │    │ - season mgmt     │
+              │             │ - venue       │    │ - user mgmt       │
+              │             │ - team        │    │                  │
+              │             │ - roster      │    │ referee_app      │
+              │             │ - athlete     │◄──►│ - game ops        │
+              │             │ - game        │    │ - check-in        │
+              │             │ - standing    │    │ - scoring         │
+              │             │ - checkin     │    │                  │
+              │             │               │    │ public_app       │
+              │             │ play          │◄──►│ - standings       │
+              └─────────────┴───────────────┴────│ - games         │
+                                                │ - player view   │
+                                                │                  │
+                                                │ coach_tools      │
+                                                │ - playbook        │
+                                                │ - stats view     │
+                                                └──────────────────┘
+```
+
+### 📋 Roadmap de Implementação (Modelo C - Simplified)
+
+#### Fase 1: Arquitetura de Roles (2-3 sprints)
+- ✅ Expandir `UserRole` enum: adicionar SUPER_ADMIN, MANAGER, USER
+- ✅ Implementar custom claims no Firebase Auth
+- ✅ Mapear permissões por role
+- ✅ Criar service de role management
+
+#### Fase 2: Hierarquia Organizacional (3-4 sprints)
+- ✅ Migrar `Team` para `Club → Team`
+- ✅ Criar nova tabela `Season` 
+- ✅ Atualizar `Roster` para ligar a Season/Competition
+- ✅ Migração Flyway: versionamento schema
+
+#### Fase 3: Core Gameplay (4-5 sprints)
+- ✅ Tiebreakers automáticos
+- ✅ Walkover tracking
+- ✅ Referee rotation
+- ✅ Per-play scoring
+
+#### Fase 4: Experiência do Usuário (3 sprints)
+- ✅ Live scoring + Apple Watch
+- ✅ Playbook tools (6v6)
+- ✅ Player profiles avançados
+- ✅ Live streaming (parceria)
 
 ---
-*Documento gerado: 2026-09-05*
-*Baseado em: web search deep, análise de research/flagstats-mapeamento.md, ADRs do projeto*
+
+## 🎯 Prioridades para Simplificação (Modelo C)
+
+### 1. Simplificar Roles → **Modelo C: 4 Layers de Acesso**
+
+```
+SUPER_ADMIN (1)     → Acesso total + gestão de orgs
+    ↓
+ORG_ADMIN (N)       → Gestão de clube/liga específica
+    ↓
+MANAGER (N)         → Cadastros dentro do clube
+    ↓
+USER (N)            → Atleta/coach/referee com roles específicos
+```
+
+### 2. Hierarquia Clara → **5 Níveis Máximos**
+
+1. **Organization** (Federação/Liga)
+2. **Club** (Clube/Universidade)  
+3. **Team** (Time de competição)
+4. **Roster** (Elenco por Season)
+5. **Athlete** (Atleta)
+
+### 3. Funções Separadas → **3 Apps + 1 Ferramenta**
+
+| App | Foco | Integração |
+|-----|------|------------|
+| Admin Web | Gestão de org/clube/time | CRUD completo |
+| Referee App | Operação de jogo | Scoring em tempo real |
+| Public App | Fan Experience | Standings, highlights |
+| Coach Tools | Estratégia | Playbook, stats |
+
+---
+
+## 💰 Estratégia de Monetização
+
+| Recurso | Modelo | Preço Sugerido |
+|---------|--------|----------------|
+| **Standar** | Free + 3.5% transaction | $0 setup |
+| **Pro** | $99/mês | Todos os recursos básicos |
+| **Elite** | $299/mês | + Playoff, AI Scheduling, Live Video |
+| **Coach Tools** | Gratuito | Playbook 6v6 |
+| **Verificação de Idade** | $2/player | Compliance |
+
+---
+
+## ✅ Próximos Passos Imediatos
+
+1. **Criar ADR-001 novo** com a nova filosofia: "Simplicidade focada em flag football, integração entre apps, regras automatizadas"
+2. **Criar Issue #1**: "Implementar hierarquia org→clube→time→elenco→atleta" 
+3. **Criar Issue #2**: "Expandir UserRole enum para SUPER_ADMIN, MANAGER, USER"
+4. **Delegar para backend**: Auth service + custom claims
+5. **Delegar para frontend**: Role-based navigation
+
+---
+
+## 📊 Resumo Executivo
+
+**O Flag Platform tem uma vantagem única:** Apps nativos dedicados para cada persona (organizador, árbitro, atleta/torcedor) que se comunicam via API unificada.
+
+**Mas precisa evoluir:**
+1. **Roles → Firebase Auth + Custom Claims** (simplificar auth)
+2. **Hierarquia → org→clube→time→elenco→atleta** (eliminar confusão)
+3. **Regras automáticas → tiebreakers, walkover, roster eligibility** (competir com FlagRoster)
+4. **Play-by-play → per-play scoring + Apple Watch** (competir com Flag50)
+5. **Fan experience → highlights + streaming** (competir com GameChanger)
+
+**Com essas mudanças, o Flag Platform pode ser a única plataforma que:**
+- Tem apps nativos otimizados (não web adaptado)
+- Oferece integração completa (gestão + jogo + fan)
+- Implementa regras Flag Football específicas
+- Mantém preço acessível (vs $499 do FlagRoster)
+
+---
+
+*Documento preparado para revisão e aprovação via ADR process.

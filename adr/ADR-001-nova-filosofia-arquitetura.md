@@ -209,23 +209,50 @@ As fases de implementação já estão documentadas nos ADRs especializados:
 
 ---
 
+## Histórico de Atualizações (ADR-014)
+
+| Data | Versão | Mudança | Motivo | Autor |
+|:---:|:---:|---|---|---|
+| 2026-09-19 | 1.1 | Evolução de Club → Institution e Athlete → Person | Separação estrita de federações e agremiações, vínculo de times diretamente a instituições e unificação cadastral com CPF | Tech Lead |
+| 2026-09-05 | 1.0 | Versão original da Nova Filosofia | 5 pilares: hierarquia, 4 roles, Firebase-First, Modular Monolith e CQRS Light | Tech Lead |
+
+---
+
+## Decisão Atualizada (Update v1.1)
+
+**Anterior (v1.0):** `Organization → Club → Team → Roster → Athlete`.  
+**Atual (v1.1):** 
+```
+Organization (Federação / Liga Esportiva)
+    └── Competition (Campeonato)
+          └── Category (Modalidade + Gênero + Faixa)
+
+Institution (Agremiação / Clube / Associação / Universidade)
+    ├── InstitutionAffiliation (Filiação formal com Organization)
+    └── Team (Equipe Esportiva)
+          └── TeamRoster (Elenco da Temporada)
+                └── Person (Pessoa Física com CPF único)
+```
+
+**Motivo da Atualização:**
+1. **Institutions vs Organizations:** Clubes e agremiações participam de torneios de diferentes ligas e federações. A relação não é de posse hierárquica fixa (`1:N` estrito), mas de **filiação formal por temporada** (`InstitutionAffiliation`).
+2. **Pessoas Físicas Unificadas (`Person`):** Uma pessoa física pode ser atleta em um time, técnico em outro ou atuar como árbitro/delegado. A tabela `persons` com CPF único evita duplicidade cadastral e preserva o histórico desportivo.
+
+**Impacto:** Refletido em ADR-002, ADR-003, ADR-006 e nas migrations Flyway V5/V7/V12/V17/V24/V26.
+
+---
+
 ## Referências Cruzadas
 
 - **ADR-002** — Estratégia de dados PostgreSQL + Firestore CQRS Light
-- **ADR-003** — Implementação da hierarquia de 5 níveis (clubs table)
-- **ADR-004** — API First (ordem de desenvolvimento compatível)
-- **ADR-010** — Autenticação Firebase-First com Custom Claims (substitui decisão de auth de ADR-001)
-- **ADR-006** — Refatoração estrutural Team/Roster/Season (implementa hierarquia de ADR-001)
-- **ADR-011** — MVVM Flutter (padrão de implementação para apps)
+- **ADR-003** — Diagramas de Base de Dados (schema com institutions e persons)
+- **ADR-004** — Diagramas do Projeto (fluxos Firebase-First e ciclo de jogo)
+- **ADR-010** — Autenticação Firebase-First com Custom Claims
+- **ADR-006** — Refatoração estrutural Team/Roster/Season
+- **ADR-011** — MVVM Flutter para todos os clientes
 - **ADR-013** — Gitflow para gestão de documentação
 - **ADR-014** — Atualização de diretivas em ADRs (documentos vivos)
 
 ---
 
-*Esta ADR foi consolidada para servir como documento mestre de filosofia arquitetônica, redirecionando detalhes de implementação para ADRs especializados. Substitui a ADR-001 anterior mantendo a filosofia central mas reorganizando o escopo para evitar redundâncias com ADRs mais específicos sobre implementação.*
-
----
-
-## Próxima Revisão
-
-Após a implementação das fases 1-5 e validação dos critérios de aceitação em ambiente de staging (conforme ADR-005).
+*Esta ADR serve como documento mestre de filosofia arquitetônica, atualizado sob as diretrizes de documentos vivos da ADR-014.*

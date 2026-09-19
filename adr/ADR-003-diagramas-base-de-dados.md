@@ -22,17 +22,19 @@ Esta ADR consolida todos os diagramas e esquemas de base de dados encontrados em
 ### Visão Geral do Domínio
 
 ```
-Organization
-  └── Competition
-        └── Category (modalidade + gênero + faixa etária)
-              ├── Modality (catálogo: Flag 5x5, 8x8, 9x9, Full Pads 11x11)
+Organization (Federação/Liga)
+  ├── InstitutionAffiliation ────── Institution (Agremiação/Clube)
+  │                                     └── Team (Equipe Esportiva)
+  └── Competition                             └── TeamRoster ── Person (Atleta)
+        └── Category (Modalidade + Gênero + Faixa)
               ├── Venue
-              ├── Team
-              │     └── TeamRoster ────── Athlete
+              ├── CompetitionTeam
               └── Round
                     └── Game
-                          ├── Standing (calculado)
-                          └── CheckIn (validação de atleta por jogo)
+                          ├── GameParticipant (Árbitro/Delegado na mesa)
+                          ├── CheckIn (Validação presencial de atleta)
+                          ├── Play & ScoreEvent (Lances e Pontuação)
+                          └── Standing (Classificação calculada)
 ```
 
 ### Detalhamento por Entidade
@@ -42,12 +44,34 @@ Organization
 | Atributo | Tipo | Restrições | Descrição |
 |----------|------|------------|-----------|
 | id | UUID | PK, DEFAULT gen_random_uuid() | Identificador único |
-| name | VARCHAR(255) | NOT NULL | Nome da organização |
+| name | VARCHAR(255) | NOT NULL | Nome da organização (Federação/Liga) |
 | short_name | VARCHAR(50) | | Nome abreviado |
 | logo_url | TEXT | | URL do logo |
 | created_at | TIMESTAMPTZ | NOT NULL DEFAULT NOW() | Data de criação |
 | updated_at | TIMESTAMPTZ | | Data de última atualização |
 | deleted_at | TIMESTAMPTZ | NULL | Soft delete |
+
+#### Institution (Agremiações / Instituições)
+
+| Atributo | Tipo | Restrições | Descrição |
+|----------|------|------------|-----------|
+| id | UUID | PK, DEFAULT gen_random_uuid() | Identificador único |
+| name | VARCHAR(255) | NOT NULL | Nome oficial da agremiação/clube |
+| short_name | VARCHAR(50) | | Nome abreviado |
+| type | VARCHAR(50) | NOT NULL | CLUB, UNIVERSITY, ASSOCIATION |
+| logo_url | TEXT | | URL do logo |
+| created_at | TIMESTAMPTZ | NOT NULL DEFAULT NOW() | Data de criação |
+
+#### InstitutionAffiliation (Filiações Institucionais)
+
+| Atributo | Tipo | Restrições | Descrição |
+|----------|------|------------|-----------|
+| id | UUID | PK, DEFAULT gen_random_uuid() | Identificador único |
+| institution_id | UUID | FK → Institution | Agremiação filiada |
+| organization_id | UUID | FK → Organization | Federação receptora |
+| status | VARCHAR(20) | PENDING, ACTIVE, REJECTED | Status da filiação |
+| affiliation_year | INTEGER | NOT NULL | Ano de vigência |
+| created_at | TIMESTAMPTZ | NOT NULL DEFAULT NOW() | Data da solicitação |
 
 #### Competition (Competições)
 
@@ -83,13 +107,13 @@ Organization
 | players_per_team | INTEGER | | Quantidade de jogadores por time |
 | is_active | BOOLEAN | DEFAULT true | Ativa no catálogo |
 
-#### Team (Times)
+#### Team (Equipes Esportivas)
 
 | Atributo | Tipo | Restrições | Descrição |
 |----------|------|------------|-----------|
 | id | UUID | PK, DEFAULT gen_random_uuid() | Identificador único |
-| club_id | UUID | FK → Club | Clube afiliado |
-| organization_id | UUID | FK → Organization | Organização (herança) |
+| institution_id | UUID | FK → Institution | Agremiação proprietária |
+| organization_id | UUID | NULLABLE (herança) | Organização opcional |
 | name | VARCHAR(255) | NOT NULL | Nome do time |
 | short_name | VARCHAR(50) | | Nome abreviado |
 | sport_name | VARCHAR(255) | | Esporte |
@@ -97,43 +121,53 @@ Organization
 | status | VARCHAR(20) | DEFAULT 'ACTIVE' | Status |
 | created_at | TIMESTAMPTZ | NOT NULL DEFAULT NOW() | Data de criação |
 
-#### Roster (Elenco)
+#### Roster (Elenco da Temporada)
 
 | Atributo | Tipo | Restrições | Descrição |
 |----------|------|------------|-----------|
 | id | UUID | PK, DEFAULT gen_random_uuid() | Identificador único |
-| team_id | UUID | FK → Team | Time afiliado |
-| competition_id | UUID | FK → Competition | Competição da inscrição |
+| team_id | UUID | FK → Team | Time associado |
+| competition_id | UUID | NULLABLE FK → Competition | Competição da inscrição |
 | name | VARCHAR(255) | | Ex: "Elenco Principal 2026" |
 | season | VARCHAR(50) | | Ex: "2026", "2026-Q1" |
 | status | VARCHAR(20) | DEFAULT 'ACTIVE' | Status do elenco |
-| UNIQUE(team_id, competition_id) | | | Um elenco por time por competição |
 
-#### RosterEntry (Entrada de Elenco)
+#### TeamRoster (Inscrição de Atletas no Elenco)
 
 | Atributo | Tipo | Restrições | Descrição |
 |----------|------|------------|-----------|
 | id | UUID | PK, DEFAULT gen_random_uuid() | Identificador único |
 | roster_id | UUID | FK → Roster | Elenco pai |
-| athlete_id | UUID | FK → Athlete | Atleta inscrito |
+| person_id | UUID | FK → Person | Atleta inscrito (Person) |
 | position | VARCHAR(50) | | Posição no campo |
 | jersey_number | VARCHAR(10) | | Número da camisa |
-| status | VARCHAR(20) | DEFAULT 'ACTIVE' | Status da entrada |
+| status | VARCHAR(20) | DEFAULT 'ACTIVE' | Status da inscrição |
 | created_at | TIMESTAMPTZ | NOT NULL DEFAULT NOW() | Data de inscrição |
 
-#### Athlete (Atletas)
+#### Person (Pessoas Físicas Unificadas)
 
 | Atributo | Tipo | Restrições | Descrição |
 |----------|------|------------|-----------|
 | id | UUID | PK, DEFAULT gen_random_uuid() | Identificador único |
-| user_id | UUID | FK → Users | Usuário associado |
-| name | VARCHAR(255) | | Nome completo |
-| cpf | VARCHAR(14) | | CPF (opcional, para Brasil) |
-| email | VARCHAR(255) | | Email institucional |
-| photo_url | TEXT | | URL da foto |
-| status | VARCHAR(20) | DEFAULT 'ACTIVE' | Status do atleta |
-| skills | JSONB | | Habilidades/attributes |
+| name | VARCHAR(150) | NOT NULL | Nome completo |
+| cpf | VARCHAR(14) | UNIQUE | CPF (para Brasil) |
+| birth_date | DATE | | Data de nascimento |
+| gender | VARCHAR(20) | MALE, FEMALE, MIXED | Gênero |
+| role | VARCHAR(30) | ATHLETE, COACH, REFEREE, DELEGATE | Papel principal no esporte |
+| photo_url | TEXT | | URL da foto para check-in |
+| status | VARCHAR(20) | DEFAULT 'ACTIVE' | Status da pessoa |
 | created_at | TIMESTAMPTZ | NOT NULL DEFAULT NOW() | Data de cadastro |
+
+#### GameParticipant (Participantes de Jogo / Oficiais)
+
+| Atributo | Tipo | Restrições | Descrição |
+|----------|------|------------|-----------|
+| id | UUID | PK, DEFAULT gen_random_uuid() | Identificador único |
+| game_id | UUID | FK → Game | Partida associada |
+| person_id | UUID | FK → Person | Pessoa atuando na mesa |
+| role | VARCHAR(30) | REFEREE, DELEGATE, COMMISSIONER | Papel na arbitragem |
+| function | VARCHAR(50) | MAIN_REFEREE, DOWN_JUDGE, etc. | Função específica no jogo |
+| created_at | TIMESTAMPTZ | NOT NULL DEFAULT NOW() | Atribuição |
 
 #### Game (Jogos)
 
@@ -222,19 +256,21 @@ flowchart LR
 
 | Módulo | Responsabilidade | Lookup Público |
 |--------|------------------|----------------|
-| `organization` | Organizações (federações, ligas, clubes) | `OrganizationLookup` |
+| `organization` | Federações e ligas organizadoras | `OrganizationLookup` |
+| `institution` | Agremiações, clubes, associações e universidades | `InstitutionLookup` |
+| `affiliation` | Filiação de agremiações a federações e janelas | `AffiliationLookup` |
 | `competition` | Campeonatos por organização | `CompetitionLookup` |
 | `modality` | Catálogo de modalidades (Flag 5x5/8x8/9x9, Full Pads 11x11) | `ModalityLookup` (`ModalityInfo`) |
-| `category` | Categorias por campeonato (combinação modalidade + gênero + faixa etária) | `CategoryLookup` |
+| `category` | Categorias por campeonato (modalidade + gênero + faixa etária) | `CategoryLookup` |
 | `venue` | Campos de jogo | `VenueLookup` (`VenueInfo`) |
-| `team` | Times por categoria | `TeamLookup` (`TeamInfo`) |
+| `team` | Equipes esportivas vinculadas a agremiações | `TeamLookup` (`TeamInfo`) |
+| `person` | Pessoas físicas unificadas (atletas, técnicos, árbitros, delegados) | `PersonLookup` (`PersonInfo`) |
+| `roster` | Elenco e inscrições por temporada (`team_roster`) | `RosterLookup` |
 | `round` | Rodadas por categoria (REGULAR/PLAYOFFS) | `RoundLookup` (`RoundInfo`) |
-| `game` | Jogos, status, placar, eventos de ponto | `GameLookup` + `GameResultRegisteredEvent` |
+| `game` | Jogos, status, placar e oficiais (`game_participants`) | `GameLookup` + `GameResultRegisteredEvent` |
 | `standing` | Classificação calculada | — |
-| `athlete` | Atletas | `AthleteLookup` (`AthleteInfo`) |
-| `roster` | Inscrição de atletas em times | `RosterLookup` |
-| `checkin` | Check-in e validação de atletas por jogo | — |
-| `user` | Usuários, papéis, aprovação, senha | `UserLookup` + `TokenProvider` |
+| `checkin` | Check-in presencial e validação de atletas por jogo | — |
+| `user` | Usuários, perfis e claims Firebase | `UserLookup` |
 | `common` | Infra compartilhada (módulo OPEN) | — |
 
 ### Diagrama de Dependências (PlantUML)
@@ -325,63 +361,61 @@ spring:
 ---
 
 ## 4. Diagramas de Schema por Módulo
-
-### Módulo Organization
-
+ 
+### Módulo Organization & Institution
+ 
 ```mermaid
 flowchart TB
     organization(id: "organizations")
-    organization --> has_club(clubs)
-    organization --> has_competition(competitions)
+    institution(id: "institutions")
+    affiliation(id: "institution_affiliations")
     
-    subgraph clubs
-        club(id: "clubs"):::entity
-    end
-    
-    subgraph competitions
-        competition(id: "competitions"):::entity
-    end
+    institution -->|filia-se| affiliation
+    organization -->|recebe_filiacao| affiliation
+    organization -->|organiza| competition(id: "competitions")
+    institution -->|possui| team(id: "team")
     
     classDef entity fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
 ```
-
-### Módulo Team
-
+ 
+### Módulo Team & Roster
+ 
 ```mermaid
 flowchart TB
     team(id: "team")
-    team --> belongs_to_club(club)
-    team --> belongs_to_organization(org)
-    team --> has_roster(roster)
-    team --> participates_in_competition(competition_team)
+    team -->|pertence_a| institution(id: "institutions")
+    team -->|inscreve_elenco| roster(id: "roster")
+    team -->|disputa| ct(id: "competition_team")
     
-    subgraph competition_team
-        ct(id: "competition_team"):::junction
-    end
+    roster -->|possui_entradas| team_roster(id: "team_roster")
+    person(id: "persons") -->|atleta_vinculado| team_roster
     
     classDef entity fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
     classDef junction fill:#fff3e0,stroke:#fb8c00,stroke-width:2px
 ```
-
-### Módulo Athlete
-
+ 
+### Módulo Person & Game
+ 
 ```mermaid
 flowchart TB
-    athlete(id: "athlete")
-    athlete --> belongs_to_user(user)
-    athlete --> inscritos_em(roster_entries)
-    athlete --> tem_habilidades(skills_jsonb)
+    person(id: "persons")
+    person -->|escalado_como_atleta| team_roster(id: "team_roster")
+    person -->|atua_como_oficial| gp(id: "game_participants")
+    
+    game(id: "games") -->|possui_oficiais| gp
+    game -->|registra_presenca| checkin(id: "checkins")
+    team_roster -->|presente_no_jogo| checkin
     
     classDef entity fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
 ```
-
+ 
 ---
-
+ 
 ## 5. Relacionamento com ADRs
-
+ 
 | ADR | Relação |
 |-----|---------|
-| **ADR-001** | Filosofia — define a hierarquia org→clube→time→elenco→atleta que este schema suporta |
+| **ADR-001** | Filosofia — define a hierarquia org→instituição→time→elenco→atleta (person) que este schema suporta |
 | **ADR-002** | CQRS Light — define PostgreSQL como write path, Firestore como read mirror (esquemas espelhados) |
 | **ADR-003** | **Original** — Implementação da hierarquia de 5 níveis (substituída por esta versão de diagramas) |
 | **ADR-006** | Refatoração estrutural — usa este schema para Team/Roster/Season changes |

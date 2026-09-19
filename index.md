@@ -78,7 +78,7 @@ Portal unificado de documentação técnica, decisões de arquitetura e especifi
 |-----------|----------|
 | [Mapeamento FlagStats](research/flagstats-mapeamento.html) | Levantamento de recursos do ecossistema FlagStats (FlagStat Go / StatHawk). |
 | [Comparativo FlagStats](research/comparativo-flagstats.html) | Análise comparativa das telas de súmula e registro de jogadas ao vivo. |
-| [Análise Competitiva de Mercado](research/market-analysis-restructured.html) | Estudo comparativo com GameChanger, TeamSnap, FlagRoster e Flag50. |
+| [Análise Competitiva de Mercado](research/market-analysis.html) | Estudo comparativo com GameChanger, TeamSnap, FlagRoster e Flag50. |
 
 ---
 
