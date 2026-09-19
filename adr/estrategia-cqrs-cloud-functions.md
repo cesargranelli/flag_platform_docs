@@ -1,6 +1,14 @@
-# ADR-007: Estratégia de Espelhamento CQRS com Cloud Functions
+# Estratégia de Espelhamento CQRS com Cloud Functions
 
-**Status:** Proposto
+> **Status: Rejeitado — superado pelo [ADR-010](ADR-010-espelhamento-firestore-admin-sdk.md).**
+> Este documento nunca foi implementado. A decisão vigente é fazer o espelhamento
+> **pelo backend, com o Firebase Admin SDK** (ver ADR-010). Mantido aqui apenas como
+> registro histórico da alternativa considerada.
+>
+> Observação: este documento se intitulava "ADR-007", número que já pertence ao
+> [ADR-007 — Migrações Flyway em Java](ADR-007-migracoes-flyway-em-java-com-jooq.md).
+> A numeração foi removida para eliminar a colisão.
+
 **Data:** 2026-09-05
 **Autor:** DevOps (Flag Platform)
 **Substitui/Complementa:** ADR-002 (PostgreSQL + Firestore CQS)

@@ -31,12 +31,18 @@ layout: home
 
 | Documento | Decisão |
 |-----------|---------|
-| [ADR-001 — Filosofia do Projeto](adr/ADR-001%20-%20Filosofia%20do%20Projeto.md) | Simplicidade e velocidade sobre arquitetura antecipada |
-| [ADR-002 — Monorepo](adr/ADR-002-monorepo.md) | Backend, frontend, infra e docs no mesmo repositório |
+| [ADR-001 — Nova Filosofia de Arquitetura e Simplificação](adr/ADR-001-nova-filosofia-arquitetura.md) | Simplicidade e velocidade sobre arquitetura antecipada |
+| [ADR-002 — PostgreSQL + Firestore (CQRS Light)](adr/ADR-002-postgres-firestore-cqs.md) | PostgreSQL é a fonte da verdade; Firestore é espelho de leitura |
 | [ADR-003 — Modular Monolith](adr/ADR-003-modular-monolith.md) | Backend monolito modular Spring Boot; sem microsserviços/K8s |
-| [ADR-004 — API First](adr/ADR-004-api-first.md) | Domínio → Banco → Service → API → Flutter; REST `/api/v1` |
+| [ADR-004 — Migração para Firebase Auth](adr/ADR-004-firebase-auth-migration.md) | Firebase Auth + custom claims no lugar do JWT próprio |
 | [ADR-005 — Staging efêmero E2E](adr/ADR-005-staging-efemero-e2e.md) | Ambientes temporários para testes ponta a ponta |
 | [ADR-006 — Team/Roster/Season](adr/ADR-006-team-roster-season-refactor.md) | Refatoração estrutural: time como entidade, elenco por temporada |
+| [ADR-007 — Migrações Flyway em Java com jOOQ](adr/ADR-007-migracoes-flyway-em-java-com-jooq.md) | Migrações em classes Java usando a DSL do jOOQ |
+| [ADR-008 — Ajustes de Autenticação](adr/ADR-008-ajustes-autenticacao.md) | Firebase Auth exclusivo; usuário PENDING em modo leitura |
+| [ADR-009 — Organização e Agremiação](adr/ADR-009-organizacao-e-agremiacao.md) | Separação de domínios e perfis (proposto) |
+| [ADR-010 — Espelhamento Firestore via Admin SDK](adr/ADR-010-espelhamento-firestore-admin-sdk.md) | Backend espelha PostgreSQL → Firestore com o Admin SDK (best-effort) |
+
+> A estratégia de espelhamento via **Cloud Functions** (`adr/estrategia-cqrs-cloud-functions.md`) foi **rejeitada** — ver ADR-010.
 
 ## Design
 
