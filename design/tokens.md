@@ -229,8 +229,26 @@ Biblioteca de widgets no `frontend/packages/core/lib/src/widgets/` (prefixo `Kic
 | `KicksterSegmentedTabs` | `kickster_segmented_tabs.dart` | Controle **segmentado** (Figma "Menu" `34433:3342`): container `surface.muted` (#F6F8FE) raio **24** com padding **4**; segmentos com padding **12×8** (gap **11**) e raio 24 — **selecionado** = fundo **`primary`** (azul) + texto branco w600 (mesmo padrão do `KicksterPillTab`); demais = texto `textSecondary` (contraste ~4,7:1, AA). Usado nas abas **Estatísticas \| Lances** da tela de Jogo |
 | `KicksterGameHeader` | `kickster_game_header.dart` | Cabeçalho **compacto** de um jogo: time (avatar 40 + nome) — centro (placar 22 w700 + status ou pill `AO VIVO` `danger` + linha auxiliar) — time. Compartilhado entre abas; times tocáveis (`onHomeTeamTap`/`onAwayTeamTap`) |
 | `KicksterStatComparison` | `kickster_stat_comparison.dart` | Linha de estatística (Figma "Statistic"): **valor da casa** (`primary`) · **rótulo** centralizado (`textSecondary`) · **valor do visitante** (`textPrimary`) + duas **lanes proporcionais** (6px, raio 12) — `primary` (casa) e **`warning` apenas na lane** (decorativo; amarelo como texto reprova AA). `homeLabel`/`awayLabel` aceitam valores formatados (ex.: `54%`) |
-| `KicksterTimeline` | `kickster_timeline.dart` | Linha do tempo com **eixo central** (1px `line`): badges circulares 40px `surface` com borda `line` e sombra `elevation.timeline.badge`; eventos **casa à esquerda / visitante à direita** com tempo (`success` 12 w500) + título (14) + tipo (12) + descrição (10). Cada evento vira **um nó de acessibilidade** quando `semanticLabel` é informado (eixo/lado são decorativos) |
+| `KicksterTimeline` | `kickster_timeline.dart` | Linha do tempo com **eixo central** (1px `line`): badges circulares 40px `surface` com borda `line` e sombra `elevation.timeline.badge`; eventos **casa à esquerda / visitante à direita** com tempo (`success` 12 w500) + título (14) + tipo (12) + descrição (10). Cada evento vira **um nó de acessibilidade** quando `semanticLabel` é informado (eixo/lado são decorativos). `onTap` opcional abre o detalhe (no jogo, um `KicksterBottomSheet`) |
 | `KicksterBottomSheet` | `kickster_bottom_sheet.dart` | Bottom sheet padrão Kickster (Figma "Actions" `34442:3789`): fundo `surface`, **raio topo 20** (`radius.sheet`), padding **24**, gap **24** entre header/conteúdo/ações e **20** entre itens do conteúdo; header com título centralizado (`labelMedium` 14/22 w600) e botões de ícone **40×40** (raio 16, `KicksterSheetIconButton`) nos extremos — fechar por padrão. **Puxador (handle bar) 40×4** `line` raio 2 no topo (mesmo padrão do Referee App / `PlayDialog`), com respiro 12 acima e 16 abaixo. `KicksterBottomSheet.show()` abre como modal com **arrastar-para-baixo** e **toque fora** para fechar (retorna `null` = fechar sem aplicar) |
+
+#### Ícones de lance (variante *outline*)
+
+Mapeamento `playIcon(PlayType)` (`flag_public_app`) — **1 ícone distinto por tipo**, todos em variante *outline* (ou lineares quando o Material não oferece a variante):
+
+| Tipo | Ícone | Relação |
+|---|---|---|
+| `kickoff` | `play_circle_outline` | início da jogada |
+| `run` | `directions_run` | jogada terrestre |
+| `pass` | `send_outlined` | lançamento |
+| `touchdown` | `sports_football_outlined` | pontuação máxima |
+| `fieldGoal` | `sports_score_outlined` | chute de pontos |
+| `punt` | `arrow_circle_down_outlined` | chute de devolução |
+| `interception` | `change_circle_outlined` | virada de posse |
+| `penalty` | `flag_outlined` | bandeira (falta) |
+| `firstDown` | `trending_flat` | avanço / nova série |
+
+> **Detalhe do lance**: tocar no evento da timeline abre um `KicksterBottomSheet` com **tipo (badge) · momento · time · recebedor · jardas · descrição**.
 
 - **Mapeamento de status do `KicksterScoreCard`**: `inProgress` → `success` · `finished` → `danger` · `scheduled` → `textSecondary` · `cancelled` → `disabled`
 - **Card de campeonato (`CompetitionCard`, `flag_public_app`)**: card branco (`surface`), raio **12** (`radius.card`), `elevation.card` + borda `line` 1px; emblema `emoji_events` 24px `primary` em círculo 40px `primary`@10% (raio 10); nome 16/22 w600 `textPrimary` (2 linhas, ellipsis); organização `textSecondary`; `KicksterBadge` de status à direita.
