@@ -36,7 +36,6 @@ Portal unificado de documentação técnica, decisões de arquitetura e especifi
 | [Papéis, Permissões e Hierarquia](architecture/roles-and-permissions.html) | Modelo de autorização: `SUPER_ADMIN`, `ORG_ADMIN`, `MANAGER` e `USER`, com matriz de acesso. |
 | [Análise de Custo-Benefício em Nuvem](architecture/cloud-cost-benefit-analysis.html) | Comparativo de custos, dimensionamento de memória, Cloudflare R2/Pages, Cloud Run e PostgreSQL. |
 | [Mapeamento de Eventos por Modalidade](architecture/mapeamento-eventos-modalidades.html) | Catálogo e padronização oficial de lances para Flag 5x5, 7x7, 8x8, 9x9 e Full Pads 11x11. |
-| [Análise de Enums do Jogo](architecture/analise-completa-enums-backend.html) | Alinhamento detalhado de enums e regras de pontuação entre backend e aplicativos. |
 | [Arquitetura do Módulo de Competições](architecture/arquitetura_modulo_competicoes.html) | Modelagem de competições, fases eliminatórias, grupos e geração de partidas. |
 | [Arquitetura do Delegado e App Público](architecture/arquitetura_delegado_e_app_publico.html) | Fluxo de validação de súmula pelo delegado e publicação para os torcedores. |
 | [Características do Referee App](architecture/flag_referee_app_caracteristicas.html) | Requisitos funcionais, modos de operação offline e regras da mesa. |
@@ -47,13 +46,15 @@ Portal unificado de documentação técnica, decisões de arquitetura e especifi
 
 ## 3. Aplicações e Módulos do Ecossistema
 
-| Aplicação | Documentação Disponível |
-|:---:|---|
-| **Backend API (`flag_backend`)** | [Visão Geral](apps/backend/) • [Modelo de Pessoas e Atletas](apps/backend/data-model-persons.html) • [Contratos Admin](apps/backend/flag-admin-web-data-model.html) • [Contratos Referee](apps/backend/flag-referee-app-data-model.html) |
-| **Admin Web (`flag_admin_web`)** | [Visão Geral](apps/admin-web/) • [Otimização de API](apps/admin-web/analise-otimizacao-api.html) • [Harmonização Forms](design/modelo_visual_harmonizacao_forms.html) |
-| **Referee App (`flag_referee_app`)** | [Visão Geral](apps/referee-app/) • [Fluxo de Telas](apps/referee-app/fluxo-de-telas.html) • [Eventos por Modalidade](architecture/mapeamento-eventos-modalidades.html) |
-| **Public App (`flag_public_app`)** | [Visão Geral](apps/public-app/) • [Fluxo de Navegação](apps/public-app/screen-flow.html) |
-| **Infraestrutura (`flag_platform_infra`)** | [Visão Geral](apps/infra/) • [Arquitetura de Infra](apps/infra/architecture.html) • [Runbook Operacional](apps/infra/runbook.html) |
+> **Diretriz de Separação:** A documentação técnica detalhada de cada módulo vive em seu respectivo repositório (`docs/`). O portal central mantém a visão geral de arquitetura do componente e pontos de integração.
+
+| Aplicação | Visão Geral no Hub | Documentação Específica no Repositório |
+|:---:|:---:|---|
+| **Backend API (`flag_backend`)** | [apps/backend/](apps/backend/) | [`flag_backend/docs`](https://github.com/cesargranelli/flag_backend/tree/develop/docs) (Modelos de dados, Contratos REST e Enums) |
+| **Admin Web (`flag_admin_web`)** | [apps/admin-web/](apps/admin-web/) | [`flag_admin_web/docs`](https://github.com/cesargranelli/flag_admin_web/tree/develop/docs) (Otimização de API, MVVM e Telas) |
+| **Referee App (`flag_referee_app`)** | [apps/referee-app/](apps/referee-app/) | [`flag_referee_app/docs`](https://github.com/cesargranelli/flag_referee_app/tree/develop/docs) (Fluxo de telas, Operação ao Vivo e Súmula) |
+| **Public App (`flag_public_app`)** | [apps/public-app/](apps/public-app/) | [`flag_public_app/docs`](https://github.com/cesargranelli/flag_public_app/tree/blocos-estabilizacao/docs) (Fluxo de navegação do torcedor) |
+| **Infraestrutura (`flag_platform_infra`)** | [apps/infra/](apps/infra/) | [`flag_platform_infra/docs`](https://github.com/cesargranelli/flag_platform_infra/tree/main/docs) (Topologia Docker e Runbook operacional) |
 
 ---
 

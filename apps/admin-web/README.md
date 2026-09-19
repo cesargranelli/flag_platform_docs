@@ -1,36 +1,40 @@
-# Flag Admin Web — Documentação Técnica
+# Flag Admin Web — Visão Geral & Integração
 
-> **Repositório:** [`flag_admin_web`](https://github.com/cesargranelli/flag_admin_web)  
-> **Stack:** Flutter Web, Dart 3.x, Provider / ChangeNotifier (MVVM), Design System Kickster  
-> **Consumo:** REST API `/api/v1/`
-
----
-
-## 1. Visão Geral
-
-O `flag_admin_web` é a aplicação web administrativa da Flag Platform, voltada para gestores de federações, ligas, agremiações e organizadores de campeonatos.
-
-### Diretrizes Arquiteturais Mandatórias:
-- **Separação Rígida Create vs Edit:** Arquivos e telas explicitamente separados (`*_create_screen.dart` e `*_edit_screen.dart`). Nunca unificar em componente híbrido.
-- **Padrão MVVM Flutter (ADR-011):** Camadas bem definidas: `domain/models/`, `data/services/`, `data/repositories/` (com cache transparente em memória TTL 30s) e `ui/<entidade>/view_models/`.
-- **Design System Kickster:** Uso estrito de `KicksterButton`, `KicksterDropdown` (largura ~240px em filtros), `KicksterSearchField`, `KicksterCard`, `KicksterMenuAnchor`, `KicksterCalendar` (nunca `showDatePicker`), `SelectableCard` e `SelectableChip`.
+> **Repositório:** [`cesargranelli/flag_admin_web`](https://github.com/cesargranelli/flag_admin_web)  
+> **Escopo:** Aplicação Web Administrativa (Flutter Web, Provider / ChangeNotifier MVVM, Kickster Design System)  
+> **Documentação Específica do Repositório:** [`flag_admin_web/docs/`](https://github.com/cesargranelli/flag_admin_web/tree/develop/docs)
 
 ---
 
-## 2. Documentos e Especificações
+## 1. Papel no Ecossistema
 
-| Documento | Descrição |
-|-----------|-----------|
-| [Análise de Otimização de API](analise-otimizacao-api.md) | Diagnóstico de latência, estratégias de payload, cache em memória e redução de overhead de rede. |
-| [Harmonização de Formulários](../../design/modelo_visual_harmonizacao_forms.md) | Especificação visual para formulários fluidos em página única agrupados em cards limpos. |
-| [Padronização de Agremiações & Organizações](../../design/modelo_visual_organizacao_agremiacao.md) | Alinhamento visual da grade de listagem, busca, filtros e cards. |
-| [Design Tokens Oficiais](../../design/tokens.md) | Cores, tipografia DM Sans, elevações e espaçamentos do Kickster. |
+O `flag_admin_web` é o painel de controle operacional e administrativo da plataforma. É utilizado por diretores de federações, gestores de ligas e administradores de agremiações para cadastros, gerenciamento de inscrições, agendamento de confrontos e auditoria.
+
+### Regras Mandatórias de Arquitetura (AGENTS.md):
+- **Separação Rígida Create vs Edit:** NUNCA unificar criação e edição no mesmo arquivo ou widget. Toda entidade possui telas e ViewModels explicitamente segregados (`*_create_screen.dart` e `*_edit_screen.dart`).
+- **Padrão MVVM Flutter (ADR-011):** `domain/models/` → `data/services/` → `data/repositories/` (com cache de 30s) → `ui/<entidade>/view_models/` → `ui/<entidade>/widgets/`.
+- **Design System Kickster:** Uso mandatório de componentes Kickster (`KicksterButton`, `KicksterDropdown`, `KicksterCard`, `KicksterCalendar`, `KicksterMenuAnchor`).
 
 ---
 
-## 3. Decisões Arquiteturais Relacionadas
+## 2. Documentações Específicas (No Repositório `flag_admin_web`)
+
+As especificações de telas e decisões técnicas locais residem no repositório web:
+
+| Documento Específico | Descrição |
+|----------------------|-----------|
+| [Análise de Otimização de API](https://github.com/cesargranelli/flag_admin_web/blob/develop/docs/analise-otimizacao-api.md) | Otimizações de payload, eliminação de consultas N+1 e política de cache em memória. |
+| [Harmonização Visual de Formulários](https://github.com/cesargranelli/flag_admin_web/blob/develop/docs/modelo_visual_harmonizacao_forms.md) | Diretrizes para formulários de página única fluidos agrupados em cards limpos. |
+| [Padronização Organizações & Agremiações](https://github.com/cesargranelli/flag_admin_web/blob/develop/docs/modelo_visual_organizacao_agremiacao.md) | Grade de 2 colunas, filtros com `KicksterDropdown` e listagem consistente. |
+| [ADR Local: Atleta MVVM](https://github.com/cesargranelli/flag_admin_web/blob/develop/docs/adr/011-athlete-module-mvvm-migration.md) | Migração arquitetural específica do módulo de atletas. |
+
+---
+
+## 3. Diretrizes e Decisões Globais Aplicáveis
 
 - [ADR-001 — Nova Filosofia de Arquitetura](../../adr/ADR-001-nova-filosofia-arquitetura.md)
 - [ADR-006 — Team / Roster / Season Refactor](../../adr/ADR-006-team-roster-season-refactor.md)
-- [ADR-010 — Autenticação Firebase-First com Custom Claims](../../adr/ADR-010-autenticacao-firebase-custom-claims.md)
-- [ADR-011 — Arquitetura Flutter MVVM](../../adr/ADR-011-flutter-mvvm-architecture.md)
+- [ADR-010 — Autenticação Centralizada Firebase-First](../../adr/ADR-010-autenticacao-firebase-custom-claims.md)
+- [ADR-011 — Padrão Arquitetural Flutter MVVM](../../adr/ADR-011-flutter-mvvm-architecture.md)
+- [Design Tokens Oficiais (Kickster)](../../design/tokens.md)
+- [Especificações Globais de Layout](../../design/layout-spec.md)

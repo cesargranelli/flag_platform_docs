@@ -39,7 +39,6 @@ Documentação transversal que rege todo o ecossistema e suas integrações:
 | [Papéis, Permissões e Hierarquia](architecture/roles-and-permissions.md) | Modelo de autorização: `SUPER_ADMIN`, `ORG_ADMIN`, `MANAGER` e `USER`, com matriz de acesso. |
 | [Análise de Custo-Benefício em Nuvem](architecture/cloud-cost-benefit-analysis.md) | Comparativo de custos, dimensionamento de memória, Cloudflare R2/Pages, Cloud Run e PostgreSQL. |
 | [Mapeamento de Eventos por Modalidade](architecture/mapeamento-eventos-modalidades.md) | Catálogo e padronização oficial de lances para Flag 5x5, 7x7, 8x8, 9x9 e Full Pads 11x11. |
-| [Análise de Enums do Jogo](architecture/analise-completa-enums-backend.md) | Alinhamento detalhado de enums e regras de pontuação entre backend e aplicativos. |
 | [Arquitetura do Módulo de Competições](architecture/arquitetura_modulo_competicoes.md) | Modelagem de competições, fases eliminatórias, grupos e geração de partidas. |
 | [Arquitetura do Delegado e App Público](architecture/arquitetura_delegado_e_app_publico.md) | Fluxo de validação de súmula pelo delegado e publicação para os torcedores. |
 | [Características do Referee App](architecture/flag_referee_app_caracteristicas.md) | Requisitos funcionais, modos de operação offline e regras da mesa. |
@@ -50,15 +49,15 @@ Documentação transversal que rege todo o ecossistema e suas integrações:
 
 ## 3. Aplicações e Módulos do Ecossistema
 
-Documentações especializadas por projeto/repositório:
+> **Diretriz de Separação:** A documentação técnica detalhada de cada módulo vive em seu respectivo repositório (`docs/`). O portal central mantém a visão geral de arquitetura do componente e pontos de integração.
 
-| Aplicação | Repositório | Documentação |
-|:---:|:---:|---|
-| **Backend API** | [`flag_backend`](https://github.com/cesargranelli/flag_backend) | [Visão Geral](apps/backend/README.md) • [Modelo de Pessoas e Atletas](apps/backend/data-model-persons.md) • [Contratos Admin](apps/backend/flag-admin-web-data-model.md) • [Contratos Referee](apps/backend/flag-referee-app-data-model.md) |
-| **Admin Web** | [`flag_admin_web`](https://github.com/cesargranelli/flag_admin_web) | [Visão Geral](apps/admin-web/README.md) • [Otimização de API](apps/admin-web/analise-otimizacao-api.md) • [Harmonização Forms](design/modelo_visual_harmonizacao_forms.md) |
-| **Referee App** | [`flag_referee_app`](https://github.com/cesargranelli/flag_referee_app) | [Visão Geral](apps/referee-app/README.md) • [Fluxo de Telas](apps/referee-app/fluxo-de-telas.md) • [Diagrama Draw.io](apps/referee-app/fluxo-de-telas.drawio) • [Eventos](architecture/mapeamento-eventos-modalidades.md) |
-| **Public App** | [`flag_public_app`](https://github.com/cesargranelli/flag_public_app) | [Visão Geral](apps/public-app/README.md) • [Fluxo de Navegação](apps/public-app/screen-flow.md) • [Diagrama Draw.io](apps/public-app/assets/flag-public-app-flow.drawio) |
-| **Infraestrutura** | [`flag_platform_infra`](https://github.com/cesargranelli/flag_platform_infra) | [Visão Geral](apps/infra/README.md) • [Arquitetura de Infra](apps/infra/architecture.md) • [Runbook Operacional](apps/infra/runbook.md) |
+| Aplicação | Repositório | Visão Geral no Hub | Documentação Específica no Repositório |
+|:---:|:---:|:---:|---|
+| **Backend API** | [`flag_backend`](https://github.com/cesargranelli/flag_backend) | [apps/backend/](apps/backend/README.md) | [`flag_backend/docs`](https://github.com/cesargranelli/flag_backend/tree/develop/docs) (Modelos de dados, Contratos REST e Enums) |
+| **Admin Web** | [`flag_admin_web`](https://github.com/cesargranelli/flag_admin_web) | [apps/admin-web/](apps/admin-web/README.md) | [`flag_admin_web/docs`](https://github.com/cesargranelli/flag_admin_web/tree/develop/docs) (Otimização de API, MVVM e Telas) |
+| **Referee App** | [`flag_referee_app`](https://github.com/cesargranelli/flag_referee_app) | [apps/referee-app/](apps/referee-app/README.md) | [`flag_referee_app/docs`](https://github.com/cesargranelli/flag_referee_app/tree/develop/docs) (Fluxo de telas, Operação ao Vivo e Súmula) |
+| **Public App** | [`flag_public_app`](https://github.com/cesargranelli/flag_public_app) | [apps/public-app/](apps/public-app/README.md) | [`flag_public_app/docs`](https://github.com/cesargranelli/flag_public_app/tree/blocos-estabilizacao/docs) (Fluxo de navegação do torcedor) |
+| **Infraestrutura** | [`flag_platform_infra`](https://github.com/cesargranelli/flag_platform_infra) | [apps/infra/](apps/infra/README.md) | [`flag_platform_infra/docs`](https://github.com/cesargranelli/flag_platform_infra/tree/main/docs) (Topologia Docker e Runbook operacional) |
 
 ---
 
