@@ -1,0 +1,242 @@
+<mxfile host="app.diagrams.net" agent="flag-agent" version="24.0.0">
+  <diagram id="flag-public-app-screens" name="Fluxo de Telas - Flag Public App">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ================= LEGENDA ================= -->
+        <mxCell id="legend" value="LEGENDA" style="text;html=1;fontSize=14;fontStyle=1;align=left;verticalAlign=middle;spacingLeft=4;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="200" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="lg-aba" value="Aba da navegação principal (Shell)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="48" width="220" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="lg-camp" value="Tela da área Campeonato" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#388E3C;" vertex="1" parent="1">
+          <mxGeometry x="290" y="48" width="220" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="lg-stack" value="Tela empilhada (fora da Shell)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#F9A825;" vertex="1" parent="1">
+          <mxGeometry x="540" y="48" width="220" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="lg-erro" value="Tela de erro / estado vazio" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEBEE;strokeColor=#E53935;" vertex="1" parent="1">
+          <mxGeometry x="790" y="48" width="220" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="lg-decision" value="Decisão / condição" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#EF6C00;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="48" width="120" height="34" as="geometry" />
+        </mxCell>
+
+        <!-- ================= ZONA A: SHELL ================= -->
+        <mxCell id="shell-container" value="PublicShell — StatefulShellRoute (IndexedStack)
+navegação principal com 3 abas" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#9E9E9E;dashed=1;verticalAlign=top;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="120" width="280" height="300" as="geometry" />
+        </mxCell>
+
+        <mxCell id="tab-live" value="Ao vivo
+/live
+LiveScreen
+(timeline live score)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;" vertex="1" parent="1">
+          <mxGeometry x="70" y="170" width="220" height="64" as="geometry" />
+        </mxCell>
+
+        <mxCell id="tab-competition" value="Campeonato
+/competition
+CompetitionDetailScreen
+(lista ou hub do campeonato em foco)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;" vertex="1" parent="1">
+          <mxGeometry x="70" y="258" width="220" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="tab-about" value="Sobre
+/about
+AboutScreen" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;" vertex="1" parent="1">
+          <mxGeometry x="70" y="362" width="220" height="44" as="geometry" />
+        </mxCell>
+
+        <mxCell id="shell-decision" value="Tela larga (>= 960px)?
+NavigationRail : BottomBar" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#EF6C00;" vertex="1" parent="1">
+          <mxGeometry x="400" y="150" width="180" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ================= ZONA B: CAMPEONATO ================= -->
+        <mxCell id="camp-container" value="Branch Campeonato (aba 1)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#9E9E9E;dashed=1;verticalAlign=top;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="360" y="120" width="420" height="520" as="geometry" />
+        </mxCell>
+
+        <mxCell id="comp-list" value="Lista de campeonatos
+/competition (sem foco)
+CompetitionDetailScreen — estado vazio
+CompetitionCard por item" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#388E3C;" vertex="1" parent="1">
+          <mxGeometry x="395" y="160" width="350" height="66" as="geometry" />
+        </mxCell>
+
+        <mxCell id="comp-empty" value="Nenhum campeonato disponível
+AppEmptyState" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEBEE;strokeColor=#E53935;" vertex="1" parent="1">
+          <mxGeometry x="395" y="250" width="200" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="hub" value="HUB do campeonato (em foco)
+/competition/:id
+CompetitionDetailScreen — TabBar (3 abas)
+AppBar: título + botão &quot;Trocar&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DCEDC8;strokeColor=#689F38;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="395" y="330" width="350" height="62" as="geometry" />
+        </mxCell>
+
+        <mxCell id="tab-games" value="Tab Jogos
+CompetitionGamesScreen
+· Próximos jogos (até 3)
+· Filtro por rodada
+· Todos os jogos" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#388E3C;" vertex="1" parent="1">
+          <mxGeometry x="395" y="420" width="350" height="74" as="geometry" />
+        </mxCell>
+
+        <mxCell id="tab-results" value="Tab Resultados
+CompetitionResultsScreen
+· só jogos FINISHED
+· ordenados por data desc" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#388E3C;" vertex="1" parent="1">
+          <mxGeometry x="395" y="520" width="350" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="tab-standings" value="Tab Classificação
+CompetitionStandingsScreen
+· tabela (Pos, PJ, V, D, SG, PTS)
+· pull-to-refresh
+· linha toca → time" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#388E3C;" vertex="1" parent="1">
+          <mxGeometry x="395" y="606" width="350" height="66" as="geometry" />
+        </mxCell>
+
+        <!-- ================= ZONA C: STACK ROUTES ================= -->
+        <mxCell id="stack-container" value="Stack routes — fora da Shell (sem barra inferior)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#9E9E9E;dashed=1;verticalAlign=top;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="840" y="120" width="440" height="540" as="geometry" />
+        </mxCell>
+
+        <mxCell id="game-detail" value="Detalhe do jogo
+/game/:id
+GameDetailScreen
+· placar + status
+· timeline de pontos
+· local (mapa)
+· auto-refresh 10s se IN_PROGRESS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#F9A825;" vertex="1" parent="1">
+          <mxGeometry x="880" y="160" width="360" height="92" as="geometry" />
+        </mxCell>
+
+        <mxCell id="team-detail" value="Detalhe do time
+/teams/:id
+TeamDetailScreen
+· header (logo, nome, shortName)
+· elenco filtrado por competição
+· ou elencos por competição" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#F9A825;" vertex="1" parent="1">
+          <mxGeometry x="880" y="280" width="360" height="86" as="geometry" />
+        </mxCell>
+
+        <mxCell id="pbp" value="Play-by-Play
+/live/:id/plays
+PlayByPlayScreen
+· header do jogo (placar)
+· lances por quarto
+· indicador AO VIVO" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#F9A825;" vertex="1" parent="1">
+          <mxGeometry x="880" y="394" width="360" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="error404" value="Página não encontrada
+errorBuilder (qualquer rota inválida)
+· botão &quot;Voltar ao início&quot; → /live" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEBEE;strokeColor=#E53935;" vertex="1" parent="1">
+          <mxGeometry x="880" y="502" width="360" height="56" as="geometry" />
+        </mxCell>
+
+        <!-- ================= SETAS: SHELL → ABAS ================= -->
+        <mxCell id="e-shell-live" value="tocar aba" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#616161;endArrow=block;html=1;fontSize=11;" edge="1" parent="1" source="shell-container" target="tab-live">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-shell-camp" value="tocar aba
+(com foco → /competition/:id)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#616161;endArrow=block;html=1;fontSize=11;" edge="1" parent="1" source="shell-container" target="tab-competition">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-shell-about" value="tocar aba" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#616161;endArrow=block;html=1;fontSize=11;" edge="1" parent="1" source="shell-container" target="tab-about">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ================= SETAS: CAMPEONATO ================= -->
+        <mxCell id="e-camp-focus" value="tocar no CompetitionCard
+→ set foco + go /competition/:id" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#616161;endArrow=block;html=1;fontSize=11;" edge="1" parent="1" source="comp-list" target="hub">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-camp-empty" value="lista vazia" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#616161;endArrow=block;html=1;fontSize=11;" edge="1" parent="1" source="comp-list" target="comp-empty">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-switch" value="botão &quot;Trocar&quot;
+→ limpa foco + go /competition" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#E53935;endArrow=block;html=1;fontSize=11;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="hub" target="comp-list">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-hub-games" value="aba Jogos" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#616161;endArrow=block;html=1;fontSize=11;" edge="1" parent="1" source="hub" target="tab-games">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-hub-results" value="aba Resultados" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#616161;endArrow=block;html=1;fontSize=11;" edge="1" parent="1" source="hub" target="tab-results">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-hub-standings" value="aba Classificação" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#616161;endArrow=block;html=1;fontSize=11;" edge="1" parent="1" source="hub" target="tab-standings">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ================= SETAS: TABS → STACK ================= -->
+        <mxCell id="e-games-game" value="tocar no jogo (qualquer status)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#F9A825;endArrow=block;html=1;fontSize=11;" edge="1" parent="1" source="tab-games" target="game-detail">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-results-game" value="tocar no jogo finalizado" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#F9A825;endArrow=block;html=1;fontSize=11;" edge="1" parent="1" source="tab-results" target="game-detail">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-games-team" value="tocar no time (casa/fora)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#F9A825;endArrow=block;html=1;fontSize=11;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="tab-games" target="team-detail">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-results-team" value="tocar no time" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#F9A825;endArrow=block;html=1;fontSize=11;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="tab-results" target="team-detail">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-standings-team" value="tocar na linha do time" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#F9A825;endArrow=block;html=1;fontSize=11;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="tab-standings" target="team-detail">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ================= SETAS: LIVE → PBP ================= -->
+        <mxCell id="e-live-pbp" value="botão Play-by-Play
+(em jogos ao vivo e recentes)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#F9A825;endArrow=block;html=1;fontSize=11;" edge="1" parent="1" source="tab-live" target="pbp">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ================= SETAS: GAME DETAIL → PBP/TEAM ================= -->
+        <mxCell id="e-game-teams" value="tocar no time" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#F9A825;endArrow=block;html=1;fontSize=11;" edge="1" parent="1" source="game-detail" target="team-detail">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ================= SETAS: 404 ================= -->
+        <mxCell id="e-404" value="URL inválida (qualquer rota)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#E53935;endArrow=block;html=1;fontSize=11;" edge="1" parent="1" target="error404">
+          <mxGeometry relative="1" as="geometry" />
+          <mxPoint x="1180" y="80" as="sourcePoint" />
+        </mxCell>
+        <mxCell id="e-404-back" value="Voltar ao início" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#E53935;endArrow=block;html=1;fontSize=11;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="error404" target="tab-live">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ================= NOTAS DE CENÁRIOS ================= -->
+        <mxCell id="note-deeplink" value="Deep links do hub:
+/competition/:id/games → aba Jogos
+/competition/:id/results → aba Resultados
+/competition/:id/standings → aba Classificação
+(abrem o hub na aba certa; state preservado por aba)" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;size=14;fillColor=#FFF9C4;strokeColor=#F9A825;" vertex="1" parent="1">
+          <mxGeometry x="40" y="470" width="280" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="note-focus" value="Campeonato em foco (FocusedCompetition):
+persistido em SharedPreferences.
+· abrir app com foco → hub direto
+· aba Campeonato → /competition/:id
+· sem foco → lista /competition" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;size=14;fillColor=#FFF9C4;strokeColor=#F9A825;" vertex="1" parent="1">
+          <mxGeometry x="40" y="590" width="280" height="96" as="geometry" />
+        </mxCell>
+
+        <mxCell id="note-stack" value="Voltar (back) nas telas empilhadas:
+sistema de back do GoRouter — cada
+tela de detalhe volta para a tela de origem
+(aba da shell ou detalhe anterior)." style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;size=14;fillColor=#FFF9C4;strokeColor=#F9A825;" vertex="1" parent="1">
+          <mxGeometry x="840" y="680" width="280" height="80" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

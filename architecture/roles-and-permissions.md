@@ -19,10 +19,10 @@ Comunidade de Flag Football no Brasil. As informações estão hoje espalhadas e
 ## Hierarquia Organizacional
 
 ```
-Organization (Federação/Liga)
-    └── Club (Clube/Universidade)
-         └── Team (Time de competição)
-              └── Roster (Elenco por Season)
+Organization (Federação/Liga/Associação)
+    └── Institution (Clube/Universidade)
+         └── Team (Equipe Esportiva)
+              └── Roster (Elenco por Temporada)
                    └── Athlete (Atleta)
 ```
 
