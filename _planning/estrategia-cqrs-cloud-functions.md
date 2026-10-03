@@ -1,6 +1,12 @@
 # ADR-007: Estratégia de Espelhamento CQRS com Cloud Functions
 
-**Status:** Proposto
+> ⚠️ **Superseded por ADR-018.**
+> Esta estratégia (Cloud Functions em três camadas) foi **superada** pelo
+> [ADR-018](../../adr/ADR-018-espelhamento-firestore-admin-sdk.md), que adota o espelhamento
+> **pelo próprio backend com o Firebase Admin SDK** e **não** por Cloud Functions.
+> O arquivo é mantido apenas como registro histórico. Status original abaixo, preservado.
+
+**Status:** Proposto (superado)
 **Data:** 2026-09-05
 **Autor:** DevOps (Flag Platform)
 **Substitui/Complementa:** ADR-002 (PostgreSQL + Firestore CQS)

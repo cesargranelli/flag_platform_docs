@@ -1,4 +1,9 @@
-# ADR-002: Manter PostgreSQL como banco de dados primário + Firestore como espelho CQRS (Light)
+# ADR-002: Manter Oracle ADB como banco de dados primário + Firestore como espelho CQRS (Light)
+
+> **Atualizado por [ADR-018](ADR-018-espelhamento-firestore-admin-sdk.md).** A decisão CQRS Light
+> permanece; a premissa de banco foi corrigida de PostgreSQL para **Oracle Autonomous Database 23ai**
+> e o **"como"** do espelhamento passa a ser o **Firebase Admin SDK no backend** (ADR-018), e não
+> Cloud Functions. O texto abaixo já reflete essa correção.
 
 ## Contexto
 
@@ -6,15 +11,19 @@ A Flag Platform possui um domínio de gestão esportiva (flag football) com:
 - Estrutura hierárquica bem definida: Organization → Institution → Team → Roster → Athlete (Person)
 - Necessidade de integridade referencial, transações e consultas complexas (leaderboards, estatísticas)
 - Volume de dados moderado (10-20 TPS de escrita em picos de rodadas), com consultas públicas massivas
-- Existing PostgreSQL schema evoluído via migrations Java Flyway
+- Schema atual no **Oracle Autonomous Database 23ai (Always Free)** — schema/usuário `platform`,
+  conexão mTLS via wallet, `jdbc:oracle:thin:@devdb_high` — evoluído via migrations **Liquibase** (YAML)
 
 ## Decisão
 
-**Manter PostgreSQL como banco de dados primário** (fonte da verdade transacional ACID) e **implementar Firestore como espelho CQRS leve** para consultas de leitura e casos de uso de tempo real.
+**Manter o Oracle ADB como banco de dados primário** (fonte da verdade transacional ACID) e **implementar Firestore como espelho CQRS leve** para consultas de leitura e casos de uso de tempo real.
+
+O **como** do espelhamento está definido no [ADR-018](ADR-018-espelhamento-firestore-admin-sdk.md):
+**Firebase Admin SDK no próprio backend**, best-effort pós-commit — e **não** Cloud Functions.
 
 ### Por quê?
 
-| Critério | PostgreSQL | Firestore |
+| Critério | Oracle ADB | Firestore |
 |----------|------------|------------|
 | Integridade referencial | ✅ Garantida | ❌ Manual |
 | Transações (scores, limites) | ✅ Suportado | ❌ Não |
@@ -33,7 +42,7 @@ A Flag Platform possui um domínio de gestão esportiva (flag football) com:
        │                    │                        │
        ▼                    ▼                        ▼
 ┌─────────────┐     ┌──────────────┐     ┌─────────────┐
-│  PostgreSQL │     │  Firestore   │     │  Firestore  │
+│  Oracle ADB │     │  Firestore   │     │  Firestore  │
 │  (Primário) │     │  (CQS Mirror)│     │  (CQS Mirror)│
 │  - Todos os │     │  - Leituras  │     │  - Dashboards│
 │    dados    │     │  - Statistics│     │  - Real-time│
@@ -43,7 +52,7 @@ A Flag Platform possui um domínio de gestão esportiva (flag football) com:
 
 ### Campos de Espelhamento (CQS Light)
 
-| Entidade | Tabela PostgreSQL | Firestore Collection | Observações |
+| Entidade | Tabela (Oracle ADB) | Firestore Collection | Observações |
 |----------|-------------------|----------------------|-------------|
 | Organization | `organizations` | `organizations` | Federações e Ligas organizadoras |
 | Institution | `institutions` | `institutions` | 1:N com Teams |
@@ -61,43 +70,48 @@ A Flag Platform possui um domínio de gestão esportiva (flag football) com:
 
 ### Benefícios
 
-1. **Preservação do domínio atual** – Nenhuma reestruturação do schema PostgreSQL
-2. **Performance de escrita** – Onde importa (inserções de scores, check-ins) permanece em PostgreSQL
+1. **Preservação do domínio atual** – Nenhuma reestruturação do schema Oracle ADB
+2. **Performance de escrita** – Onde importa (inserções de scores, check-ins) permanece no Oracle ADB
 3. **Consultas rápidas de leitura** – Dashboards, leaderboards, estatísticas em Firestore
 4. **Escalabilidade gradual** – Firestore escala bem para leituras massivas sem impacto na escrita
-5. **Custo controlado** – Ambos são gratuitos ou de baixo custo (PostgreSQL gerenciado + Firestore Free Tier)
+5. **Custo controlado** – Oracle ADB Always Free + Firestore Free Tier (monitorar operações de leitura — ver nota de custo no ADR-018)
 
 ### Limitações
 
 - **Soft deletes** devem ser implementados em ambas as fontes (PK + `deleted_at`)
-- **Transações** que envolvem múltiplas tabelas devem permanecer em PostgreSQL
-- **Auditoria** completa (logs de alterações) mantida em PostgreSQL
-- **Integração com autenticação** (Firebase Auth) permanece no PostgreSQL (user table)
+- **Transações** que envolvem múltiplas tabelas devem permanecer no Oracle ADB
+- **Auditoria** completa (logs de alterações) mantida no Oracle ADB
+- **Integração com autenticação** (Firebase Auth) permanece no Oracle ADB (tabela `users`)
 
 ## Execução
 
-1. **Configurar Cloud Functions** para sincronização bidirecional (PostgreSQL → Firestore)
-2. **Implementar soft deletes** em todas as entidades (adicionar `deleted_at` column)
-3. **Migrar dados iniciais** (seed) para Firestore
-4. **Criar APIs de leitura** em Firestore para dashboards e notificações
-5. **Monitorar performance** e ajustar estratégias de indexação
+O **"como"** do espelhamento está definido no [ADR-018](ADR-018-espelhamento-firestore-admin-sdk.md)
+(Firebase Admin SDK no backend, best-effort pós-commit). Em resumo:
+
+1. **Espelhar** via `GameChangedEvent` + `@TransactionalEventListener(AFTER_COMMIT)` no módulo `realtime`
+   do `flag_backend` (primeiro corte: `games`; depois `scoreEvents` e catálogo).
+2. **Implementar soft deletes** nas entidades espelhadas (coluna `deleted_at`).
+3. **Migrar dados iniciais** (seed) para Firestore via backfill opt-in.
+4. **Reconciliar** `firestore.rules`/`indexes.json` (escrita só pelo backend; leitura pública).
+5. **Monitorar** operações/drift do espelho.
 
 ## Próximos Passos
 
-- [ ] Criar Cloud Functions para sincronização CQRS
-- [ ] Implementar soft deletes em PostgreSQL
-- [ ] Migrar dados iniciais para Firestore
-- [ ] Criar endpoints de leitura em Firestore (dashboards, leaderboards)
-- [ ] Validar performance de consultas em Firestore
+- [ ] Implementar o writer de `games` no backend (dependência `firebase-admin` + módulo `realtime`)
+- [ ] Implementar soft deletes nas entidades espelhadas
+- [ ] Backfill inicial para Firestore
+- [ ] Criar/validar índices e a coleção de leitura em Firestore (dashboards, leaderboards)
+- [ ] Validar performance e custo de consultas em Firestore
 
 ## Referências
 
 - [ADR-001](ADR-001-nova-filosofia-arquitetura.md) – Filosofia inicial
+- [ADR-018](ADR-018-espelhamento-firestore-admin-sdk.md) – **Como** o espelhamento acontece (Admin SDK)
 - [Market Analysis](market-analysis-restructured.md) – Comparativo de soluções
 - [FlagStats Mapping](flagstats-mapeamento.md) – Mapeamento de métricas
 
 ---
 
-**Status**: Approved
+**Status**: Approved — atualizado por ADR-018
 **Created**: 2026-09-06
 **Version**: 1.0
