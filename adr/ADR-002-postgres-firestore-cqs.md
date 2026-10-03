@@ -107,7 +107,7 @@ O **"como"** do espelhamento está definido no [ADR-018](ADR-018-espelhamento-fi
 
 - [ADR-001](ADR-001-nova-filosofia-arquitetura.md) – Filosofia inicial
 - [ADR-018](ADR-018-espelhamento-firestore-admin-sdk.md) – **Como** o espelhamento acontece (Admin SDK)
-- [Market Analysis](market-analysis-restructured.md) – Comparativo de soluções
+- [Market Analysis](../research/market-analysis.md) – Comparativo de soluções
 - [FlagStats Mapping](flagstats-mapeamento.md) – Mapeamento de métricas
 
 ---

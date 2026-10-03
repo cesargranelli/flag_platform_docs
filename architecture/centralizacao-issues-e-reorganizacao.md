@@ -26,7 +26,7 @@ Consolidar um **único tracker oficial (local, markdown)** para todo trabalho da
 | `backend-issues.md` (raiz) | arquivo único | `ISSUE-001..006` (pendências do `flag_backend`) | **Issue específica fora do tracker** |
 | GitHub Issues | remoto | **#5** (governança/docs) e **#37** (infra: build do hub) abertas | Contraria a regra de tracker local |
 
-> Nota: `_planning/motor-de-calculo-classificacao/` já é a **referência de estrutura** (um diretório, `map.md` + `spec.md` + `issues/NN-*.md` com `Status:`), embora o campo seja apenas `Status` (sem `Type`).
+> Nota: `_planning/_archive/motor-de-calculo-classificacao/` já é a **referência de estrutura** (um diretório, `map.md` + `spec.md` + `issues/NN-*.md` com `Status:`), embora o campo seja apenas `Status` (sem `Type`).
 
 ### 2.2 Nos repositórios (`<repo>/docs/`)
 
@@ -182,5 +182,5 @@ Cada passo vira uma fatia independente e pode ser um commit/PR próprio.
 - [Inventário do Hub](inventario-hub.md)
 - [Governança de Documentação](governanca-documentacao.md) — regra anti-docs-fantasma e Hub × repos
 - [Governança de Agentes e Skills](governanca-agentes-skills.md) — casas de artefatos e tracker
-- `_planning/motor-de-calculo-classificacao/map.md` — referência de estrutura de esforço
+- `_planning/_archive/motor-de-calculo-classificacao/map.md` — referência de estrutura de esforço
 - PR **#38** (`flag-platform-docs`) — consolidação em aberto para `main`
