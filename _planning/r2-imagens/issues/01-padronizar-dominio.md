@@ -1,7 +1,12 @@
 # R2-01: Padronizar 100% das imagens em `pub.america.app.br`
 
-Type: task
-Status: open
+> **Type:** task
+> **Status:** open
+> **Effort:** r2-imagens
+> **Repo(s):** flag_backend, flag_public_app, flag_referee_app, flag_platform_infra
+> **Blocks:** R2-05
+> **Blocked by:** —
+> **Origin:** —
 
 ## Objetivo
 

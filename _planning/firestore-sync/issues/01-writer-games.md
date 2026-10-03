@@ -1,7 +1,12 @@
 # FS-01: Implementar writer de `games` no backend (Admin SDK)
 
-Type: feature
-Status: open
+> **Type:** feature
+> **Status:** open
+> **Effort:** firestore-sync
+> **Repo(s):** flag_backend, flag_public_app
+> **Blocks:** FS-03
+> **Blocked by:** —
+> **Origin:** ADR-018
 
 ## Objetivo
 

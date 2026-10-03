@@ -160,7 +160,7 @@ um recurso, é **Variable**. Na dúvida, use Secret (o default seguro).
 3. **Validar** com um deploy em `staging` (workflow_dispatch do Hub a partir do satélite).
 4. **Propagar** para `production` e validar health check / smoke test.
 5. **Revogar** a credencial antiga no provedor **somente após** a validação.
-6. **Registrar** no tracker `flag_platform_docs/_planning/segredos-e-env/` (data, chave,
+6. **Registrar** no tracker `flag_platform_docs/_planning/_archive/segredos-e-env/` (data, chave,
    motivo, quem executou).
 7. Atualizar **backups offline** (keystores, service accounts) no cofre do operador.
 
@@ -205,4 +205,4 @@ um recurso, é **Variable**. Na dúvida, use Secret (o default seguro).
 - `flag_platform_infra/docs/kb/dispatch-and-automation.md` — dispatch entre repositórios.
 - `flag_platform_infra/scripts/sync-github-secrets.ps1` — sincronizador (stdin).
 - [ADR-016](../adr/ADR-016-gestao-segredos-github-environments.md) — decisão de arquitetura.
-- `flag_platform_docs/_planning/segredos-e-env/` — tracker da auditoria.
+- `flag_platform_docs/_planning/_archive/segredos-e-env/` — tracker da auditoria.

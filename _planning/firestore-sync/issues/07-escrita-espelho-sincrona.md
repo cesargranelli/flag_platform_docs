@@ -1,7 +1,12 @@
 # FS-07: Escrita do espelho síncrona no thread da request
 
-Type: Issue
-Status: open
+> **Type:** task
+> **Status:** open
+> **Effort:** firestore-sync
+> **Repo(s):** flag_backend
+> **Blocks:** —
+> **Blocked by:** —
+> **Origin:** ADR-018 / PR #73
 
 ## Objetivo
 

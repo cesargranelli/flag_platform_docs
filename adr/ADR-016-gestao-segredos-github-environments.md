@@ -51,7 +51,7 @@ Em paralelo, o responsável decidiu **não rotacionar** as credenciais expostas 
 ### Concretização
 
 - Documento canônico: [`architecture/env-vars-e-secrets.md`](../architecture/env-vars-e-secrets.md).
-- Tracker da auditoria: `_planning/segredos-e-env/`.
+- Tracker da auditoria: `_planning/_archive/segredos-e-env/`.
 - Script de sincronização por stdin: `flag_platform_infra/scripts/sync-github-secrets.ps1`.
 
 ---
