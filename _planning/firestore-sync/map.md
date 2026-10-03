@@ -48,13 +48,13 @@ por último.
 | ID | Tipo | Título | Critérios de aceitação | Status |
 |----|------|--------|------------------------|--------|
 | **FS-01** | feature | Implementar writer de `games` no backend (Admin SDK) | Ver [issue detalhada](issues/01-writer-games.md) | open |
-| **FS-02** | issue | Reconciliar `firestore.rules`/`firestore.indexes.json` e nomes de claims | Um único conjunto canônico; leitura pública (ou autenticada, decidida) e **escrita só pelo backend**; remover `write` por `isOrganizer()`/`isMesa()` do backend; alinhar claims (`role`, `organization_id`/`organizationId`) ao que o backend realmente emite; índices refletem apenas queries reais (o admin web hoje está vazio; o backend tem índices de `games`). Detalhada em [issues/02-reconciliar-rules-claims.md](issues/02-reconciliar-rules-claims.md) — incorpora o achado das rules divergentes do PR #73 (FS-02 existente, **não duplicada**) | open |
+| **FS-02** | task | Reconciliar `firestore.rules`/`firestore.indexes.json` e nomes de claims | Um único conjunto canônico; leitura pública (ou autenticada, decidida) e **escrita só pelo backend**; remover `write` por `isOrganizer()`/`isMesa()` do backend; alinhar claims (`role`, `organization_id`/`organizationId`) ao que o backend realmente emite; índices refletem apenas queries reais (o admin web hoje está vazio; o backend tem índices de `games`). Detalhada em [issues/02-reconciliar-rules-claims.md](issues/02-reconciliar-rules-claims.md) — incorpora o achado das rules divergentes do PR #73 (FS-02 existente, **não duplicada**) | open |
 | **FS-03** | task | Backfill inicial `games` + testes E2E (write→mirror→read) | Backfill idempotente e opt-in popula `games/{id}`; teste E2E cobre registrar resultado e o app/leitor enxergar o doc; no-op sem credencial não quebra o build | open |
 | **FS-04** | ops | Monitoramento e detecção de drift do espelho | Contadores de sync OK/falha por coleção; alerta de coleção vazia/desatualizada; runbook de backfill manual; nenhum dado sensível no espelho | open |
 | **FS-05** | docs | Consolidar premissas de infra nos docs | `flag_platform_docs` (e `flag_backend/docs`) sem afirmar PostgreSQL/jOOQ/Flyway/Cloud Run como runtime; Oracle ADB + Liquibase + OCI/Docker/Caddy como verdade; ajustar ADR-002, ADR-012 e análise de custo onde couber | open |
 | **FS-06** | atividade | Deleção de jogos fora do `GameService` deixa documento órfão no espelho | Ver [issue detalhada](issues/06-delecao-jogos-fora-game-service.md) | open |
-| **FS-07** | issue | Escrita do espelho síncrona no thread da request | Ver [issue detalhada](issues/07-escrita-espelho-sincrona.md) | open |
-| **FS-08** | issue | Backfill sem paginação (`findAll()` + N+1) | Ver [issue detalhada](issues/08-backfill-sem-paginacao.md) | open |
+| **FS-07** | task | Escrita do espelho síncrona no thread da request | Ver [issue detalhada](issues/07-escrita-espelho-sincrona.md) | open |
+| **FS-08** | task | Backfill sem paginação (`findAll()` + N+1) | Ver [issue detalhada](issues/08-backfill-sem-paginacao.md) | open |
 | **FS-09** | atividade | Pré-requisito de deploy: credencial Firebase no container | Ver [issue detalhada](issues/09-prerequisito-deploy-credencial.md) | open |
 
 ## Fora de escopo

@@ -1,7 +1,12 @@
 # FS-08: Backfill sem paginação (`findAll()` + N+1)
 
-Type: Issue
-Status: open
+> **Type:** task
+> **Status:** open
+> **Effort:** firestore-sync
+> **Repo(s):** flag_backend
+> **Blocks:** —
+> **Blocked by:** —
+> **Origin:** ADR-018 / PR #73
 
 ## Objetivo
 

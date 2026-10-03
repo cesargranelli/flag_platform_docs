@@ -1,7 +1,12 @@
 # FS-02: Reconciliar `firestore.rules`/`firestore.indexes.json` e claims
 
-Type: Issue
-Status: open
+> **Type:** task
+> **Status:** open
+> **Effort:** firestore-sync
+> **Repo(s):** flag_backend, flag_admin_web
+> **Blocks:** —
+> **Blocked by:** —
+> **Origin:** ADR-018 / PR #73
 
 ## Objetivo
 

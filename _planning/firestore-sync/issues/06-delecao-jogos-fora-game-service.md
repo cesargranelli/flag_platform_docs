@@ -1,7 +1,12 @@
 # FS-06: Deleção de jogos fora do `GameService` deixa documento órfão no espelho
 
-Type: Atividade
-Status: open
+> **Type:** atividade
+> **Status:** open
+> **Effort:** firestore-sync
+> **Repo(s):** flag_backend
+> **Blocks:** —
+> **Blocked by:** —
+> **Origin:** ADR-018 / PR #73
 
 ## Objetivo
 

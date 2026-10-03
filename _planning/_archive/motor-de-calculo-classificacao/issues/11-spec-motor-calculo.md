@@ -10,7 +10,7 @@ pronta para virar plano de implementação (o destino do esforço). Não é uma 
 artefato.
 
 - Entrada: as seções `## Answer` dos tickets resolvidos + `map.md`.
-- Saída: `_planning/motor-de-calculo-classificacao/spec.md`.
+- Saída: `_planning/_archive/motor-de-calculo-classificacao/spec.md`.
 - Sem código; apenas especificação.
 
 ## Answer

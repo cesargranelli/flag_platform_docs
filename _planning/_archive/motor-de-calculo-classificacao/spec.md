@@ -1,7 +1,7 @@
 # Spec — Motor de Cálculo de Classificação de Competições
 
 > **Status:** especificação consolidada. Destino do esforço de wayfinding
-> `_planning/motor-de-calculo-classificacao/` (tickets 01–10). Pronta para virar plano de implementação.
+> `_planning/_archive/motor-de-calculo-classificacao/` (tickets 01–10). Pronta para virar plano de implementação.
 > **Nada aqui é código:** é o contrato de decisão para backend (`flag_backend`), admin web
 > (`flag_admin_web`) e o contrato de leitura do `flag_public_app`.
 
@@ -207,7 +207,7 @@ No admin web: card de disparo por `isAdminUser`; edição por `canEditCompetitio
 
 ## 8. UI admin web (`flag_admin_web`)
 
-Protótipo: **[assets/08-ux-regras-admin.md](../assets/08-ux-regras-admin.md)**.
+Protótipo: **[assets/08-ux-regras-admin.md](assets/08-ux-regras-admin.md)**.
 
 - Seção **"Regras de Classificação"** no fluxo **create/edit** (DRAFT), no padrão
   `competition_grouping_section.dart`; **somente leitura** no detail.
@@ -232,13 +232,13 @@ Protótipo: **[assets/08-ux-regras-admin.md](../assets/08-ux-regras-admin.md)**.
 
 | Ticket | Assunto |
 |--------|---------|
-| [01](../issues/01-pesquisa-dominio-jogos.md) | Domínio de jogos (status, resultado, W.O.) |
-| [02](../issues/02-pesquisa-rbac.md) | RBAC — organizador dono vs ADMIN |
-| [03](../issues/03-regras-classificacao-v1.md) | Regras de classificação e critérios do v1 |
-| [04](../issues/04-modelo-dados-migracao.md) | Modelo de dados e migração |
-| [05](../issues/05-motor-escopo-grupos.md) | Escopo de cálculo e pipeline |
-| [06](../issues/06-contratos-rest.md) | Contratos REST e versionamento |
-| [07](../issues/07-permissoes-disparo.md) | Permissões |
-| [08](../issues/08-ux-telas-regras-admin.md) | UX no admin |
-| [09](../issues/09-wo-dominio-jogos.md) | W.O. no domínio de jogos |
-| [10](../issues/10-pesquisa-sos-sov.md) | Fórmulas de SOS e SOV |
+| [01](issues/01-pesquisa-dominio-jogos.md) | Domínio de jogos (status, resultado, W.O.) |
+| [02](issues/02-pesquisa-rbac.md) | RBAC — organizador dono vs ADMIN |
+| [03](issues/03-regras-classificacao-v1.md) | Regras de classificação e critérios do v1 |
+| [04](issues/04-modelo-dados-migracao.md) | Modelo de dados e migração |
+| [05](issues/05-motor-escopo-grupos.md) | Escopo de cálculo e pipeline |
+| [06](issues/06-contratos-rest.md) | Contratos REST e versionamento |
+| [07](issues/07-permissoes-disparo.md) | Permissões |
+| [08](issues/08-ux-telas-regras-admin.md) | UX no admin |
+| [09](issues/09-wo-dominio-jogos.md) | W.O. no domínio de jogos |
+| [10](issues/10-pesquisa-sos-sov.md) | Fórmulas de SOS e SOV |

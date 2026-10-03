@@ -112,7 +112,7 @@ Fora de qualquer repositório rastreado, porém sensíveis se expostos/backup:
 
 ## 7. Referências
 
-- Doc canônico: [`architecture/env-vars-e-secrets.md`](../../architecture/env-vars-e-secrets.md)
-- Decisão: [`adr/ADR-016-gestao-segredos-github-environments.md`](../../adr/ADR-016-gestao-segredos-github-environments.md)
+- Doc canônico: [`architecture/env-vars-e-secrets.md`](../../../architecture/env-vars-e-secrets.md)
+- Decisão: [`adr/ADR-016-gestao-segredos-github-environments.md`](../../../adr/ADR-016-gestao-segredos-github-environments.md)
 - KB de credenciais: `flag_platform_infra/docs/kb/credentials-and-secrets.md`
 - Contrato do backend: `flag_backend/docs/environment-variables.md`

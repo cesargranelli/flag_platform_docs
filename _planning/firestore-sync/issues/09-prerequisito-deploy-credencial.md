@@ -1,7 +1,12 @@
 # FS-09: Pré-requisito de deploy — credencial Firebase no container
 
-Type: Atividade
-Status: open
+> **Type:** atividade
+> **Status:** open
+> **Effort:** firestore-sync
+> **Repo(s):** flag_backend, flag_platform_infra
+> **Blocks:** —
+> **Blocked by:** —
+> **Origin:** ADR-018 / PR #73
 
 ## Objetivo
 
@@ -29,11 +34,11 @@ disponível. Sem ela o espelho é **no-op** e o app público segue lendo a cole�
 - [ ] Container de produção sobe com a credencial e o espelho **não** é no-op (log/handshake do
       Admin SDK confirmando `FirebaseApp` inicializado).
 - [ ] Backfill opt-in popula `games/{id}` após o deploy e o app público enxerga o documento.
-- [ ] Rotação da credencial coberta pelo runbook de segredos (ver esforço `segredos-e-env`).
+- [ ] Rotação da credencial coberta pelo runbook de segredos (ver esforço `_archive/segredos-e-env`).
 
 ## Arquivos afetados (referência)
 
 - `flag_backend/src/main/resources/application*.yml` — `FIREBASE_CREDENTIALS` / caminho padrão.
 - `flag_backend/.gitignore` — linha do service account (referência, não alterar).
 - `flag_platform_infra/**` — compose/Caddy/deploy da VM OCI (montagem do segredo).
-- `flag_platform_docs/_planning/segredos-e-env` — governança de segredos.
+- `flag_platform_docs/_planning/_archive/segredos-e-env` — governança de segredos.

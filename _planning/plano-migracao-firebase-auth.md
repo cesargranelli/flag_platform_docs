@@ -2,7 +2,7 @@
 
 ## Visão Geral
 
-Migrar e padronizar o sistema de autenticação de todo o ecossistema da **Flag Platform** para o modelo **Firebase-First com Custom Claims e Validação Stateless**, em total conformidade com a [ADR-010 — Autenticação Firebase-First com Custom Claims e Validação Stateless](ADR-010-autenticacao-firebase-custom-claims.md) e a arquitetura oficial Flutter [ADR-001](ADR-001-nova-filosofia-arquitetura.md).
+Migrar e padronizar o sistema de autenticação de todo o ecossistema da **Flag Platform** para o modelo **Firebase-First com Custom Claims e Validação Stateless**, em total conformidade com a [ADR-010 — Autenticação Firebase-First com Custom Claims e Validação Stateless](../adr/ADR-010-autenticacao-firebase-custom-claims.md) e a arquitetura oficial Flutter [ADR-001](../adr/ADR-001-nova-filosofia-arquitetura.md).
 
 O PostgreSQL (`flag_backend`) permanece como a **fonte única da verdade** (*source of truth*) para usuários, papéis e afiliações de entidades.
 
