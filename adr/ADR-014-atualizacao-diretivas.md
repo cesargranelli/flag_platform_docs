@@ -94,7 +94,7 @@ Quando aplicar, a ADR deve ser atualizada seguindo este modelo na seção final:
 
 - **ADR original:** ADR-001 — Filosofia do Projeto (versão 1.0, data: 2026-09-05)
 - **Impacto:** Afeta ADR-006 (Team/Roster/Season), ADR-010 (Autenticação Firebase-First)
-- **Relacionadas:** ADR-003 (Modular Monolith), ADR-004 (API First)
+- **Relacionadas:** ADR-019 (Modular Monolith), ADR-003 (Diagramas de Base de Dados)
 
 ---
 

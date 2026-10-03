@@ -14,16 +14,24 @@ Os Architecture Decision Records (ADRs) registram as decisões técnicas mandat�
 | ADR | Título | Resumo da Decisão |
 |:---:|--------|-------------------|
 | **001** | [Nova Filosofia de Arquitetura e Simplificação](adr/ADR-001-nova-filosofia-arquitetura.md) | Hierarquia de 5 níveis, 4 roles, Firebase-First, Modular Monolith e CQRS Light. |
-| **002** | [Estratégia de Dados Híbrida (PostgreSQL + Firestore)](adr/ADR-002-postgres-firestore-cqs.md) | PostgreSQL como fonte da verdade (ACID/Escrita) e Firestore como espelho para leitura em tempo real. |
+| **002** | [Estratégia de Dados Híbrida (Oracle ADB + Firestore)](adr/ADR-002-postgres-firestore-cqs.md) | Oracle ADB como fonte da verdade (ACID/Escrita) e Firestore como espelho para leitura em tempo real. |
 | **003** | [Diagramas de Base de Dados](adr/ADR-003-diagramas-base-de-dados.md) | Diagramas E-R, esquemas das tabelas relacionais e dependências entre módulos. |
 | **004** | [Diagramas do Projeto](adr/ADR-004-diagramas-projeto.md) | Diagramas de arquitetura C4, fluxos de sequência e componentes. |
 | **005** | [Staging Efêmero E2E](adr/ADR-005-staging-efemero-e2e.md) | Criação de ambientes temporários isolados para execução de testes ponta a ponta. |
 | **006** | [Team / Roster / Season Refactor](adr/ADR-006-team-roster-season-refactor.md) | Separação estrita de time, elenco vinculado por temporada e histórico do atleta. |
 | **010** | [Autenticação Centralizada Firebase-First](adr/ADR-010-autenticacao-firebase-custom-claims.md) | IdP Firebase Auth em todos os clientes, Custom Claims stateless e Security Rules. |
 | **011** | [Padrão Arquitetural Flutter MVVM](adr/ADR-011-flutter-mvvm-architecture.md) | Estrutura obrigatória das aplicações cliente: Domain, Data, Repository (cache) e ViewModel. |
-| **012** | [Migrations com jOOQ e Flyway](adr/ADR-012-migrations-jooq-java.md) | Evolução versionada de schema em Java com tipos seguros via jOOQ. |
+| **012** | [Migrations com Liquibase (YAML) + Oracle ADB](adr/ADR-012-migrations-jooq-java.md) | Evolução versionada de schema via changelogs Liquibase (YAML) contra Oracle ADB. |
 | **013** | [Gitflow para Gestão de Documentação](adr/ADR-013-gitflow-documentacao.md) | Ciclo de vida de documentação usando branches de feature, develop, release e tags. |
 | **014** | [Atualização de Diretivas em ADRs](adr/ADR-014-atualizacao-diretivas.md) | Princípio de documentos vivos: atualizar a ADR preservando histórico em vez de substituí-la. |
+| **015** | [Importação em Rascunho de Organizações](adr/ADR-015-importacao-rascunho-organizacoes.md) | Criação de organizações como `INACTIVE` via `importDraft` para semeadura assistida. |
+| **016** | [Gestão de Segredos via GitHub Environments](adr/ADR-016-gestao-segredos-github-environments.md) | Segredos em environments do GitHub com rotação controlada. |
+| **017** | [Configuração de Playoffs](adr/ADR-017-configuracao-playoffs.md) | Modelo de configuração de fases eliminatórias. |
+| **018** | [Espelhamento Firestore (Admin SDK)](adr/ADR-018-espelhamento-firestore-admin-sdk.md) | Oracle ADB → Firestore pelo backend via Firebase Admin SDK. |
+| **019** | [Modular Monolith](adr/ADR-019-modular-monolith.md) | Backend Spring Boot em monolito modular; sem microsserviços/K8s. (renumerado do antigo ADR-003 da linhagem `main`) |
+| **020** | [Migração de Autenticação para Firebase Auth](adr/ADR-020-firebase-auth-migration.md) | Decisão histórica de migração para Firebase Auth + Custom Claims. (renumerado do antigo ADR-004 da linhagem `main`) |
+
+> **Reconciliação de linhagens:** os antigos ADRs `007` (Flyway/jOOQ), `008` (ajustes de autenticação) e `009` (organização e agremiação) da linhagem `main` foram absorvidos/descartados. Detalhes em [Reconciliação de ADRs entre Linhagens](architecture/reconciliacao-adr-linhagens.md).
 
 ---
 
@@ -45,6 +53,7 @@ Documentação transversal que rege todo o ecossistema e suas integrações:
 | [Características do Referee App](architecture/flag_referee_app_caracteristicas.md) | Requisitos funcionais, modos de operação offline e regras da mesa. |
 | [Filiação e Inscrição de Agremiações](architecture/fluxo_filiacao_e_inscricao_agremiacoes.md) | Ciclo de vida do registro de agremiações e times nos campeonatos. |
 | [Guia de Competições e Partidas](architecture/guia-passo-a-passo-competicoes-e-partidas.md) | Manual passo a passo para configuração de novos torneios e tabelas de jogos. |
+| [Reconciliação de ADRs entre Linhagens](architecture/reconciliacao-adr-linhagens.md) | Mapa final de numeração, renumeração 019/020 e absorções 007/008/009. |
 
 ---
 

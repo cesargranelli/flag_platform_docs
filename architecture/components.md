@@ -70,14 +70,14 @@ br.com.flagplatform.{modulo}/
 
 ## 4. Persistência e Estratégia de Dados Híbrida (ADR-002)
 
-1. **PostgreSQL 16 (Escrita / Fonte da Verdade):**
+1. **Oracle ADB (Escrita / Fonte da Verdade):**
    - Transações ACID garantidas.
-   - Migrações versionadas em Java (`db.migration`) via Flyway e tipadas via jOOQ ([ADR-012](../adr/ADR-012-migrations-jooq-java.md)).
-   - UUID gerado nativamente em todas as chaves primárias.
+   - Migrações versionadas via **Liquibase (changelogs YAML)**; DDL em código é proibido ([ADR-012](../adr/ADR-012-migrations-jooq-java.md)).
+   - Identificadores (UUID) gerados na aplicação/banco conforme o schema Oracle.
 2. **Google Cloud Firestore (Leitura / Espelho CQRS Light):**
    - Coleções desnormalizadas para consultas de alta frequência e baixa latência.
    - Suporte nativo a *Realtime Listeners* para atualização em tempo real de placares e classificações no `flag_public_app`.
-   - Sincronização orientada a eventos a partir das transações confirmadas no PostgreSQL.
+   - Sincronização orientada a eventos a partir das transações confirmadas no Oracle ADB ([ADR-018](../adr/ADR-018-espelhamento-firestore-admin-sdk.md)).
 
 ---
 

@@ -1,147 +1,182 @@
-# ADR-012: Migrations Flyway com JOOQ DSL (Java)
+# ADR-012: Migrations com Liquibase (YAML) — runtime Oracle ADB
+
+> **Correção (reconciliação de linhagens):** o conteúdo original desta ADR afirmava "Flyway + PostgreSQL + JOOQ DSL em Java".
+> O runtime real do `flag_backend` é **Liquibase (changelogs YAML) + Oracle ADB**, e **DDL em código é proibido**
+> (ver `AGENTS.md` do `flag_backend` e [ADR-018](ADR-018-espelhamento-firestore-admin-sdk.md)).
+> O **nome do arquivo** (`ADR-012-migrations-jooq-java.md`) foi mantido para não quebrar links; a proposta de
+> renomeação de título/slug está registrada em
+> [architecture/reconciliacao-adr-linhagens.md](../architecture/reconciliacao-adr-linhagens.md).
+>
+> **Absorção:** o antigo **ADR-007 — Migrações Flyway em Java com JOOQ** (linhagem `main`) tratava deste
+> mesmo tema e foi **descartado como duplicata**; seu arquivo standalone foi removido e o conteúdo relevante
+> (runtime de migrações) vive nesta ADR-012, corrigido para Liquibase + Oracle ADB.
 
 ## Status
 
-Accepted
+Aceito — **corrigido** em 2026-10-03 (o runtime é Liquibase + Oracle ADB, não Flyway/jOOQ).
 
 ## Contexto
 
-O projeto utiliza Flyway para gerenciamento de migrations do PostgreSQL. Historicamente, existem migrations em SQL puro (`src/main/resources/db/migration/`) e migrations em Java com JOOQ DSL (`src/main/java/db/migration/`). As migrations SQL legadas (V1-V3) nao devem ser utilizadas para novas alteracoes.
+O `flag_backend` versiona a evolução do schema do **Oracle ADB** exclusivamente por meio de
+**changelogs do Liquibase em YAML** (`src/main/resources/db/changelog/`). A regra mandatória do
+repositório é: **nunca** escrever DDL/DML de migração em código Java ou SQL solto na aplicação —
+toda alteração de schema vive em um `changeSet` versionado do Liquibase.
 
-## Decisao
+Versões anteriores da documentação descreviam um pilha diferente (Flyway + PostgreSQL + JOOQ DSL).
+Essa pilha **não é** o runtime vigente e não deve ser usada como referência para novas migrações.
 
-Todas as novas migrations Flyway devem ser escritas em **Java usando JOOQ DSL**, seguindo o padrao estabelecido nas migrations V4-V14.
+## Decisão
 
-### Localizacao
+Todas as novas migrações são implementadas como **changelogs YAML do Liquibase**, aplicadas ao
+**Oracle ADB**.
+
+### Localização
 
 ```
-src/main/java/db/migration/
-├── V15__RemoveAthleteNickNumber.java
-├── V16__RenameAthletesToParticipants.java
-├── V17__SuaProximaMigracao.java
-└── ...
+src/main/resources/db/changelog/
+├── db.changelog-master.yaml        # changelog raiz (includes)
+├── 001-baseline.yaml
+├── ...
+├── 015-remove-athlete-nick-number.yaml
+└── 016-rename-athletes-to-participants.yaml
 ```
 
-### Numeracao
+O `db.changelog-master.yaml` inclui os arquivos na ordem de execução:
 
-- Ultima migration existente: V14 (CreateCompetitionEnrollmentWindows)
-- Proximas migrations: V15, V16, V17, ...
-- Formato: `V{numero}__{DescricaoCamelCase}.java`
+```yaml
+databaseChangeLog:
+  - include:
+      file: db/changelog/001-baseline.yaml
+  - include:
+      file: db/changelog/015-remove-athlete-nick-number.yaml
+```
+
+### Numeração e nomenclatura
+
+- Arquivos: `{NNN}-{descricao-em-kebab-case}.yaml` (ex.: `015-remove-athlete-nick-number.yaml`).
+- `changeSet.id`: descritivo e único (ex.: `015-remove-athlete-nick-number`).
+- `author`: identificador fixo do time/projeto.
 
 ### Template Base
 
-```java
-package db.migration;
-
-import java.sql.Connection;
-import org.flywaydb.core.api.migration.BaseJavaMigration;
-import org.flywaydb.core.api.migration.Context;
-import org.jooq.DSLContext;
-import org.jooq.SQLDialect;
-import org.jooq.impl.DSL;
-import org.jooq.impl.SQLDataType;
-
-/**
- * Migration V{N}: Descricao da migracao.
- *
- * <p>Detalhes sobre o que esta migracao faz.
- */
-public class V{N}__Descricao extends BaseJavaMigration {
-
-    @Override
-    public void migrate(Context context) throws Exception {
-        Connection connection = context.getConnection();
-        DSLContext dsl = DSL.using(connection, SQLDialect.POSTGRES);
-
-        // DDL usando JOOQ DSL
-        dsl.createTableIfNotExists(DSL.name("schema", "table"))
-                .column(DSL.field(DSL.name("id"), SQLDataType.UUID.nullable(false)
-                        .defaultValue(DSL.function("gen_random_uuid", SQLDataType.UUID))))
-                // ... mais colunas
-                .constraint(DSL.constraint(DSL.name("pk_table")).primaryKey(DSL.field(DSL.name("id"))))
-                .execute();
-    }
-}
+```yaml
+databaseChangeLog:
+  - changeSet:
+      id: 015-remove-athlete-nick-number
+      author: flag-platform
+      changes:
+        - dropColumn:
+            schemaName: PLATFORM
+            tableName: PARTICIPANTS
+            columnName: NICK_NUMBER
+      rollback:
+        - addColumn:
+            schemaName: PLATFORM
+            tableName: PARTICIPANTS
+            columns:
+              - column:
+                  name: NICK_NUMBER
+                  type: NUMBER(10)
 ```
 
-### Sintaxes Comuns
+### Sintaxes Comuns (Oracle)
 
 #### Criar tabela
 
-```java
-dsl.createTableIfNotExists(DSL.name("platform", "tabela"))
-    .column(DSL.field(DSL.name("coluna"), SQLDataType.VARCHAR(100).nullable(false)))
-    .constraint(DSL.constraint(DSL.name("pk_tabela")).primaryKey(DSL.field(DSL.name("id"))))
-    .execute();
+```yaml
+- changeSet:
+    id: 016-create-table
+    author: flag-platform
+    changes:
+      - createTable:
+          schemaName: PLATFORM
+          tableName: TABELA
+          columns:
+            - column:
+                name: ID
+                type: RAW(16)
+                constraints:
+                  primaryKey: true
+                  nullable: false
+            - column:
+                name: NOME
+                type: VARCHAR2(255)
+                constraints:
+                  nullable: false
 ```
 
-#### Adicionar coluna
+#### Adicionar / renomear / remover coluna
 
-```java
-dsl.alterTable(DSL.name("platform", "tabela"))
-    .add(
-        DSL.field(DSL.name("nova_coluna"), SQLDataType.VARCHAR(100)),
-        DSL.field(DSL.name("outra_coluna"), SQLDataType.INTEGER)
-    )
-    .execute();
+```yaml
+- changeSet:
+    id: 017-alter-tabela
+    author: flag-platform
+    changes:
+      - addColumn:
+          schemaName: PLATFORM
+          tableName: TABELA
+          columns:
+            - column:
+                name: NOVA_COLUNA
+                type: VARCHAR2(100)
+      - renameColumn:
+          schemaName: PLATFORM
+          tableName: TABELA
+          oldColumnName: ANTIGA
+          newColumnName: NOVA
+      - dropColumn:
+          schemaName: PLATFORM
+          tableName: TABELA
+          columnName: OBSOLETA
 ```
 
-#### Renomear tabela
+#### Criar índice e constraint
 
-```java
-dsl.alterTable(DSL.name("platform", "tabela_antiga"))
-    .renameTo(DSL.name("platform", "tabela_nova"))
-    .execute();
-```
-
-#### Criar indice
-
-```java
-dsl.createIndexIfNotExists(DSL.name("idx_tabela_coluna"))
-    .on(DSL.table(DSL.name("platform", "tabela")),
-        DSL.field(DSL.name("coluna")))
-    .execute();
-```
-
-#### Operacoes complexas (FK, constraints renomeadas)
-
-Para operacoes que o JOOQ DSL nao suporta nativamente (como renomear constraints ou criar FKs com WHERE), usar SQL direto:
-
-```java
-dsl.execute("ALTER TABLE platform.tabela DROP CONSTRAINT IF EXISTS constraint_antiga");
-dsl.execute("ALTER TABLE platform.tabela ADD CONSTRAINT constraint_nova FOREIGN KEY (col) REFERENCES outra_tabela(id)");
+```yaml
+- changeSet:
+    id: 018-indexes
+    author: flag-platform
+    changes:
+      - createIndex:
+          schemaName: PLATFORM
+          tableName: TABELA
+          indexName: IDX_TABELA_COLUNA
+          columns:
+            - column:
+                name: COLUNA
+      - addUniqueConstraint:
+          schemaName: PLATFORM
+          tableName: TABELA
+          columnNames: COLUNA_A, COLUNA_B
+          constraintName: UK_TABELA_AB
 ```
 
 ### Regras
 
-1. **Sempre usar JOOQ DSL** quando possible (CREATE TABLE, ALTER TABLE ADD/DROP column, CREATE INDEX)
-2. **SQL direto** apenas para operacoes nao suportadas pelo JOOQ (rename constraint, FK complexas)
-3. **Schema**: sempre qualificado com `platform.` (via `DSL.name("platform", "table")`)
-4. **Nomes de constraints**: usar prefixo descritivo (ex: `pk_`, `fk_`, `uk_`, `idx_`)
-5. **Comentarios Javadoc**: documentar o proposito da migration
-6. **Rollback**: nao suportado pelo Flyway; migration deve ser idempotente quando possivel
+1. **Sempre Liquibase YAML** — nunca DDL/DML de migração em Java, SQL solto ou anotações de entidade.
+2. **Schema qualificado**: `PLATFORM` (Oracle usa identificadores em maiúsculas por padrão).
+3. **Tipos Oracle**: `RAW(16)`/`VARCHAR2(n)`/`NUMBER(p,s)`/`TIMESTAMP WITH TIME ZONE`/`CLOB`.
+4. **Append-only**: nunca editar um `changeSet` já aplicado (checksums do Liquibase).
+5. **Rollback**: declarar `rollback` sempre que viável.
+6. **Idempotência/precondições**: usar `preConditions` (`onFail: MARK_RAN`/`HALT`) quando necessário.
 
-### Arquivos Legados (NAO USAR)
+### Arquivos Legados (NÃO USAR)
 
-```
-src/main/resources/db/migration/
-├── V1__MomentZero.sql      # Legado - schema inicial
-├── V2__*.sql                # Legado - nao usar
-└── V3__*.sql                # Legado - nao usar
-```
+As migrações SQL/Java da pilha antiga (Flyway + PostgreSQL + JOOQ, ex.: `V1__MomentZero.sql`,
+`src/main/java/db/migration/`) **não fazem parte do runtime atual** e não devem ser reaproveitadas
+nem servir de modelo para novas migrações. O baseline vigente é o changelog do Liquibase.
 
-Esses arquivos SQL sao do inicio do projeto e nao devem ser modificados ou utilizados para novas migrations.
+## Consequências
 
-## Consequencias
+- **Consistência**: todas as migrações seguem o mesmo padrão Liquibase/YAML.
+- **Rastreabilidade**: `changeSet.id`/`author` e checksums garantem histórico auditável.
+- **Rollback**: suporte nativo do Liquibase (quando declarado).
+- **Portabilidade**: changelogs independentes do dialeto, com `dbms`/`contexts` quando preciso.
+- **Legado**: os scripts Flyway/jOOQ permanecem apenas como histórico e não são executados.
 
-- **Consistencia**: todas as migrations seguem o mesmo padrao Java/JOOQ
-- **Type-safety**: JOOQ DSL oferece verificacao em tempo de compilacao
-- **Manutencao**: migrations mais faveis de ler e modificar
-- **Flexibilidade**: SQL direto disponivel para operacoes complexas
-- **Legado**: migrations SQL antigas permanecem para compatibilidade com ambientes existentes
+## Referências
 
-## Referencias
-
-- [jOOQ Manual - DDL Statements](https://www.jooq.org/doc/latest/manual/sql-building/ddl-statements/)
-- [Flyway Java Migrations](https://flywaydb.org/documentation/concepts/java-based-migrations)
-- Existing migrations: V4-V14 em `src/main/java/db/migration/`
+- [Liquibase — Changelog Formats](https://docs.liquibase.com/concepts/changelogs/yaml-format.html)
+- [Liquibase — changeSet & rollback](https://docs.liquibase.com/concepts/changelogs/changeset.html)
+- [ADR-018](ADR-018-espelhamento-firestore-admin-sdk.md) — infraestrutura real (Oracle ADB + OCI)
+- [ADR-003 — Diagramas de Base de Dados](ADR-003-diagramas-base-de-dados.md)

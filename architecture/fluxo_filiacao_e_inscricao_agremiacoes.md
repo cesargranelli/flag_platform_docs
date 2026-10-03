@@ -120,3 +120,48 @@ erDiagram
 - Listagem em cards fluidos com dados da agremiação (nome, tipo, cidade/UF, data de solicitação e status).
 - Menu de ações Kickster (`KicksterMenuAnchor`): "Ver Detalhes da Agremiação", "Aprovar", "Recusar".
 
+---
+
+## 5. Separação de Domínios e Perfis
+
+> **Rastreabilidade:** conteúdo absorvido de **ADR-009 — Organização e Agremiação: separação de domínios e perfis**
+> (linhagem `main`). O arquivo standalone `adr/ADR-009-organizacao-e-agremiacao.md` foi removido na
+> reconciliação de linhagens.
+
+### 5.1. Domínios
+
+| Módulo | Entidades | Tabela(s) | Notas |
+|---|---|---|---|
+| **Organização** | Federação, Associação, Liga | `organizations` (com `type` enum) | Entidades de governança; **não** contém clubes/universidades. |
+| **Agremiação (Institution)** | Club, University | `institutions` | Novo módulo; `Institution` é a entidade e `Club`/`University` são tipos (`institution_type`). Relação com times/atletas via `institution_id`. |
+
+> **Nomenclatura:** **Institution** (entidade) evita a colisão `Club` (entidade) vs `Club` (tipo).
+> A filiação a organizações é registrada em `institution_affiliations` por temporada (ver §2),
+> refinando a proposta original de junção N:N — a afiliação é **opcional, fraca e mutável**
+> (uma agremiação pode estar vinculada a mais de uma organização).
+
+### 5.2. Perfis e permissões (escrita)
+
+| Perfil | `organizations` (fed/assoc/liga) | `institutions` (Club/University) |
+|---|---|---|
+| **ORGANIZER** | cria/edita | cria/edita |
+| **MANAGER** | somente leitura | cria/edita |
+
+- Leitura: ambos os perfis leem os dois módulos.
+- `PENDING` continua **read-only global** (ver [ADR-010](../adr/ADR-010-autenticacao-firebase-custom-claims.md) §6.5).
+- `SecurityExpressions`: `ORGANIZATION_WRITE = "hasAuthority('STATUS_ACTIVE') and hasAnyRole('ORGANIZER','ADMIN','ADMIN_LIGA')"` e
+  `INSTITUTION_WRITE = "hasAuthority('STATUS_ACTIVE') and hasAnyRole('ORGANIZER','MANAGER','ADMIN','ADMIN_LIGA')"`.
+
+### 5.3. Home — novo card "Agremiações"
+
+- Novo `KicksterCard` "Agremiações" no `flag_admin_web`, apontando para o módulo `institutions`.
+- **Ordem dos cards:** `Organizações` (1º) → `Agremiações` (2º) → demais cards (Competições, Times, etc.).
+
+### 5.4. Melhorias de UX (backlog anotado, sem implementação)
+
+- **Dropdown — lista descola ao rolar:** o overlay deve ser ancorado ao campo (`OverlayEntry`/`CompositedTransformFollower`)
+  e reposicionar/fechar ao scroll ou resize. Registrar como bug de `KicksterDropdown` em `flag_core`.
+- **Modal de escolha de cores — fora do Design System:** substituir as 4 cores fixas por paleta editável
+  (até 6 cores), com preview ao vivo; persistir `institution.colors: string[]` (hex). Tokens de modal:
+  `radius.modal = 24`, `elevation.modal`, `modal.padding = 24`, `modal.gap = 20`, `modal.maxWidth = 343` (mobile) / `480` (web).
+

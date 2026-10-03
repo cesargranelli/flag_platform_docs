@@ -164,8 +164,9 @@ Esta ADR serve como o **documento mestre de filosofia** que direciona e dá cont
 | ADR | Relação com ADR-001 |
 |-----|---------------------|
 | **ADR-002** | Define a estratégia CQRS (PostgreSQL ↔ Firestore) mencionada no Pilar 5 |
-| **ADR-003** | Implementa a hierarquia de entidades (clubs table) definida no Pilar 1 |
-| **ADR-004** | Define a ordem de desenvolvimento API First; compatível com nova auth (ver ADR-010) |
+| **ADR-003** | Diagramas de Base de Dados — schema relacional (organizations, institutions, teams, persons, jogos) do Pilar 1 |
+| **ADR-004** | Diagramas de Fluxo do Projeto — fluxos Firebase-First e ciclo de jogo, integrados à nova auth (ver ADR-010) |
+| **ADR-019** | Modular Monolith (Spring Boot) — arquitetura de backend vigente |
 | **ADR-010** | Implementa a autenticação Firebase-First e matrix de roles, substituindo a decisão de auth de ADR-001 |
 | **ADR-006** | Refatoração estrutural de Team/Roster/Season, implementando o pilar 1 (hierarquia) de ADR-001 |
 | **ADR-011** | Padrão MVVM Flutter para implementação dos apps especializados (Pilar 4) |

@@ -51,11 +51,11 @@ Adotamos a arquitetura de **Hub Central + Colocalização Específica** para bal
 ```
 
 ### O que pertence a `flag_platform_docs`:
-1. **ADRs (Architecture Decision Records):** Todas as decisões arquiteturais da plataforma ([ADR-001](../adr/ADR-001-nova-filosofia-arquitetura.md) a [ADR-014](../adr/ADR-014-atualizacao-diretivas.md)).
+1. **ADRs (Architecture Decision Records):** Todas as decisões arquiteturais da plataforma ([ADR-001](../adr/ADR-001-nova-filosofia-arquitetura.md) a [ADR-020](../adr/ADR-020-firebase-auth-migration.md); ver [Reconciliação de ADRs entre Linhagens](reconciliacao-adr-linhagens.md)).
 2. **Arquitetura de Domínio & Plataforma:** Modelo de permissões ([`roles-and-permissions.md`](roles-and-permissions.md)), fluxos lógicos ([`logical-flows.md`](logical-flows.md)) e infraestrutura na nuvem ([`cloud-cost-benefit-analysis.md`](cloud-cost-benefit-analysis.md)).
 3. **Regras Esportivas Oficiais:** Catálogo de eventos e pontuações por modalidade ([`mapeamento-eventos-modalidades.md`](mapeamento-eventos-modalidades.md)).
 4. **Design System Kickster:** Fonte da verdade visual ([`tokens.md`](../design/tokens.md), [`layout-spec.md`](../design/layout-spec.md)).
-5. **Pesquisas e Benchmarks:** Estudos de mercado ([`market-analysis-restructured.md`](../research/market-analysis-restructured.md), [`comparativo-flagstats.md`](../research/comparativo-flagstats.md)).
+5. **Pesquisas e Benchmarks:** Estudos de mercado ([`market-analysis.md`](../research/market-analysis.md), [`comparativo-flagstats.md`](../research/comparativo-flagstats.md)).
 6. **Planejamento Diretor:** Planos de migração e arquitetura ([`_planning/`](../_planning/)).
 
 ### O que pertence ao repositório específico (`<repo>/docs/`):

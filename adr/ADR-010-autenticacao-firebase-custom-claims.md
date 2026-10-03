@@ -2,7 +2,7 @@
 
 ## Status
 
-**Aceito** — 2026-09-07 (Substitui e consolida a proposta anterior que colidia com a ADR-004 de API First)
+**Aceito** — 2026-09-07 (Substitui e consolida a proposta anterior de migração — hoje preservada como [ADR-020](ADR-020-firebase-auth-migration.md) — que colidia com a ADR-004 de API First da linhagem `main`)
 
 ---
 
@@ -19,7 +19,7 @@ Anteriormente, a plataforma contava com autenticação fragmentada baseada em JW
 3. Risco de indisponibilidade ou latência caso cada requisição de API exigisse consultas síncronas de autorização entre microsserviços.
 4. Chamadas desatualizadas nos clientes (o `flag_referee_app` apontava para endpoints legados como `/api/v1/auth/login`).
 
-Além disso, na documentação histórica houve uma colisão de numeração entre a **ADR-004 — API First** e uma proposta anterior de migração. Esta ADR-010 resolve a colisão e oficializa a decisão arquitetural definitiva.
+Além disso, na documentação histórica houve uma colisão de numeração entre a **ADR-004 — API First** e uma proposta anterior de migração. Esta ADR-010 resolve a colisão e oficializa a decisão arquitetural definitiva. A proposta histórica foi renumerada e preservada como [ADR-020 — Migração de Autenticação para Firebase Auth + Custom Claims](ADR-020-firebase-auth-migration.md).
 
 ---
 
@@ -157,9 +157,80 @@ sequenceDiagram
 
 ---
 
-## 6. Documentos Relacionados
+## 6. Ajustes de Implementação — Firebase Auth exclusivo + PENDING read-only
+
+> **Rastreabilidade:** conteúdo absorvido de **ADR-008 — Ajustes de Autenticação** (linhagem `main`,
+> originalmente implementado em `flag_backend@4482c5e` e `flag_admin_web@96b2c0d`). O arquivo standalone
+> `adr/ADR-008-ajustes-autenticacao.md` foi removido na reconciliação de linhagens. A decisão original de
+> migração está preservada como [ADR-020](ADR-020-firebase-auth-migration.md).
+
+### 6.1. Fluxo de autenticação
+
+| Operação | Onde | Como |
+|---|---|---|
+| Signup | Flutter | `FirebaseAuth.signUpWithEmailPassword()` → `signOut()` → `POST /register {name,email}` |
+| Login | Flutter | `FirebaseAuth.signInWithEmailPassword()` → `getIdToken(true)` → `GET /me` (Bearer ID Token) |
+| Forgot password | Flutter | `FirebaseAuth.sendPasswordResetEmail()` direto (sem backend) |
+
+O backend **não armazena nem valida senha**. O único ponto autenticado no fluxo é `GET /me`.
+
+### 6.2. Endpoints
+
+- **Mantidos:** `POST /register` (público, sem senha), `GET /me`, `POST /users`, `GET /users`, `GET /users/pending`, `POST /users/{id}/approve|reject`.
+- **Removidos:** `POST /login`, `POST /forgot-password`, `POST /reset-password`.
+
+### 6.3. Modelo de dados
+
+- `users.password_hash` removido (migration `V4__RemovePasswordHashAndResetTokens`).
+- `password_reset_tokens` removido (mesma migration).
+- `RegisterRequest` / `CreateUserRequest` sem campo `password`.
+- `UserMapper`, `UserDetailsServiceImpl`, `StagingDataSeeder` sem referência a senha.
+
+### 6.4. Verificação de token
+
+- `FirebaseJwtVerifier` (verificação manual com `java.net.http` + `jjwt`) **removido**.
+- `FirebaseTokenService` volta a usar `FirebaseAuth.verifyIdToken()` nativo do Firebase Admin SDK.
+  O bug de `Not in GZIP format` (`google-http-client 1.45.3 + JDK 25`) é contornado via exclusão de
+  `google-http-client-apache-v2` no `pom.xml` e `System.setProperty("java.net.preferIPv4Stack")` /
+  `https.protocols` em `FirebaseConfig`.
+
+### 6.5. PENDING read-only
+
+- `JwtAuthenticationFilter` autentica **qualquer** status (antes bloqueava `PENDING`) e vincula
+  `firebase_uid` via `AuthService.getOrProvisionFirebaseUser()`.
+- `UserPrincipal` sempre `isEnabled=true`; authorities incluem `STATUS_ACTIVE` ou `STATUS_PENDING` + `ROLE_*`.
+- `SecurityExpressions` (`ADMIN`, `ADMIN_OR_ORGANIZER`, `ADMIN_OR_MESA`, `CLUB_MANAGER`) exigem
+  `hasAuthority('STATUS_ACTIVE')`. `PENDING` passa em `isAuthenticated()` e leitura (`GET`), mas falha em
+  qualquer escrita (`POST/PUT/PATCH/DELETE`) com 403.
+
+### 6.6. Frontend (`flag_admin_web`)
+
+- `AuthApi`: removidos `loginWithFirebaseToken()`, `forgotPassword()`, `resetPassword()`; `register()` e
+  `createUser()` sem `password`.
+- `LoginResponse` e `reset_password_screen.dart` (rota `/reset-password`) removidos;
+  `forgot_password_screen.dart` mantido (usa Firebase SDK direto).
+- `UserFormScreen` sem campo de senha; `app_router` sem import/rota de reset.
+
+### 6.7. Consequências
+
+- Auth 100% Firebase SDK; o backend é apenas lookup validado, sem hash de senha nem reset tokens no banco.
+- `PENDING` passa a ter UX melhor (vê dados, sem bloqueio total no login) mantendo escrita bloqueada.
+- Superfície de ataque reduzida; dependência volta ao Firebase Admin SDK oficial.
+
+### 6.8. Arquivos-chave
+
+- `flag_backend`: `AuthController`, `AuthService`, `RegisterRequest`, `UserEntity`, `SecurityConfig`,
+  `JwtAuthenticationFilter`, `UserPrincipal`, `SecurityExpressions`, `FirebaseTokenService`,
+  `FirebaseConfig`, `V4__RemovePasswordHashAndResetTokens`.
+- `flag_admin_web`: `auth_api.dart`, `signup_screen.dart`, `auth_controller.dart`, `user_form_screen.dart`,
+  `app_router.dart`.
+
+> **Nota:** `architecture/ajustes-autenticacao.md` descreve o estado anterior a estes ajustes e está
+> marcado como histórico/superado.
+
+## 7. Documentos Relacionados
 - [ADR-001 — Nova Filosofia de Arquitetura de Aplicações](ADR-001-nova-filosofia-arquitetura.md)
-- [ADR-003 — Modular Monolith com Spring Boot](ADR-003-modular-monolith.md)
-- [ADR-004 — API First](ADR-004-api-first.md)
-- [Plano de Migração de Autenticação](plano-migracao-firebase-auth.md)
-- [Diretrizes de Trabalho de Agentes e GitFlow](../architecture/diretrizes-trabalho-agentes.md)
+- [ADR-019 — Modular Monolith com Spring Boot](ADR-019-modular-monolith.md)
+- [ADR-004 — Diagramas de Fluxo do Projeto](ADR-004-diagramas-projeto.md)
+- [Plano de Migração de Autenticação](../_planning/plano-migracao-firebase-auth.md)
+- [Governança de Agentes e Skills](../architecture/governanca-agentes-skills.md)

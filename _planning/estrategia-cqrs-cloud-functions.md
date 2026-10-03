@@ -1,8 +1,8 @@
-# ADR-007: Estratégia de Espelhamento CQRS com Cloud Functions
+# Estratégia de Espelhamento CQRS com Cloud Functions (documento histórico — não é ADR)
 
 > ⚠️ **Superseded por ADR-018.**
 > Esta estratégia (Cloud Functions em três camadas) foi **superada** pelo
-> [ADR-018](../../adr/ADR-018-espelhamento-firestore-admin-sdk.md), que adota o espelhamento
+> [ADR-018](../adr/ADR-018-espelhamento-firestore-admin-sdk.md), que adota o espelhamento
 > **pelo próprio backend com o Firebase Admin SDK** e **não** por Cloud Functions.
 > O arquivo é mantido apenas como registro histórico. Status original abaixo, preservado.
 
@@ -17,7 +17,7 @@
 
 A Flag Platform adota **CQRS Light**: PostgreSQL é a *source of truth* (write path) e Firestore é o *espelho de leitura* (read path) para dashboards, leaderboards, real-time scores e casos onde Firestore oferece melhor performance/custo.
 
-Conforme definido em [ADR-002](ADR-002-postgres-firestore-cqs.md), a sincronização entre PostgreSQL e Firestore é o ponto crítico da arquitetura. Este ADR define **como** essa sincronização acontece na prática — quais triggers, Cloud Functions, schema mapping, error handling e monitoramento.
+Conforme definido em [ADR-002](../adr/ADR-002-postgres-firestore-cqs.md), a sincronização entre PostgreSQL e Firestore é o ponto crítico da arquitetura. Este ADR define **como** essa sincronização acontece na prática — quais triggers, Cloud Functions, schema mapping, error handling e monitoramento.
 
 ### Restrições
 - Volume baixo (~10-20 TPS) → sem necessidade de event broker dedicado (Kafka, Pub/Sub)
@@ -723,12 +723,12 @@ Firestore é público para leitura de apps autenticados → não pode conter PII
 
 ## Referências
 
-- [ADR-001](ADR-001-nova-filosofia-arquitetura.md) – Filosofia de arquitetura
-- [ADR-002](ADR-002-postgres-firestore-cqs.md) – PostgreSQL + Firestore CQS Light
-- [ADR-003](ADR-003-modular-monolith.md) – Modular Monolith
-- [ADR-004](ADR-004-api-first.md) – API First
-- [ADR-010](ADR-010-autenticacao-firebase-custom-claims.md) – Autenticação Firebase-First com Custom Claims
-- [ADR-005](ADR-005-staging-efemero-e2e.md) – Staging efêmero E2E
+- [ADR-001](../adr/ADR-001-nova-filosofia-arquitetura.md) – Filosofia de arquitetura
+- [ADR-002](../adr/ADR-002-postgres-firestore-cqs.md) – Oracle ADB + Firestore CQS Light
+- [ADR-019](../adr/ADR-019-modular-monolith.md) – Modular Monolith
+- [ADR-004](../adr/ADR-004-diagramas-projeto.md) – Diagramas de Fluxo do Projeto
+- [ADR-010](../adr/ADR-010-autenticacao-firebase-custom-claims.md) – Autenticação Firebase-First com Custom Claims
+- [ADR-005](../adr/ADR-005-staging-efemero-e2e.md) – Staging efêmero E2E
 - [Cloud Functions Gen 2 docs](https://cloud.google.com/functions/docs/2nd-gen/overview)
 - [Firestore Security Rules](https://firebase.google.com/docs/firestore/security/get-started)
 - [Cloud SQL Connector](https://cloud.google.com/sql/docs/postgres/connect-overview)
