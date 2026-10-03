@@ -1,6 +1,10 @@
 # Ajustes no Módulo de Autenticação
 
 > **Propósito:** Registrar as ações executadas para ajustar o módulo de autenticação da Flag Platform à estratégia híbrida descrita na Especificação Técnica (Seção 3), evitando perda de contexto em futuras sessões.
+>
+> **⚠️ Estado histórico/superado:** os ajustes de implementação descritos aqui foram consolidados no
+> [ADR-010 — Autenticação Firebase-First com Custom Claims](../adr/ADR-010-autenticacao-firebase-custom-claims.md)
+> (conteúdo absorvido do antigo ADR-008 da linhagem `main`). Consulte o ADR-010 para o estado vigente.
 
 ## 1. Estado Final (Concluído — Issue #39)
 
@@ -35,8 +39,8 @@
 ## 3. Documentação Relacionada
 
 - **Especificação Técnica (PDF):** Seção 3 - Estratégia de Autenticação e Segurança Híbrida.
-- **ADR-004:** `adr/ADR-004-firebase-auth-migration.md` — Migração de Autenticação para Firebase Auth + Custom Claims.
-- **Plano de Migração:** `adr/plano-migracao-firebase-auth.md` — Fases detalhadas da migração JWT custom → Firebase Auth.
+- **ADR-020:** [`adr/ADR-020-firebase-auth-migration.md`](../adr/ADR-020-firebase-auth-migration.md) — Migração de Autenticação para Firebase Auth + Custom Claims (histórico; renumerado de ADR-004).
+- **Plano de Migração:** [`_planning/plano-migracao-firebase-auth.md`](../_planning/plano-migracao-firebase-auth.md) — Fases detalhadas da migração JWT custom → Firebase Auth.
 - **Arquitetura Híbrida:** `architecture/autenticacao-hibrida.md` — Diagrama de arquitetura, modelo de dados e ações de implementação.
 
 ## 4. Próximos Passos

@@ -19,43 +19,52 @@ Comunidade de Flag Football no Brasil. As informações estão hoje espalhadas e
 ## Hierarquia Organizacional
 
 ```
-Organization (Federação/Liga)
-    └── Club (Clube/Universidade)
-         └── Team (Time de competição)
-              └── Roster (Elenco por Season)
+Organization (Federação/Liga/Associação)
+    └── Institution (Clube/Universidade)
+         └── Team (Equipe Esportiva)
+              └── Roster (Elenco por Temporada)
                    └── Athlete (Atleta)
 ```
 
 ## Papéis de sistema
 
-### Hierarquia de Roles (4 níveis)
+### Papéis de Sistema (enum `UserRole`)
 
+Define o nível de privilégio e escopo de acesso às APIs e interfaces:
+
+| Role | Descrição | Criação / Atribuição | App Principal |
+|------|-----------|----------------------|--------------|
+| **ADMIN** | Administrador geral da plataforma: gerencia organizações, parâmetros globais e usuários | Seed / Admin existente | Admin Web |
+| **ORGANIZER** | Gestor de federação ou liga esportiva: gerencia competições, categorias e aprova filiações | ADMIN | Admin Web |
+| **COMMISSIONER** | Comissário/delegado oficial das partidas: validação e encerramento de súmulas | ORGANIZER | Referee App |
+| **REFEREE** | Árbitro de campo: check-in presencial e registro de lances ao vivo | ORGANIZER / ADMIN | Referee App |
+| **MANAGER** | Gestor de agremiação/clube: gerencia equipes e inscreve elencos por temporada | Auto-cadastro / ORGANIZER | Admin Web |
+| **FAN** | Torcedor / Atleta: visualização pública e acompanhamento em tempo real | Auto-cadastro no Firebase | Public App |
+
+### Papéis Esportivos da Pessoa Física (enum `PersonRole`)
+
+Diferente do acesso ao sistema, o `PersonRole` define a atuação desportiva unificada da pessoa física (`Person` com CPF único):
+
+| PersonRole | Descrição | Atuação Principal |
+|------------|-----------|-------------------|
+| **ATHLETE** | Atleta competidor | Inscrito em elencos (`team_roster`), passa por check-in presencial |
+| **COACH** | Treinador / Head Coach | Comissão técnica inscrita na equipe |
+| **TECHNICAL_STAFF** | Auxiliar / Preparador | Comissão técnica estendida |
+| **REFEREE** | Árbitro de campo | Escalado como participante oficial (`game_participants`) |
+| **DELEGATE** | Delegado da partida | Mesa de arbitragem e conferência oficial |
+| **COMMISSIONER** | Comissário da liga | Auditoria de rodada e partidas |
+
+### Custom Claims no Firebase Auth
+
+O Firebase Auth armazena no token JWT as claims decodificadas pelo backend:
+
+```json
+{
+  "role": "ORGANIZER",
+  "org_id": "uuid-da-organizacao",
+  "institution_id": "uuid-da-agremiacao-se-manager"
+}
 ```
-SUPER_ADMIN (1)
-    └── ORG_ADMIN (N por organização)
-         └── MANAGER (N por clube/time)
-              └── USER (N - atleta/coach/referee)
-```
-
-### Backend — roles (enum `UserRole`)
-
-| Role | Uso | Criação | App Principal |
-|------|-----|--------|--------------|
-| **SUPER_ADMIN** | Super usuário: aprova contas, gerencia usuários, cria organizações | Via seed/ADMIN | Admin Web |
-| **ORG_ADMIN** | Gestão de conteúdo do campeonato específico | SUPER_ADMIN | Admin Web, Referee App |
-| **MANAGER** | Operação de jogos, check-in, atualização de placar | ORG_ADMIN ou SUPER_ADMIN | Referee App |
-| **USER** | Atleta, coach, referee - acesso básico | Auto-cadastro ou ADMIN | Public App |
-
-### Skills (Custom Claims Firebase - futuro)
-
-Além dos roles hierárquicos, usuários podem ter skills específicos:
-
-| Skill | Descrição | Apps |
-|-------|-----------|------|
-| `athlete` | Praticante de flag football | Public App |
-| `coach` | Treinador de equipe | Admin Web, Referee App |
-| `referee` | Árbitro certificado | Referee App |
-| `manager` | Gestor de clube/time | Admin Web, Referee App |
 
 ### Status de conta (enum `UserStatus`)
 

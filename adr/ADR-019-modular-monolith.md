@@ -1,7 +1,12 @@
-# ADR-003 — Modular Monolith
+# ADR-019 — Modular Monolith
 
 **Status:** Aceito
 **Data:** 2026-07-26
+
+> **Rastreabilidade:** renumerado de **ADR-003** (linhagem `main`) para **ADR-019**, em razão da
+> colisão de número com o [ADR-003 — Diagramas de Base de Dados](ADR-003-diagramas-base-de-dados.md)
+> (linhagem vigente). Referências que apontavam para este documento foram atualizadas.
+> Reconciliado em [architecture/reconciliacao-adr-linhagens.md](../architecture/reconciliacao-adr-linhagens.md).
 
 ## Contexto
 

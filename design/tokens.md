@@ -7,6 +7,7 @@ Fonte da verdade visual para os apps (Flutter). Reflete `frontend/packages/core/
 - **Arquivo**: [Kickster — Live Score & News Sport (Community)](https://www.figma.com/design/bXGRAtra3DkMAPGKLLLaCQ/Kickster---Live-Score---News-Sport-Apps-UI-Kits--Community-?node-id=65-400)
 - Referência completa em `docs/design/kickster-reference.md` (issue #431).
 - Usar como referência visual de componentes ao avaliar/propor layouts (ex.: calendário, inputs, chips).
+- **Última sincronização**: 2026-09-11 — tokens e componentes atualizados para consistência com o `flag_admin_web` v2.1.
 
 ## Cores
 
@@ -225,6 +226,7 @@ Biblioteca de widgets no `frontend/packages/core/lib/src/widgets/` (prefixo `Kic
 | `KicksterInput` | `kickster_input.dart` | Wrapper de `TextFormField` sobre o `InputDecorationTheme` (raio 24 (pill), rótulo visível) — não sobrescreve bordas |
 | `KicksterSectionTitle` | `kickster_section_title.dart` | Título de seção ("Ao vivo"/"Próximos"): `titleMedium` `textPrimary`, ícone `primary` opcional, `action?` à direita |
 | `KicksterNavBar` | `kickster_nav_bar.dart` | Barra de navegação inferior mobile: `NavigationBar` com fundo `surface` e indicador `primary`@12% |
+| `KicksterCalendar` | `kickster_calendar.dart` | Calendário modal/inline (Figma 34433:3189): seleção de data, header refinado, dias semana w600, raio 16, botões Cancelar/Selecionar |
 | `KicksterFilterSheet` | `kickster_filter_sheet.dart` | Filtro **multi-seleção** em bottom sheet (base `KicksterBottomSheet`): grupos (`KicksterFilterSection`) com opções em `KicksterPillTab`; ações **Limpar** (outline, desabilitado sem seleção) e **Aplicar** (primary). Chaves `grupo:valor`; semântica **OR dentro do grupo / AND entre grupos** (`KicksterFilterSelection.matches`). `show()` retorna as chaves aplicadas ou `null` (fechado sem aplicar). Trigger: `KicksterFilterButton` (pílula raio 24, `tune` + contador, `primary` quando ativo) |
 | `KicksterSegmentedTabs` | `kickster_segmented_tabs.dart` | Controle **segmentado** (Figma "Menu" `34433:3342`): container `surface.muted` (#F6F8FE) raio **24** com padding **4**; segmentos com padding **12×8** (gap **11**) e raio 24 — **selecionado** = fundo **`primary`** (azul) + texto branco w600 (mesmo padrão do `KicksterPillTab`); demais = texto `textSecondary` (contraste ~4,7:1, AA). Usado nas abas **Estatísticas \| Lances** da tela de Jogo |
 | `KicksterPillTabs` | `kickster_pill_tabs.dart` | Grupo de abas em **pílula** com rolagem horizontal (Figma "Standings" `34433:3457`): compõe `KicksterPillTab`. Use quando houver **3+ opções** (ex.: abas do hub de Campeonato: Jogos · Resultados · Classificação · Estatísticas); para **2** opções use `KicksterSegmentedTabs` |

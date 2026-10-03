@@ -4,9 +4,9 @@
 - Reinstitute Flag Platform from "moment zero" with a new architecture and data model.
 - Preserving `main_v1` existant branches in repositories: `flag_admin_web`, `flag_backend`.
 - A phases approach starting with `flag_admin_web`.
-- Use combination of Flyway for DB migration management and JOOQ for type-safe persistence. From baseline `V1__MomentZero.sql` onwards, subsequent migrations will be written in Java using JOOQ DSL (ADR-007).
+- Use **Liquibase (YAML changelogs) + Oracle ADB** for DB migration management (ADR-012). DDL in code (Java/SQL) is forbidden.
 - Zero data in all tables before starting.
-- Implement data migration logic for `organizations` -> `clubs` entity hierarchy change (ADR-003) via Java-based Flyway migration.
+- Implement data migration logic for the `organizations` -> `institutions`/`clubs` entity hierarchy change (ADR-006) via Liquibase changesets.
 
 ## Branching Strategy
 - Preserve existing `main` branches.
@@ -30,14 +30,14 @@
 
 #### Step 0.3: Backend Stabilization & Data Consolidation (Fase 0 - Diagnóstico/Consolidação)
 - Create `develop` branch on `flag_backend`.
-- Clean old Flyway scripts on `develop` branch.
-- Consolidate DDL to `V1__MomentZero.sql` adapting it for Flyway, ANSI SQL compliant.
-- Configure `pom.xml` in `flag_backend` to include Flyway, JOOQ, and configure JOOQ plugin for type-safe generation mapping DB complex types to Java speculative enums.
-- Implement zero data and data migration logic (`organizations` -> `clubs`) in Flyway scripts.
+- Clean old legacy (Flyway) migration scripts on `develop` branch.
+- Consolidate the DDL baseline into Liquibase changesets (YAML), Oracle ADB compliant.
+- Configure `pom.xml` in `flag_backend` to include **Liquibase** (no JOOQ codegen for migrations).
+- Implement zero data and data migration logic (`organizations` -> `institutions`) in Liquibase changesets.
 
 #### Step 0.4: Disable CI Pipelines
 - Global disable of CI/CD pipelines to prevent premature deploys during phases 1-3.
-- Update `flag_backend` CI pipeline to include JOOQ generation step.
+- Update `flag_backend` CI pipeline to validate the Liquibase changelog.
 
 ### Phase 1: First decoupled app (`flag_admin_web`)
 - Develop `flag_admin_web` features.

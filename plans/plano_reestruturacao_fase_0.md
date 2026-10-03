@@ -9,8 +9,8 @@ Esta fase inicial foca em estabelecer a base técnica e estrutural para o projet
 - **Reinstituição Total:** Reiniciar a Flag Platform a partir de um "momento zero", implementando uma nova arquitetura e modelo de dados.
 - **Preservação de Histórico:** Manter as branches `main_v1` existentes nos repositórios `flag_admin_web` e `flag_backend` para fins de histórico e fallback.
 - **Abordagem em Fases:** O desenvolvimento das aplicações ocorrerá sequencialmente, começando pelo `flag_admin_web`.
-- **Tecnologias de Persistência e Migrações:** Utilizar Flyway para o gerenciamento de migrações de banco de dados e JOOQ para persistência type-safe. A partir do baseline `V1__MomentZero.sql`, todas as migrações subsequentes serão implementadas em Java utilizando a DSL do JOOQ (`BaseJavaMigration`), conforme estabelecido na **ADR-007**.
-- **Migração de Dados:** Implementar a migração de dados da hierarquia antiga (`organizations`) para a nova (`clubs`), conforme a ADR-003, via migração Java com JOOQ. Para o "momento zero", todas as tabelas relevantes serão zeradas.
+- **Tecnologias de Persistência e Migrações:** Utilizar **Liquibase (changelogs YAML) + Oracle ADB** para o gerenciamento de migrações. Todas as migrações são `changeSet`s YAML; **DDL em código (Java/SQL solto) é proibido**, conforme a **ADR-012** (nota: a referência histórica a "Flyway/jOOQ" foi corrigida na reconciliação de linhagens).
+- **Migração de Dados:** Implementar a migração de dados da hierarquia antiga (`organizations`) para a nova (`institutions`/`clubs`), conforme a **ADR-006** (e ADR-001 v1.1), via `changeSet` Liquibase. Para o "momento zero", todas as tabelas relevantes serão zeradas.
 
 ## Passos da Fase 0
 
@@ -22,10 +22,10 @@ Esta fase inicial foca em estabelecer a base técnica e estrutural para o projet
 
 ### Passo 0.3: Estabilização do Backend e Consolidação de Dados
 - **Ação:** Criar a branch `develop` no repositório `flag_backend` a partir da `main`.
-- **Ação:** Limpar os scripts de migração Flyway antigos na branch `develop`.
-- **Ação:** Consolidar o DDL de referência no arquivo `V1__MomentZero.sql`, adaptando-o para Flyway e garantindo conformidade ANSI SQL.
-- **Ação:** Configurar o `pom.xml` do `flag_backend` para incluir Flyway e JOOQ, e configurar o plugin do JOOQ para geração de código type-safe, mapeando tipos complexos do banco para enums Java.
-- **Ação:** Implementar a lógica de "zerar dados" e a migração (`organizations` -> `clubs`) nos scripts Flyway do "momento zero".
+- **Ação:** Limpar os scripts de migração legados (Flyway) na branch `develop`.
+- **Ação:** Consolidar o DDL de referência (baseline) em `changeSet` do Liquibase (YAML), validando sintaxe para Oracle ADB.
+- **Ação:** Configurar o `pom.xml` do `flag_backend` para incluir o **Liquibase**; sem geração de código JOOQ para migrações.
+- **Ação:** Implementar a lógica de "zerar dados" e a migração (`organizations` -> `institutions`) nos `changeSet`s do Liquibase do "momento zero".
 
 ### Passo 0.4: Desabilitar Pipelines de CI
 - **Ação:** Desabilitar globalmente os pipelines de CI/CD para prevenir deploys prematuros durante as fases 1 a 3.

@@ -1,8 +1,15 @@
-# ADR-004: Migração de Autenticação para Firebase Auth + Custom Claims
+# ADR-020: Migração de Autenticação para Firebase Auth + Custom Claims
 
 ## Status
 
 Aceito — Consolidado com base na Especificação Técnica (Seção 3 - Autenticação e Segurança Híbrida)
+
+> **Rastreabilidade:** renumerado de **ADR-004** (linhagem `main`) para **ADR-020**, em razão da
+> colisão de número com o [ADR-004 — Diagramas de Fluxo do Projeto](ADR-004-diagramas-projeto.md)
+> (linhagem vigente). O tema é hoje consolidado pelo
+> [ADR-010 — Autenticação Firebase-First com Custom Claims](ADR-010-autenticacao-firebase-custom-claims.md);
+> este registro preserva a decisão histórica da linhagem `main`.
+> Reconciliado em [architecture/reconciliacao-adr-linhagens.md](../architecture/reconciliacao-adr-linhagens.md).
 
 ## Contexto
 
@@ -116,7 +123,7 @@ Migrar para **Firebase Auth** como identity provider, mantendo o **PostgreSQL co
 
 ## Implementação
 
-Ver documento detalhado: [plano-migracao-firebase-auth.md](plano-migracao-firebase-auth.md)
+Ver documento detalhado: [plano-migracao-firebase-auth.md](../_planning/plano-migracao-firebase-auth.md)
 
 ### Fases:
 1. **Configuração Firebase** (1 sprint)

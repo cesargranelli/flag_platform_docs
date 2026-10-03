@@ -1,4 +1,4 @@
-# ADR-001: Refatoração Estrutural — Team, Roster e Season
+# ADR-006: Refatoração Estrutural — Team, Roster e Season
 
 **Status:** Proposto  
 **Data:** 2026-08-31  
@@ -310,6 +310,10 @@ ALTER TABLE competition ADD COLUMN season VARCHAR(50) NOT NULL DEFAULT '2026';
 | App público e referee precisam atualizar | Comunicar equipe com antecedência |
 | Complexidade do elenco por competição | Design simplificado: 1 roster por time/competição |
 | Migração de dados | Sem migração — base zerada |
+
+## Referência a Decisão Filosofical
+
+Esta ADR implementa o **Pilar 1 (Hierarquia de Entidades Clara)** definido em [ADR-001 — Nova Filosofia de Arquitetura e Simplificação](ADR-001-nova-filosofia-arquitetura.md). Enquanto a ADR-001 define o "porquê" da hierarquia org→clube→time→elenco→atleta, esta ADR detalha o "como" através de mudanças no schema Banco de Dados, API e domain models.
 
 ---
 

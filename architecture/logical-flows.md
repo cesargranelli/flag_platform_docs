@@ -1,226 +1,135 @@
 # Flag Platform — Fluxos Lógicos da Solução
 
-Fluxos ponta a ponta do sistema, do cadastro de uma conta até a operação ao vivo de uma partida. Diagramas em Mermaid (renderizam no GitHub).
+> Fluxos operacionais ponta a ponta do ecossistema, desde o ciclo de identidade até a operação de partida e projeção em tempo real.
 
 ---
 
-## 1. Ciclo de vida de uma conta (registro → aprovação → login)
+## 1. Ciclo de Vida de Identidade & Autenticação (Firebase-First — ADR-010)
+
+O sistema utiliza o **Firebase Auth** como Provedor de Identidade (IdP) e o backend como validador *stateless* com base em **Custom Claims**.
+
+### Cadastro e Primeiro Acesso:
 
 ```mermaid
 sequenceDiagram
-    participant U as Usuário
-    participant W as Admin Web
-    participant A as API /api/v1/auth
+    actor U as Usuário
+    participant App as Cliente Flutter (Kickster)
+    participant FB as Firebase Auth (IdP)
+    participant API as Flag Backend (/api/v1)
     participant DB as PostgreSQL
 
-    U->>W: Preenche cadastro (signup)
-    W->>A: POST /register
-    A->>DB: cria User role=ORGANIZER status=PENDING
-    A-->>W: 201 (conta criada)
-    W-->>U: "Conta criada! Aguardando aprovação"
+    U->>App: Preenche cadastro (E-mail + Senha)
+    App->>FB: createUserWithEmailAndPassword()
+    FB-->>App: Retorna UserCredential + ID Token (JWT)
 
-    Note over U,W: ADMIN acessa Aprovações
-    U->>W: Admin vê lista de pendentes (GET /users/pending)
-    W->>A: POST /users/{id}/approve
-    A->>DB: status → ACTIVE
-
-    Note over U,W: Usuário tenta logar
-    U->>W: E-mail + senha
-    W->>A: POST /login
-    A->>DB: valida credenciais + status ACTIVE
-    A-->>W: 200 { token, user }
-    W-->>U: Autenticado → home
+    App->>API: GET /auth/me (Bearer <ID_TOKEN>)
+    Note over API: JwtAuthenticationFilter:<br/>Valida ID Token em memória com chaves públicas do Google
+    API->>DB: Provisiona ou busca registro em platform.users
+    DB-->>API: Dados do usuário + Role
+    API-->>App: HTTP 200 { user, permissions }
+    App-->>U: Redireciona para Dashboard correspondente
 ```
 
-**Pontos-chave**
-- Registro público cria sempre um **ORGANIZER com status `PENDING`**.
-- Conta `PENDING`/`REJECTED` ao logar → **403 `AccountPendingApprovalException`**.
-- Somente **ADMIN** aprova/rejeita (`POST /users/{id}/approve` | `/reject`).
-- ADMIN também cria usuários direto (role livre, status já `ACTIVE`) — ex.: contas da **mesa** (`MESA`).
-- Login tem **rate limit** por IP (`LoginRateLimitFilter`): 10 tentativas / 300s → **429**.
-
-### Recuperação de senha
-
-```mermaid
-flowchart LR
-    A[Esqueci a senha<br/>Admin Web] --> B[POST /auth/forgot-password]
-    B --> C[(token hash<br/>expira em 60min)]
-    B --> D{mail.enabled?}
-    D -->|sim| E[Envia e-mail]
-    D -->|não / dev| F[Retorna resetToken no body]
-    C --> G[POST /auth/reset-password<br/>token + nova senha]
-    G --> H[(marca usedAt<br/>senha atualizada)]
-    H --> I[Volta ao login]
-```
-
----
-
-## 2. Cadastro do campeonato (Admin Web)
-
-```mermaid
-flowchart TB
-    A[Organizador logado<br/>home com cards] --> B[Organizações]
-    B --> B1[Formulário wizard 3 etapas:<br/>Identificação · Contato · Visual]
-    B1 --> B2[POST /organizations]
-
-    B2 --> C[Campeonatos]
-    C --> C1[Formulário<br/>organização + datas + status]
-    C1 --> C2[POST /competitions]
-
-    C2 --> D[Estrutura do campeonato]
-    D --> D1[Categories → POST /categories]
-    D --> D2[Venues → POST /venues]
-    D --> D3[Teams → POST /teams]
-    D --> D4[Rounds → POST /rounds]
-    D --> D5[Games → POST /games]
-    D5 --> D6[Athletes + Roster<br/>POST /athletes + POST /teams/{id}/roster]
-
-    E[Public App<br/>consulta tudo sem login] --> C2
-```
-
-Hierarquia (FK em cadeia): `organization → competition → category → {venue, team, round} → game`.
-
----
-
-## 3. Dia do jogo — operação ao vivo (Referee App)
+### Recuperação de Senha:
 
 ```mermaid
 sequenceDiagram
-    participant M as Mesa
-    participant RA as Referee App
-    participant A as API
-    participant DB as Banco
+    actor U as Usuário
+    participant App as Cliente Flutter
+    participant FB as Firebase Auth
 
-    Note over M,A: Pré-jogo
-    M->>RA: Escolhe campeonato → categoria → rodada → jogo
-    M->>RA: Abre Check-in (GET /games/{id}/checkin)
-    RA->>A: lista roster dos dois times
-    M->>RA: Marca PRESENT / NO_SHOW por atleta
-    RA->>A: POST /games/{id}/checkin/{athleteId}
-    A->>DB: upsert checkin (validatedBy/validatedAt)
-
-    Note over M,A: Início
-    M->>RA: "Iniciar partida"
-    RA->>A: PATCH /games/{id}/status → IN_PROGRESS
-    A->>DB: transição SCHEDULED→IN_PROGRESS
-
-    loop Placar ao vivo
-        M->>RA: "+1" para time (casa/fora)
-        RA->>A: POST /games/{id}/score/events
-        A->>DB: incrementa placar + registra ScoreEvent
-    end
-
-    M->>RA: "Finalizar partida"
-    RA->>A: POST /games/{id}/result
-    A->>DB: FINISHED + placar final
-    A-->>Standing: publica GameResultRegisteredEvent
+    U->>App: Solicita recuperação ("Esqueci a senha")
+    App->>FB: sendPasswordResetEmail(email)
+    FB-->>U: Envia e-mail oficial com link de redefinição
+    U->>FB: Usuário redefine senha com segurança no Firebase
+    App-->>U: Notifica instrução de sucesso na tela
 ```
-
-### Validação de atleta durante a partida
-
-```mermaid
-flowchart TD
-    A[Atleta chega no jogo em andamento] --> B[Mesa toca Validar]
-    B --> C[POST /games/{id}/checkin/{athleteId}/validate]
-    C --> D{Atleta está no roster<br/>do time do jogo?}
-    D -->|não| E[Retorna NOT_REGISTERED]
-    E --> E1[Referee App mostra<br/>'não está no roster']
-    D -->|sim| F[Upsert PRESENT]
-    F --> G[Libera atleta em campo]
-```
-
-**Regras de status de jogo** (transições válidas):
-
-```
-SCHEDULED ──► IN_PROGRESS ──► FINISHED   (terminais: FINISHED, CANCELLED)
-     └──────► CANCELLED
-```
-
-- Registrar resultado, somar ponto e corrigir placar exigem jogo **IN_PROGRESS** (`GameNotInProgressException` → 409).
-- Transição inválida → `InvalidGameStatusTransitionException` → 409.
 
 ---
 
-## 4. Classificação automática (Standing)
+## 2. Fluxo Institucional: Organização, Agremiação e Filiação
+
+A Flag Platform separa estritamente quem organiza campeonatos (`Organization`) de quem possui as equipes esportivas (`Institution`):
 
 ```mermaid
 sequenceDiagram
-    participant G as GameService
-    participant P as ApplicationEventPublisher
-    participant L as StandingEventListener
-    participant S as StandingService
-    participant DB as Banco
+    actor Org as Diretor da Federação
+    actor Club as Gestor da Agremiação
+    participant Web as Flag Admin Web
+    participant API as Flag Backend (/api/v1)
+    participant DB as PostgreSQL
 
-    G->>DB: registra resultado (FINISHED)
-    G->>P: publica GameResultRegisteredEvent<br/>(gameId, categoryId)
-    P->>L: AFTER_COMMIT
-    L->>S: recalculate(categoryId)
-    S->>DB: busca times da categoria + jogos FINISHED
-    S->>DB: deleta standings da categoria (bulk)
-    S->>DB: recalcula played/wins/draws/losses<br/>gols pró/contra · pontos (vitória×3 + empate)
-    S->>DB: insere novo ranking
+    Note over Org,DB: 1. Organização cria o campeonato e abre janela de filiação
+    Org->>Web: Cadastra Competição e Janela de Filiação
+    Web->>API: POST /competitions e POST /affiliation-windows
+    API->>DB: Grava competição e janela
+
+    Note over Club,DB: 2. Agremiação filia-se à Organização
+    Club->>Web: Solicita Filiação Institucional
+    Web->>API: POST /institutions/{id}/affiliations
+    API->>DB: Registra InstitutionAffiliation status=PENDING
+    Org->>Web: Aprova filiação
+    Web->>API: PATCH /affiliations/{id}/approve
+    API->>DB: Status → ACTIVE
+
+    Note over Club,DB: 3. Inscrição de Equipes e Elencos
+    Club->>Web: Inscreve Time da Agremiação na Competição
+    Web->>API: POST /competitions/{id}/teams
+    API->>DB: Cria competition_team
+    Club->>Web: Registra Elenco da Temporada com Atletas (Persons)
+    Web->>API: POST /rosters/{rosterId}/athletes
+    API->>DB: Vincula PersonId em team_roster
 ```
-
-**Ordenação da classificação**: pontos ↓ → saldo de gols ↓ → gols pró ↓ → nome do time ↑. A posição é atribuída sequencialmente no response.
 
 ---
 
-## 5. Navegação e autenticação dos apps
+## 3. Fluxo de Operação de Partida ao Vivo (Mesa → Público — ADR-002)
 
-### Admin Web (GoRouter com proteção)
+O `flag_referee_app` opera o confronto de forma tolerante a oscilações de rede. O resultado é consolidado no PostgreSQL e espelhado no Firestore para os torcedores:
 
 ```mermaid
-flowchart TD
-    R{Rota acessada} --> Auth{Autenticado?}
-    Auth -->|não + rota pública| LOGIN[login / signup /<br/>forgot-password / reset-password]
-    Auth -->|não + rota restrita| LOGIN2[redirect → /login]
-    Auth -->|sim + rota de auth| HOME[redirect → /]
-    Auth -->|sim + rota restrita| OK[rota normal]
+sequenceDiagram
+    actor Ref as Árbitro / Mesário
+    participant RefApp as Flag Referee App
+    participant API as Flag Backend (/api/v1)
+    participant PG as PostgreSQL (ACID)
+    participant FS as Cloud Firestore (CQRS Mirror)
+    participant PubApp as Flag Public App (Torcedor)
 
-    HOME --> NAV[Home: grid de cards]
-    NAV -->|context.go| LISTA[Lista de gestão]
-    LISTA -->|context.push| FORM[Formulário criar/editar]
-    NAV -->|só ADMIN| APROV[Approvals / Users]
-```
+    Note over Ref,RefApp: 1. Check-In de Atletas
+    Ref->>RefApp: Confere foto, documento e camisa de cada atleta
+    RefApp->>API: POST /games/{id}/checkins
+    API->>PG: Grava presença confirmada do atleta no jogo
 
-- `refreshListenable: AuthController` — qualquer mudança de estado reavalia o redirect.
-- Rotas explícitas no browser (`context.go`) mantêm o path; formulários usam `context.push` (pilha) com `BackButton`.
-- A home exibe **cards** (mesmos ícones do antigo menu lateral), variando por role: **Aprovações** e **Usuários** só para `ADMIN`.
+    Note over Ref,RefApp: 2. Início do Confronto e Registro de Lances
+    Ref->>RefApp: Registra Touchdown / Falta / Pontuação Extra
+    RefApp->>API: POST /games/{id}/plays e POST /games/{id}/score-events
+    API->>PG: Grava transação de lance e atualiza placar oficial
 
-### Referee App (GoRouter protegido)
+    Note over PG,FS: 3. Projeção CQRS Light para Tempo Real
+    PG-->>FS: Projeta estado atualizado do jogo (Live Score)
+    FS-->>PubApp: Realtime Listener dispara atualização na tela do torcedor em milissegundos
 
-```
-/login      (público, mesa)
-/           home da mesa → push /operation | /checkin
-/operation  operação ao vivo (iniciar, placar, finalizar)
-/checkin    check-in e validação de atletas
-```
-
-### Public App (GoRouter público)
-
-```
-/                  home → lista de campeonatos
-/competition/:id   detalhe (placeholder) → sub-rotas games | results | standings
-/game/:id          detalhe do jogo (auto-refresh 10s do placar ao vivo)
+    Note over Ref,PG: 4. Finalização da Súmula
+    Ref->>RefApp: Finaliza Partida (Assinatura digital da mesa)
+    RefApp->>API: POST /games/{id}/finish
+    API->>PG: Atualiza status=FINISHED e recalcula Standings (Classificação)
+    PG-->>FS: Projeta nova tabela de classificação no Firestore
 ```
 
 ---
 
-## 6. Endpoints principais (API REST `/api/v1`)
+## 4. Matriz de Autorização por Endpoint (SpEL & SecurityExpressions)
 
-| Área | Endpoints |
-|------|-----------|
-| **Auth** | `POST /auth/register`, `POST /auth/login`, `POST /auth/forgot-password`, `POST /auth/reset-password`, `GET /auth/me`, `GET|POST /auth/users`, `GET /auth/users/pending`, `POST /auth/users/{id}/approve\|reject` |
-| **Organizações** | `POST /organizations`, `GET /organizations`, `GET/PUT /organizations/{id}` |
-| **Campeonatos** | `POST /competitions`, `GET /competitions`, `GET /competitions/{id}`, `GET /organizations/{orgId}/competitions`, `PUT /competitions/{id}` |
-| **Categorias** | `POST /categories`, `GET /competitions/{id}/categories`, `PUT/DELETE /categories/{id}` |
-| **Campos** | `POST /venues`, `GET /venues`, `GET/PUT /venues/{id}` |
-| **Times** | `POST /teams`, `GET /categories/{id}/teams`, `GET/PUT /teams/{id}` |
-| **Rodadas** | `POST /rounds`, `GET /categories/{id}/rounds`, `PUT /rounds/{id}` |
-| **Jogos** | `POST /games`, `GET /rounds/{id}/games`, `GET /competitions/{id}/games`, `GET/PUT /games/{id}`, `PATCH /games/{id}/status`, `POST /games/{id}/result`, `POST /games/{id}/score/events`, `PATCH /games/{id}/score`, `GET /games/{id}/score/events` |
-| **Classificação** | `GET /categories/{id}/standings` |
-| **Atletas** | `POST /athletes`, `GET /athletes`, `GET/PUT /athletes/{id}` |
-| **Roster** | `POST /teams/{id}/roster`, `GET /teams/{id}/roster`, `DELETE /teams/{id}/roster/{athleteId}` |
-| **Check-in** | `GET /games/{id}/checkin`, `POST /games/{id}/checkin/{athleteId}`, `POST /games/{id}/checkin/{athleteId}/validate`, `GET /games/{id}/validations` |
+A segurança da API é garantida stateless em tempo de execução via `@PreAuthorize`:
 
-Documentação interativa: Swagger UI em `/swagger-ui.html` e OpenAPI em `/api-docs`.
+| Recurso | Ação | Mínimo Papel Exigido | Método / Endpoint |
+|---|---|:---:|---|
+| **Organizações** | Criar nova Organização | `SUPER_ADMIN` | `POST /api/v1/organizations` |
+| **Agremiações** | Criar Agremiação | `ORG_ADMIN` / `SUPER_ADMIN` | `POST /api/v1/institutions` |
+| **Filiações** | Aprovar Filiação de Agremiação | `ORG_ADMIN` da Organização | `PATCH /api/v1/affiliations/{id}/approve` |
+| **Competições** | Criar Campeonato e Categorias | `ORG_ADMIN` da Organização | `POST /api/v1/competitions` |
+| **Elencos** | Inscrever Atletas no Elenco | `MANAGER` / `ORG_ADMIN` | `POST /api/v1/rosters/{id}/athletes` |
+| **Partidas** | Realizar Check-in de Atleta | `REFEREE` / `MANAGER` / `ORG_ADMIN` | `POST /api/v1/games/{id}/checkins` |
+| **Súmula** | Registrar Pontuação de Lance | `REFEREE` da Partida | `POST /api/v1/games/{id}/score-events` |
+| **Público** | Consultar Classificação e Jogos | *Acesso Público (Sem Auth)* | `GET /api/v1/competitions/{id}/standings` |
