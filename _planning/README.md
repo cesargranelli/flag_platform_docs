@@ -103,10 +103,10 @@ _planning/
 | Repositório | Prefixo | Local | Último ID | Próximo livre |
 |---|---|---|:---:|:---:|
 | flag_backend | `BACK` | `repos/backend/` | BACK-06 | `BACK-07` |
-| flag_platform_infra | `INFRA` | `repos/infra/` | INFRA-01 | `INFRA-02` |
+| flag_platform_infra | `INFRA` | `repos/infra/` | INFRA-02 | `INFRA-03` |
 | flag_admin_web | `ADMIN` | `repos/admin-web/` (a criar) | — | `ADMIN-01` |
 | flag_referee_app | `REF` | `repos/referee-app/` (a criar) | — | `REF-01` |
-| flag_public_app | `PUB` | `repos/public-app/` (a criar) | — | `PUB-01` |
+| flag_public_app | `PUB` | `repos/public_app/` | PUB-03 | `PUB-04` |
 | flag_platform_agent | `AGENT` | `repos/agent/` (a criar) | — | `AGENT-01` |
 
 ### 5.3 Esforços arquivados (`_archive/`)
