@@ -1,6 +1,6 @@
 # ADR-017: Configuracao de Playoffs
 
-> **Status:** aceito
+> **Status:** aceito — decisões **2 (geração)** e **4 (restrição de DRAFT)** substituídas por [ADR-021](ADR-021-geracao-fase-a-fase-playoffs.md)
 > **Data:** 2026-09-30
 > **Decisores:** tech-lead
 
