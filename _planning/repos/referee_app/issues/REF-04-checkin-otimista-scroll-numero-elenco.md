@@ -28,3 +28,7 @@
 - [x] Scroll da lista de check-in é fluido e sem loops.
 - [x] O número cadastrado do atleta fica visível em destaque para conferência da mesa.
 - [x] Apenas atletas elegíveis para a modalidade da partida aparecem no roster.
+
+## Resolução Implementada
+- **Backend (`CheckInService`, `RosterService`, `RosterLookup`)**: Adicionado método `findAthleteIdsByTeamIdAndCompetitionId(teamId, competitionId)` que consulta estritamente o `RosterEntity` associado à competição da partida (ou fallback ao elenco-base `competition_id IS NULL`), eliminando a agregação indiscriminada de atletas de outras competições e modalidades (ex.: Flag 5x5 em jogos de Flag 8x8).
+- **Frontend (`PlayDialog`, `GameApi`)**: Priorização do elenco da competição em `findCompetitionRoster` para garantir que apenas os atletas daquela modalidade/torneio apareçam no autocomplete de jogadas.
