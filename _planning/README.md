@@ -105,7 +105,7 @@ _planning/
 | flag_backend | `BACK` | `repos/backend/` | BACK-06 | `BACK-07` |
 | flag_platform_infra | `INFRA` | `repos/infra/` | INFRA-02 | `INFRA-03` |
 | flag_admin_web | `ADMIN` | `repos/admin-web/` (a criar) | — | `ADMIN-01` |
-| flag_referee_app | `REF` | `repos/referee-app/` (a criar) | — | `REF-01` |
+| flag_referee_app | `REF` | `repos/referee_app/` | REF-08 | `REF-09` |
 | flag_public_app | `PUB` | `repos/public_app/` | PUB-10 | `PUB-11` |
 | flag_platform_agent | `AGENT` | `repos/agent/` (a criar) | — | `AGENT-01` |
 
