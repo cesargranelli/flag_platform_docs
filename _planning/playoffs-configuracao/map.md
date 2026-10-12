@@ -1,5 +1,14 @@
 # Mapa: Configuracao de Playoffs
 
+> **Esforço:** `playoffs-configuracao` · **Status:** aberto
+
+## Issues
+
+| ID | Tipo | Título | Repo(s) | Status |
+|----|------|--------|---------|--------|
+| [PLY-01](issues/PLY-01-backend-fases-e-geracao.md) | feature | Backend — fases configuráveis e geração fase a fase | flag_backend | resolved (v1.9.0) |
+| [PLY-02](issues/PLY-02-admin-web-fases-e-chave.md) | feature | Admin Web — config de fases + card "Chave de Playoffs" | flag_admin_web | resolved |
+
 ## Ordem de execucao
 
 1. **Spec** (`spec.md`) — ja criada
