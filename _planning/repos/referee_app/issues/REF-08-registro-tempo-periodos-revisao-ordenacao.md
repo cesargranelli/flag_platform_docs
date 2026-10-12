@@ -1,7 +1,7 @@
 # REF-08: Registro de tempo, períodos (Início/Fim), revisão e estabilização da ordenação
 
 > **Type:** bug / feature
-> **Status:** open
+> **Status:** done
 > **Effort:** repos/referee_app
 > **Repo(s):** flag_referee_app, flag_backend
 > **Blocks:** —
@@ -27,7 +27,7 @@
 
 ## Critérios de aceite
 
-- [ ] Campo de tempo é persistido e exibido nos lances da timeline.
-- [ ] Início e término de períodos podem ser registrados formalmente.
-- [ ] Lista de lances mantém rigorosamente a mesma ordem antes e depois de recarregar a tela.
-- [ ] Detalhe do registro exibe as jardas anotadas na jogada.
+- [x] Campo de tempo é persistido e exibido nos lances da timeline.
+- [x] Início e término de períodos podem ser registrados formalmente.
+- [x] Lista de lances mantém rigorosamente a mesma ordem antes e depois de recarregar a tela.
+- [x] Detalhe do registro exibe as jardas anotadas na jogada.

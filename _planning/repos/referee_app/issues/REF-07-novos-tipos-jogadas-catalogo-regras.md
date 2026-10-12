@@ -1,7 +1,7 @@
 # REF-07: Novos tipos de jogada: Kickoff/Retorno, FG Errados/Bloqueados, Toss, Faltas Duplas, Ejeção
 
 > **Type:** regra / api
-> **Status:** open
+> **Status:** done
 > **Effort:** repos/referee_app
 > **Repo(s):** flag_referee_app, flag_backend
 > **Blocks:** —
@@ -35,5 +35,5 @@ Expandir o enum `PlayType` e modelos de request com os seguintes tipos:
 
 ## Critérios de aceite
 
-- [ ] Todos os novos tipos de jogadas estão disponíveis para seleção na modalidade compatível.
-- [ ] Regras de posse e descida reagem adequadamente a cada novo evento.
+- [x] Todos os novos tipos de jogadas estão disponíveis para seleção na modalidade compatível.
+- [x] Regras de posse e descida reagem adequadamente a cada novo evento.

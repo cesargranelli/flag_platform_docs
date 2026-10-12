@@ -1,7 +1,7 @@
 # REF-04: Check-in otimista imediato, resolução de loop de scroll, número cadastrado e filtro de elenco
 
 > **Type:** bug / perf
-> **Status:** open
+> **Status:** done
 > **Effort:** repos/referee_app
 > **Repo(s):** flag_referee_app, flag_backend
 > **Blocks:** —
@@ -24,7 +24,7 @@
 
 ## Critérios de aceite
 
-- [ ] Toque no botão ON/OFF muda imediatamente na UI sem travamento.
-- [ ] Scroll da lista de check-in é fluido e sem loops.
-- [ ] O número cadastrado do atleta fica visível em destaque para conferência da mesa.
-- [ ] Apenas atletas elegíveis para a modalidade da partida aparecem no roster.
+- [x] Toque no botão ON/OFF muda imediatamente na UI sem travamento.
+- [x] Scroll da lista de check-in é fluido e sem loops.
+- [x] O número cadastrado do atleta fica visível em destaque para conferência da mesa.
+- [x] Apenas atletas elegíveis para a modalidade da partida aparecem no roster.

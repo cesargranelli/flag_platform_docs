@@ -1,7 +1,7 @@
 # REF-06: Rollback confiável de lances no backend (estorno de pontos e score events) e botão no painel
 
 > **Type:** feature
-> **Status:** open
+> **Status:** done
 > **Effort:** repos/referee_app
 > **Repo(s):** flag_referee_app, flag_backend
 > **Blocks:** —
@@ -27,6 +27,6 @@
 
 ## Critérios de aceite
 
-- [ ] Chamada de rollback remove o lance da lista de jogadas de forma permanente.
-- [ ] Pontos atrelados ao lance revertido são subtraídos automaticamente do placar do jogo.
-- [ ] Botão de desfazer no painel do árbitro permite corrigir erros de lançamento em 1 toque.
+- [x] Chamada de rollback remove o lance da lista de jogadas de forma permanente.
+- [x] Pontos atrelados ao lance revertido são subtraídos automaticamente do placar do jogo.
+- [x] Botão de desfazer no painel do árbitro permite corrigir erros de lançamento em 1 toque.

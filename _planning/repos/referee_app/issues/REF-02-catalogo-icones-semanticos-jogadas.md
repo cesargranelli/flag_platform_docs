@@ -1,7 +1,7 @@
 # REF-02: Catálogo e revisão semântica de ícones para todos os registros de jogadas
 
 > **Type:** design
-> **Status:** open
+> **Status:** done
 > **Effort:** repos/referee_app
 > **Repo(s):** flag_referee_app
 > **Blocks:** —
@@ -32,5 +32,5 @@ Atribuir ícones semânticos esportivos específicos para cada tipo de jogada:
 
 ## Critérios de aceite
 
-- [ ] Cada tipo de lance possui ícone visualmente coerente e intuitivo.
-- [ ] Ícones de pontuação, passe, corrida, defesa e chutes claramente diferenciáveis à primeira vista.
+- [x] Cada tipo de lance possui ícone visualmente coerente e intuitivo.
+- [x] Ícones de pontuação, passe, corrida, defesa e chutes claramente diferenciáveis à primeira vista.

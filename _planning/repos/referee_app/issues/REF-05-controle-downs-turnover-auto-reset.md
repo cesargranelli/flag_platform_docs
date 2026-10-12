@@ -1,7 +1,7 @@
 # REF-05: Gestão sequencial de descidas (downs), turnover on downs automático e auto-reset
 
 > **Type:** regra
-> **Status:** open
+> **Status:** done
 > **Effort:** repos/referee_app
 > **Repo(s):** flag_referee_app
 > **Blocks:** —
@@ -25,6 +25,6 @@
 
 ## Critérios de aceite
 
-- [ ] Descidas avançam automaticamente conforme as regras esportivas.
-- [ ] 4ª descida falha inverte a posse (Turnover on Downs) e reseta para 1ª descida.
-- [ ] Formulário/botoeira reseta para o default após cada lance registrado.
+- [x] Descidas avançam automaticamente conforme as regras esportivas.
+- [x] 4ª descida falha inverte a posse (Turnover on Downs) e reseta para 1ª descida.
+- [x] Formulário/botoeira reseta para o default após cada lance registrado.

@@ -1,7 +1,7 @@
 # REF-01: Substituição de foto por escudo nos avatares & desencapsulamento de ícones
 
 > **Type:** design
-> **Status:** open
+> **Status:** done
 > **Effort:** repos/referee_app
 > **Repo(s):** flag_referee_app
 > **Blocks:** —
@@ -22,5 +22,5 @@
 
 ## Critérios de aceite
 
-- [ ] Avatar de cada atleta exibe o escudo de seu time com badge `#N` da camisa.
-- [ ] Botões de lances não possuem caixas/containers pesados isolando o ícone.
+- [x] Avatar de cada atleta exibe o escudo de seu time com badge `#N` da camisa.
+- [x] Botões de lances não possuem caixas/containers pesados isolando o ícone.

@@ -1,7 +1,7 @@
 # REF-03: Priorização e ordenação estrita dos confrontos na Home por esteira operacional
 
 > **Type:** feature
-> **Status:** open
+> **Status:** done
 > **Effort:** repos/referee_app
 > **Repo(s):** flag_referee_app
 > **Blocks:** —
@@ -23,5 +23,5 @@ Em `referee_home_screen.dart`, unificar a exibição dos jogos priorizando a seg
 
 ## Critérios de aceite
 
-- [ ] A tela Home lista os jogos estritamente na ordem: `IN_PROGRESS` → `OPEN` → `CONFERENCE` → `FINISHED` → passados (máx 5).
-- [ ] Partidas em andamento ganham destaque e acesso em 1 toque ao painel de operação.
+- [x] A tela Home lista os jogos estritamente na ordem: `IN_PROGRESS` → `OPEN` → `CONFERENCE` → `FINISHED` → passados (máx 5).
+- [x] Partidas em andamento ganham destaque e acesso em 1 toque ao painel de operação.
