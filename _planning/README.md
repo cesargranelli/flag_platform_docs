@@ -1,7 +1,7 @@
 # Tracker Oficial de Trabalho — `_planning/`
 
 > **Status:** vigente
-> **Data:** 3 de Outubro de 2026
+> **Data:** 15 de Outubro de 2026
 > **Modelo:** **hub-first** — todas as *issues de trabalho* da Flag Platform vivem aqui.
 > **Base:** [Centralização das Issues e Reorganização](../architecture/centralizacao-issues-e-reorganizacao.md) ·
 > [Inventário do Hub](../architecture/inventario-hub.md)
@@ -97,6 +97,7 @@ _planning/
 | playoffs-configuracao | `PLAYOFFS` | `playoffs-configuracao/` | rascunho | — | `PLAYOFFS-01` |
 | padronizacao-listagens | `LIST` | `padronizacao-listagens/` | em execução | LIST-01 | `LIST-02` |
 | governanca-operacional-agentes | `GOV` | `governanca-operacional-agentes/` | resolvido | GOV-01 | `GOV-02` |
+| escopo-perfis | `ESC` | `escopo-perfis/` | resolvido (2026-10-15) | ESC-07 | `ESC-08` — aguardando arquivamento |
 
 ### 5.2 Issues por repositório (`repos/`)
 
