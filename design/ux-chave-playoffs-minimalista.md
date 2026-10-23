@@ -3,88 +3,103 @@
 > **Status:** Implementado  
 > **Data:** 2026-10-22 (Atualizado)  
 > **Aplicações:** `flag_admin_web` e `flag_public_app`  
-> **Tema:** Design System Kickster canônico, cards estruturados de 210×88px, cabeçalhos 210×52px, chave espelhada estilo NFL / Super Bowl, visualização em tela única e navegação conectada  
+> **Tema:** Cards normais de confrontos Kickster (240×96px na árvore e cards responsivos na lista), escudos circulares em destaque (34–44px), área central de pontuação, colunas por fase com linhas de ligação ortogonais, visualização em tela única no admin_web e navegação conectada no public_app  
 
 ---
 
 ## 1. Princípios de Design e Diretrizes Kickster
 
-1. **Containers Canônicos Estruturados (`BracketMatchCard`)**:
-   - Abandona caixas flutuantes improvisadas e adota os padrões oficiais do UI Kit Kickster (*Figma Live Score & News Sport*).
-   - Container de **210px de largura por 88px de altura**:
+1. **Cards Normais de Confronto Esportivo (`BracketMatchCard`)**:
+   - Cada confronto esportivo utiliza a estrutura sóbria e canônica do Kickster com dimensões de **240px de largura por 96px de altura** na árvore:
      - Fundo sólido `AppColors.surface` (`#FFFFFF`).
-     - Borda `AppColors.line` (`#E3E7EC`, 1px), raio `AppRadii.cardBorder` (12px) e sombra suave (`BoxShadow` com 4% de opacidade e blur 6).
-     - Destaques semânticos: borda dourada (`#F59E0B`) na Grande Final, borda primária (`#083879`) na fase ativa, e borda vermelha (`#EF4444`) quando a partida está ao vivo com dot/badge pulsante.
-2. **Duas Linhas Esportivas com Divisor Fino**:
-   - Cada equipe ocupa uma linha balanceada de 43.5px com divisor central horizontal de 1px.
-   - Componentes da linha:
-     - **Seed (#1, #2...)**: 10.5pt `w700`.
-     - **Escudo Oficial Kickster (`KicksterTeamShield`)**: 26×26px com proporção natural `BoxFit.contain` e fallback esportivo vetorial com a paleta oficial da agremiação/cidade.
-     - **Nome da Equipe**: tipografia `Plus Jakarta Sans`, 12pt (`w700` para o vencedor e atenuado para o eliminado).
-     - **Área de Pontuação (Score Box)**: container de `30×24px` alinhado à direita, com fundo primário suave e peso `w800` para o time vencedor.
-3. **Cabeçalhos de Fase Enquadrados (`_PhaseHeader`)**:
-   - Dimensões: **210px de largura por 52px de altura**, garantindo que títulos extensos como `"WILDCARD"`, `"SEMIFINAIS"`, `"FINAL DE CONFERÊNCIA"` e `"SUPER BOWL"` enquadrem com respiro e sem quebras indesejadas.
-   - Fundo `surfaceMuted` (`#F6F8FE`), borda `line` e raio de 10px.
-   - Ícone temático Kickster (`Icons.emoji_events` dourado para finais e `Icons.shield_outlined` para fases eliminatórias).
-4. **Navegação Espelhada (Estilo NFL / Super Bowl)**:
-   - As preliminares iniciam nas extremidades e **ambas as alas navegam em direção ao centro**:
-     - **Ala Esquerda (Conferência A / Chave Superior)**: avança da esquerda para o centro.
-     - **Ala Direita (Conferência B / Chave Inferior)**: avança da direita para o centro.
-     - **Centro (Grande Final / Super Bowl)**: as pontes dos campeões convergem no topo da árvore para a decisão final do título.
+     - Borda `AppColors.line` (`#E3E7EC`, 1px), raio de 12px e sombra sutil.
+     - Destaques semânticos: borda dourada (`#F59E0B`) na Grande Final, borda primária (`#083879`) no card destacado/ativo, e borda vermelha (`#EF4444`) quando a partida está ao vivo.
+2. **Escudos Circulares em Destaque & Área Central de Pontuação**:
+   - Substituição de tabelas estáticas pelo formato canônico de confronto esportivo:
+     - **Equipe Mandante**: `KicksterTeamShield` circular de **34px** (ou **44px** na listagem), com o nome e seed (`#1`) abaixo, e indicação visual discreta de vitória (anel/check verde).
+     - **Área Central de Pontuação**: bloco dedicado com placar numérico (`homeScore : awayScore`, 16–24pt `w800`) ou pill `VS` quando o jogo ainda não iniciou, com data e horário em tipografia `Plus Jakarta Sans`.
+     - **Equipe Visitante**: `KicksterTeamShield` circular de **34px** (ou **44px** na listagem), com o nome e seed (`#2`) abaixo, com opacidade atenuada caso eliminada.
+3. **Cabeçalhos de Fase Enquadrados Dinamicamente (`_PhaseHeader`)**:
+   - Dimensões: **240px de largura por 48px de altura**, garantindo que todos os textos ("Wildcard", "Semifinais", "Final", "Decisão do Título") sejam enquadrados perfeitamente com `FittedBox` sem cortes ou quebras artificiais.
+   - Subtítulo dinâmico baseado na quantidade de confrontos da fase (ex.: *"Decisão do Título"* ou *"4 jogos"*), sem amarrações a nomes específicos de eventos.
+4. **Montagem em Colunas por Fase com Linhas de Ligação (`BracketLayout`)**:
+   - No `admin_web` e no modo árvore do `public_app`, os confrontos são dispostos em **colunas sequenciais por fase**:
+     - **Coluna 1 (Quartas de Final / Wildcard)**: confrontos empilhados verticalmente com agrupamento ordenado.
+     - **Linhas de Ligação (`BracketConnectorPainter`)**: traçados ortogonais com cantos arredondados (raio 8px) conectando o lado direito do confronto anterior ao lado esquerdo do confronto correspondente na fase seguinte.
+     - **Coluna 2 (Semifinais)**: confrontos perfeitamente alinhados ao centro geométrico dos seus jogos de origem.
+     - **Coluna 3 (Grande Final)**: partida decisiva no topo/centro da chave.
 
 ---
 
-## 2. Anatomia do Card Canônico Kickster (210×88px)
+## 2. Anatomia do Card Canônico Kickster na Árvore (240×96px)
 
 ```
 ┌────────────────────────────────────────────────────────┐
-│  #1  🛡️ [ESCUDO 26px]   SP Spartans               [ 28 ]│ <- Mandante (Vencedor)
+│ JOGO 1 · QUARTAS DE FINAL                     [ FINAL ]│ <- Cabeçalho compacto (20px)
 ├────────────────────────────────────────────────────────┤
-│  #4  🐺 [ESCUDO 26px]   Curitiba Wolves           [ 14 ]│ <- Visitante
+│     (🛡️ 34px)                               (🐺 34px)   │
+│   #1 Spartans           28  :  14        #4 Wolves     │
+│   (Mandante Vencedor)   Placar Central   (Visitante)   │
 └────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 3. Diagrama da Chave Espelhada Convergente
+## 3. Diagrama da Chave em Colunas com Linhas de Ligação
 
 ```
-      CONFERÊNCIA A                                   CONFERÊNCIA B
-    (Avanço Esquerda →)      ★ GRANDE FINAL ★      (← Avanço Direita)
+   QUARTAS DE FINAL                  SEMIFINAIS                  GRANDE FINAL
+  (Coluna de Fase 1)            (Coluna de Fase 2)            (Coluna de Fase 3)
 
-  ┌──────────────────┐                              ┌──────────────────┐
-  │ #1 Spartans [28] │──┐                        ┌──│ #1 Raptors  [24] │
-  │ #4 Wolves   [14] │  │                        │  │ #4 Miners   [10] │
-  └──────────────────┘  ├──┌──────────────────┐──┤  └──────────────────┘
-  ┌──────────────────┐  │  │ #1 Spartans [  ] │  │  ┌──────────────────┐
-  │ #2 Storm    [21] │──┘  │ #1 Raptors  [  ] │  └──│ #2 Eagles   [18] │
-  │ #3 Titans   [17] │     └──────────────────┘     │ #3 Falcons  [20] │
-  └──────────────────┘          🏆 SUPER BOWL       └──────────────────┘
+┌──────────────────────┐
+│ (🛡️) 28 : 14 (🐺)    │───────┐
+│ #1 Spartans / Wolves │       │
+└──────────────────────┘       ├───────┌──────────────────────┐
+┌──────────────────────┐       │       │ (🛡️) 31 : 24 (⚡)    │───────┐
+│ (⚡) 21 : 17 (🦅)    │───────┘       │ #1 Spartans / Storm  │       │
+│ #2 Storm / Titans    │               └──────────────────────┘       │
+└──────────────────────┘                                              ├───────┌──────────────────────┐
+┌──────────────────────┐                                              │       │ (🛡️)   VS   (🦅)     │
+│ (🦖) 24 : 10 (⛏️)    │───────┐                                      │       │ #1 Spartans / Eagles │
+│ #1 Raptors / Miners  │       │                                      │       └──────────────────────┘
+└──────────────────────┘       ├───────┌──────────────────────┐       │            🏆 GRANDE FINAL
+┌──────────────────────┐       │       │ (🦅) 20 : 14 (🦖)    │───────┘
+│ (🦅) 20 : 18 (🦅)    │───────┘       │ #3 Falcons / Raptors │
+│ #3 Falcons / Eagles  │               └──────────────────────┘
+└──────────────────────┘
 ```
 
 ---
 
 ## 4. Adaptação Específica por Plataforma
 
-### 4.1 Admin Web (`flag_admin_web`): Visualização em Tela Única (Fit-to-Screen)
+### 4.1 Admin Web (`flag_admin_web`): Visualização em Tela Única
 - **Modo Tela Única (Padrão)**:
-  - Redimensiona e ajusta toda a árvore eliminatória via `FittedBox` responsivo para caber **100% na largura disponível da viewport**, eliminando o scroll horizontal forçado e permitindo ao organizador inspecionar todos os confrontos em uma única visualização limpa.
+  - Redimensiona e ajusta toda a árvore eliminatória via `FittedBox` responsivo para caber **100% na largura da tela**, permitindo ao organizador inspecionar todas as colunas de fases e suas conexões simultaneamente sem barra de rolagem horizontal.
 - **Alternador de Visualização Kickster**:
-  - `[ Tela única ]`: escala proporcional automática para visão geral sem scroll.
-  - `[ Rolagem livre ]`: exibição em tamanho original 100% com barra de rolagem e atalhos rápidos (*"Início"* e *"Final (Centro)"*).
-- Breakpoint responsivo otimizado para **768px** (tablets e desktops operam em tela única).
+  - `[ Tela única ]`: visualização panorâmica integral adaptada à viewport.
+  - `[ Rolagem livre ]`: visualização em tamanho natural (100%) com barra de rolagem e botões de atalho rápido (*"Início"* e *"Final"*).
+- Breakpoint responsivo: abaixo de 768px, apresentação em accordion por fases.
 
-### 4.2 Public App (`flag_public_app`): Navegação Conectada entre Fases
-- **Stepper Horizontal de Fases Conectadas**:
-  - Trilha interativa no topo ligando as etapas eliminatórias com linhas de progressão:
+### 4.3 Tratamento de Avanço Direto (BYE) e Equipes Pré-Classificadas
+- **Eliminação de Cards Sintéticos Sobrepostos:**
+  - Cards artificiais de folga/avanço foram removidos das colunas intermediárias (evitando encavalamento/sobreposição visual com os jogos reais de fases como as semifinais).
+- **Badge/Anotação no Time (`directQualifier`):**
+  - Quando um time avança direto para uma fase avançada (ex.: 1º colocado de conferência direto para as finais ou semifinais), recebe uma anotação compacta diretamente no card em que disputa a partida:
+    - Tag Kickster: `[ 1º CONFERÊNCIA CAIPIRA ]`, `[ 1º METRÓPOLES ]` ou `[ AVANÇO DIRETO ]`.
+- **Harmonização Posicional e Conectores Inteligentes:**
+  - Centralização vertical proporcional (`centers[c][0] = (centers[c-1].first + centers[c-1].last) / 2`): quando os times chegam direto ou a fase tem menos confrontos, o card da fase seguinte permanece geometricamente balanceado em relação a todos os confrontos da fase anterior.
+  - Regra anti-colisão vertical (`minY = centers[c][j-1] + matchHeight + baseGap`).
+  - Prevenção de conectores falsos: quando ambos os finalistas avançam direto por classificação, linhas ortogonais falsas conectando semifinais alheias à final não são traçadas.
+
+### 4.2 Public App (`flag_public_app`): Visualização Direta da Árvore Eliminatória em Fases
+- **Visualização da Chave Eliminatória**:
+  - Apresenta os confrontos em colunas por fases consecutivas conectadas por traçados ortogonais com cantos arredondados.
+  - Cards normais de confronto Kickster no formato canônico (240×96px) com escudos circulares de 34px, placar central ou pill `VS`, status, identificação de seeds e anotações de avanço direto no time (`[ 1º CONFERÊNCIA CAIPIRA ]`).
+- **Seletor Rápido de Fases no Topo**:
+  - Trilha horizontal compacta e limpa no topo com chips de fase:
     `[ 1. Quartas de Final ] ────> [ 2. Semifinais ] ────> [ 🏆 Grande Final ]`
-  - Toque direto em qualquer fase para navegação instantânea.
-- **Ligação Explícita dos Confrontos**:
-  - **Destino do Vencedor**: banner contextual no rodapé de cada confronto com seta e rótulo:
-    `Vencedor avança para: Semifinais (Jogo 1)` acompanhado de botão de salto rápido `[ Ver próximo → ]` que troca de fase e destaca o confronto de destino.
-  - **Origem dos Participantes**: banner superior nos confrontos de fases avançadas:
-    `Origem: Vencedores da Fase Anterior (Jogos 1 e 2)` com botão `[ Ver fase anterior ← ]`.
-- **Alternador de Modos no Public App**:
-  - `[ Fases ]`: navegação guiada mobile-first conectando os confrontos de ponta a ponta.
-  - `[ Árvore ]`: visão panorâmica com suporte a zoom livre e pan via `InteractiveViewer`.
-- Toque no confronto esportivo abre diretamente a súmula ao vivo da partida (`/game/:id`).
+  - O toque em qualquer fase executa navegação/rolagem horizontal suave até a coluna correspondente na árvore.
+- **Rolagem Horizontal Fluida**:
+  - Suporte nativo a gestos de rolagem horizontal no mobile, sem conflitos com a rolagem vertical da página.
+  - Toque no card abre a súmula ao vivo da partida (`/game/:id`).
