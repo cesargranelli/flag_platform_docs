@@ -9,40 +9,72 @@ Fonte da verdade visual para os apps (Flutter). Reflete `frontend/packages/core/
 - Usar como referência visual de componentes ao avaliar/propor layouts (ex.: calendário, inputs, chips).
 - **Última sincronização**: 2026-09-11 — tokens e componentes atualizados para consistência com o `flag_admin_web` v2.1.
 
-## Cores
+## Cores e Tema Central (Kickster Theme System)
 
-Marca única adotada (2026-08-29, issue #431): paleta do UI Kit **Kickster** (primário azul royal, fundo claro), mapeada para os tokens semânticos atuais. Substitui a paleta Shifty (laranja).
+Marca única adotada (issue #431): paleta do UI Kit **Kickster** (primário azul royal, com suporte centralizado a Tema Claro e Escuro).
+**Regra Mandatória**: NUNCA declarar `Color(0x...)` literal ou cores hardcoded em widgets, telas ou cards. Todas as cores devem vir de `AppColors`, `GameStatusColors` ou `Theme.of(context)`.
 
-| Token | Valor | Uso |
+### 1. Tokens Fundamentais e Reativos (Light & Dark)
+
+| Token | Modo Claro (Light) | Modo Escuro (Dark) | Uso Semântico |
+|---|---|---|---|
+| `AppColors.primary` | `#083879` (Royal Navy) | `#3B82F6` (Electric Blue) | Cor da marca, destaques, botões ativos, tabs selecionadas |
+| `AppColors.brandNavy` | `#083879` | `#083879` | Azul royal institucional fixo da marca Kickster |
+| `AppColors.brandNavyGradientEnd` | `#0D47A1` | `#0D47A1` | Fim do gradiente dos cabeçalhos e cards de jogo |
+| `AppColors.background` | `#FEFEFE` | `#0A0F1D` | Fundo principal do Scaffold e das telas |
+| `AppColors.surface` | `#FFFFFF` | `#131B2E` | Fundo de cards, modais, inputs e listas |
+| `AppColors.surfaceMuted` | `#F6F8FE` | `#1E293B` | Superfície secundária (chips, tabs segmentadas, containers) |
+| `AppColors.line` | `#E3E7EC` | `#22304E` | Bordas e divisores sutis |
+| `AppColors.fieldBorder` | `#DADADA` | `#334155` | Borda em repouso dos campos de formulário e inputs |
+| `AppColors.textPrimary` | `#171725` | `#F1F5F9` | Títulos, placares e textos de alta ênfase |
+| `AppColors.textSecondary` | `#66707A` | `#94A3B8` | Subtítulos, metadados e legendas (contraste AA) |
+| `AppColors.textMuted` | `rgba(0,0,0,.6)` | `rgba(255,255,255,.7)` | Textos secundários de apoio e rodapé |
+| `AppColors.grayFill` | `#ECF1F6` | `#1E293B` | Cabeçalhos de tabela e preenchimentos neutros |
+| `AppColors.grayLabel` | `#78828A` | `#94A3B8` | Ícones inativos de topbar e labels overline |
+| `AppColors.disabled` | `#9CA4AB` | `#64748B` | Elementos e textos desabilitados |
+
+### 2. Paleta Esportiva Premium (Jogos, Placar e Liderança)
+
+| Token | Valor Hex | Uso Esportivo |
 |---|---|---|
-| `color.primary` | `#083879` | Marca, AppBar, botões principais, destaque (azul royal) |
-| `color.secondary` | `#17153B` | Elementos secundários, azul-escuro |
-| `color.accent` | `#0A4A9E` | Alertas/destaques pontuais (azul mais claro) |
-| `color.success` | `#00C566` | Sucesso, status positivos, pontos |
-| `color.warning` | `#FACC15` | Avisos, alertas — **conteúdo (texto/ícone) deve ser escuro** (`#171725`), nunca branco |
-| `color.danger` | `#E53935` | Erro, cancelamento, fim de partida |
-| `color.black` | `#111111` | Preto (bordas, checado) |
-| `color.disabled` | `#9CA4AB` | Texto/fundo de elementos desabilitados |
-| `color.gray.fill` | `#ECF1F6` | Preenchimentos neutros (checkbox não checado) |
-| `color.background` | `#FEFEFE` | Fundo de telas |
-| `color.surface` | `#FFFFFF` | Cards, inputs, superfícies elevadas |
-| `color.text.primary` | `#171725` | Texto principal |
-| `color.text.secondary` | `#66707A` | Legendas, metadados, placeholders (4.6:1 sobre surface — AA) |
-| `color.text.muted` | `rgba(0,0,0,.6)` | Subtítulos de tela e rodapé (issue #269) |
-| `color.gray.g100` | `#78828A` | Labels curtas em caixa alta (divisor "OU") |
-| `color.field.border` | `#DADADA` | Borda de repouso dos campos do kit (inputs/dropdowns) |
-| `color.surface.muted` | `#F6F8FE` | BG secundário — fundo azulado de cards/áreas |
+| `AppColors.stadiumNavy` | `#0F172A` | Fundo profundo esportivo de scoreboards |
+| `AppColors.stadiumCard` | `#1E293B` | Superfície de card escuro de placar |
+| `AppColors.liveRed` | `#EF4444` | Badge de partida ao vivo / tempo real |
+| `AppColors.gold` | `#F59E0B` | 1º Lugar / Campeão / Troféu dourado |
+| `AppColors.goldDark` | `#D97706` | Destaque escuro e bordas de troféu |
+| `AppColors.goldLight` | `#FEF3C7` | Fundo de destaque da grande final |
+| `AppColors.goldText` | `#92400E` | Texto sobre fundo dourado claro |
+| `AppColors.silver` | `#94A3B8` | 2º Lugar do pódio / Vice-campeão |
+| `AppColors.bronze` | `#CD7F32` | 3º Lugar do pódio |
+| `AppColors.winnerGreen` | `#10B981` | Destaque do vencedor da partida |
+| `AppColors.formWin` | `#10B981` | Forma recente: Vitória (V) |
+| `AppColors.formLoss` | `#EF4444` | Forma recente: Derrota (D) |
+| `AppColors.formDraw` | `#94A3B8` | Forma recente: Empate (E) |
+| `AppColors.playoffZone` | `#10B981` | Zona de classificação direta para playoffs |
+| `AppColors.wildcardZone` | `#3B82F6` | Zona de repescagem / wildcard |
+| `AppColors.bracketHighlighted` | `#60A5FA` | Realce da fase selecionada na árvore |
 
-### Semântica esportiva (`GameStatus`)
+### 3. Categorias Estatísticas
+
+| Token | Valor Hex | Categoria |
+|---|---|---|
+| `AppColors.statsPassing` | `#0284C7` | Passes / Quarterback |
+| `AppColors.statsRushing` | `#16A34A` | Corridas / Rushing Yards |
+| `AppColors.statsReceiving` | `#EA580C` | Recepções / Receiving |
+| `AppColors.statsDefense` | `#7C3AED` | Defesa / Interceptações / Flag Pulls |
+| `AppColors.statsKicking` | `#D97706` | Chutes / Field Goals / Extra Points |
+| `AppColors.statsPenalties` | `#DC2626` | Faltas / Penalidades |
+
+### 4. Semântica esportiva (`GameStatus`)
 
 | Status | Significado | Cor | Token |
 |---|---|---|---|
-| `inProgress` | Ao vivo | verde | `color.success` (`#00C566`) |
-| `finished` | Finalizado | vermelho | `color.danger` (`#E53935`) |
-| `scheduled` | Agendado | cinza | `color.text.secondary` |
-| `open` | Abertura | cinza | `color.text.secondary` |
-| `conference` | Conferência | cinza | `color.text.secondary` |
-| `cancelled` | Cancelado | cinza | `color.disabled` |
+| `inProgress` | Ao vivo | vermelho vivo | `AppColors.liveRed` (`#EF4444`) |
+| `finished` | Finalizado | verde | `AppColors.formWin` (`#10B981`) |
+| `scheduled` | Agendado | azul | `AppColors.primary` |
+| `open` | Abertura | azul celeste | `AppColors.accent` (`#0A4A9E`) |
+| `conference` | Conferência | âmbar | `AppColors.goldDark` (`#D97706`) |
+| `cancelled` | Cancelado | cinza | `AppColors.disabled` (`#9CA4AB`) |
 
 Fonte única no código: extensão **`GameStatusColors.statusColor`** (`flag_core`) — badges, placares e ícones de status devem consumir esse mapeamento, nunca redefinir cores por status.
 

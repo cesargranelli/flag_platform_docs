@@ -175,5 +175,14 @@ erDiagram
 
 ---
 
+## 6. Internacionalização e Localização (i18n / l10n)
+
+Ambos os aplicativos móveis operam com arquitetura de internacionalização dinâmica com suporte a **Português (`pt`)**, **Inglês (`en`)** e **Espanhol (`es`)**, detectando automaticamente as preferências do dispositivo do usuário.
+
+Para detalhes completos de implementação, contratos e diretrizes de código, consulte:
+- [Documento de Arquitetura: Internacionalização nos Apps Móveis](file:///C:/Projetos/America/flag_platform_docs/architecture/internacionalizacao-apps-moveis.md)
+
+---
+
 > [!TIP]
 > A separação entre o estado **`LIVE`**, o estado de auditoria **`IN_REVIEW`** e o estado definitivo **`FINISHED`** protege o sistema contra reclamações e inconsistências de súmula, garantindo que o placar final oficial seja homologado com tranquilidade antes do fechamento das estatísticas da competição.
