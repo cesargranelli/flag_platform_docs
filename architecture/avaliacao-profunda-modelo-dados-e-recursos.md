@@ -364,23 +364,22 @@ timeline
     Fase 3 : Consolidação Semântica : Tornar teams.institution_id NOT NULL : Renomear goals_for -> points_for : Eliminar tabela institution_organizations : Consolidar Bounded Contexts Modulith
 ```
 
-### Fase 1: Limpeza de Débito Morto & Enriquecimento Não-Quebrante
-- [ ] Criar changeset Liquibase para dropar tabelas órfãs: `user_skills` e `categories`.
-- [ ] Adicionar coluna `nickname VARCHAR(100)` na tabela `persons` e expor no DTO `PersonResponse`.
-- [ ] Adicionar coluna `competition_id UUID` na tabela `games` (preenchida via migration com base em `rounds.competition_id`).
-- [ ] Adicionar endpoint `POST /teams/{teamId}/roster/batch` para carga em lote do elenco-base.
+### Fase 1: Limpeza de Débito Morto & Enriquecimento Não-Quebrante (Concluída)
+- [x] Criar changeset Liquibase para dropar tabelas órfãs: `user_skills` e `categories` (`017-schema-optimizations-phase1.yaml`).
+- [x] Adicionar coluna `nickname VARCHAR(100)` na tabela `persons` e expor no DTO `PersonResponse` e frontend (`flag_admin_web`).
+- [x] Adicionar coluna `competition_id UUID` na tabela `games` (preenchida via migration com base em `rounds.competition_id` com índice).
+- [x] Eliminar consultas N+1 via lookups em lote (`findTeamInfoByIdIn`, `findVenueInfoByIdIn`) reduzindo 200+ queries para 3.
+- [x] Criar agregador REST do Match Center (`GET /api/v1/games/{id}/match-center`).
 
-### Fase 2: Racionalização de Recursos REST & Desacoplamento de Placar
-- [ ] Tornar `plays` a única gravadora de eventos de jogo; transformar `score_events` em projeção ou consulta derivada de `plays WHERE points_to_add > 0`.
-- [ ] Ajustar `GameMirrorListener` para projetar lances e pontuações no Firestore a partir de um único stream de eventos.
-- [ ] Marcar como `@Deprecated` as rotas legadas (`POST /organizations/{id}/teams`, `PUT /institutions/{id}/organizations`, `POST /organizations/{id}/clubs`).
-- [ ] Atualizar clientes frontend (`flag_admin_web`, `flag_referee_app`) para consumir exclusivamente as rotas canônicas.
+### Fase 2: Racionalização de Recursos REST & HTTP Caching (Concluída)
+- [x] Habilitar HTTP Caching condicional com `ShallowEtagHeaderFilter` e exposição de cabeçalho `ETag` via CORS.
+- [x] Adicionar endpoint canônico `POST /api/v1/teams/{teamId}/roster/batch` para carga em lote do elenco-base com relatório por linha.
+- [x] Marcar formalmente como `@Deprecated` as rotas legadas (`POST /organizations/{id}/teams`, `GET /organizations/{id}/teams`, `PUT /institutions/{id}/teams/{teamId}`, `PUT /institutions/{id}/organizations`, `GET/POST/DELETE /organizations/{id}/clubs`, `POST /games/{id}/score/events`).
 
-### Fase 3: Consolidação Semântica do Domínio e Schema
-- [ ] Migrar times órfãos de agremiação e aplicar restrição `teams.institution_id NOT NULL` e remover `teams.organization_id`.
-- [ ] Renomear colunas de classificação em `standings` (`goals_for` -> `points_for`, `goals_against` -> `points_against`).
-- [ ] Eliminar tabela legada `institution_organizations`, unificando consultas federativas em `institution_affiliations`.
-- [ ] Consolidar pacotes internos do Spring Modulith sob os Bounded Contexts principais (`competition`, `game`, `institution`, `team`, `person`).
+### Fase 3: Consolidação Semântica do Domínio e Schema (Concluída)
+- [x] Migrar times órfãos de agremiação e aplicar restrição `teams.institution_id NOT NULL` (`018-schema-optimizations-phase3.yaml`).
+- [x] Renomear colunas de classificação em `standings`: `goals_for` -> `points_for`, `goals_against` -> `points_against` (eliminando a terminologia incorreta de futebol de campo), com métodos de compatibilidade reversa.
+- [x] Atualizar `StandingEntity`, `StandingService`, `StandingsCalculator` e `TeamService` para refletir a nova semântica pura de Flag Football.
 
 ---
 
