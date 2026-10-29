@@ -383,11 +383,21 @@ timeline
 
 ---
 
-## 6. Conclusão e Próximos Passos
+## 6. Conclusão e Validação em Staging
 
-Esta avaliação demonstra que a plataforma possui uma fundação sólida e estável, mas acumula resíduos da fase inicial de exploração. A execução planejada das melhorias estruturará o ecossistema com:
+Todas as 3 fases de modernização foram executadas, validadas e publicadas em ambiente de Staging através do Hub Central de Deploys (`flag_platform_infra`):
+
+| Componente | Plataforma / Destino | Status de Publicação | Detalhes da Validação |
+|---|---|---|---|
+| **`flag_backend`** | Oracle Cloud VM (Always Free) + Oracle ADB 23ai | **DEPLOYED (SUCCESS)** | Run `40813130980`. Resolução de dependência circular no Spring Boot, Liquibase migrado sem falhas, Actuator Health `HTTP 200 OK` (`{"status":"UP"}`). |
+| **`flag_admin_web`** | Cloudflare Pages | **DEPLOYED (SUCCESS)** | Run `40807653668`. Build Flutter Web compilado, suporte a `nickname`, remoção de telas e rotas órfãs. |
+| **`flag_public_app`** | Google Play Store (Internal Track) | **PUBLISHED (SUCCESS)** | Run `40809726998` (v0.13.5+18). Tabela de classificação com Saldo de Pontos (`SP`), `pointsFor`/`pointsAgainst` tolerante. |
+| **`flag_referee_app`** | Google Play Store (Internal Track) | **PUBLISHED (SUCCESS)** | Run `40809706624` (v1.3.3+13). Desacoplamento de `addPoint` para `/plays`, súmula eletrônica resiliente. |
+
+Esta modernização assegura:
 1. **Fronteiras de domínio limpas e inequívocas** (Federações gerenciam torneios; Agremiações gerenciam times; Atletas possuem identidade única com apelido vitalício).
 2. **APIs REST enxutas e consistentes** (fim dos endpoints concorrentes e contratos ambíguos).
+3. **Placar e classificação com integridade garantida** pelo agregador canônico de jogadas e colunas dedicadas de pontuação de Flag Football.
 3. **Placar em tempo real à prova de falhas** (lance a lance como única fonte da verdade).
 
 Recomenda-se o alinhamento deste relatório para aprovação e posterior priorização das tarefas no backlog oficial.
