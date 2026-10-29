@@ -243,6 +243,104 @@ A análise detalhada dos 78 endpoints revelou **4 grupos críticos de concorrên
 
 ---
 
+### 3.4. Eficiência de Transporte, Gargalo de N+1 Queries e "Chatty APIs"
+
+A avaliação de desempenho e eficiência computacional das APIs revelou gargalos severos de transporte e execução de banco de dados:
+
+#### A. O Problema das N+1 Queries em Cascata no Backend
+- **Diagnóstico:** Para preservar o isolamento de pacotes do Spring Modulith sem expor entidades JPA entre módulos, o `GameService` utiliza métodos de lookup pontuais (`TeamLookup`, `VenueLookup`, `RoundLookup`, `CompetitionLookup`).
+- **Gargalo Identificado:** No método `GameService.findByCompetitionId(competitionId)`:
+  ```java
+  // GameService.java:242
+  private GameSummaryResponse toSummary(GameEntity game, UUID competitionId, RoundInfo roundInfo) {
+      VenueInfo venue = venueLookup.findVenueInfoById(game.getVenueId());       // 1 query por jogo
+      TeamInfo homeTeam = teamLookup.findTeamInfoById(game.getHomeTeamId());     // 1 query por jogo
+      TeamInfo awayTeam = teamLookup.findTeamInfoById(game.getAwayTeamId());     // 1 query por jogo
+      CompetitionInfo comp = competitionLookup.findCompetitionInfoById(...);    // 1 query por jogo
+      ...
+  }
+  ```
+  Ao listar uma rodada ou campeonato com **50 partidas**, o backend dispara **200 queries SQL adicionais** sequenciais para enriquecer nomes de times, sedes e campeonato.
+- **Mesmo problema em `listScoreEvents`:** Para cada evento de pontuação de um jogo, o backend executa `teamLookup.findTeamInfoById(event.getTeamId())` dentro de um stream `map(...)`.
+- **Solução de Otimização:**
+  1. Expandir as interfaces de lookup do Modulith com métodos de busca em lote (*Batch Lookups*):
+     - `teamLookup.findTeamInfoByIdIn(Set<UUID> ids)` -> executa `SELECT ... WHERE id IN (...)` uma única vez.
+     - `venueLookup.findVenueInfoByIdIn(Set<UUID> ids)` -> 1 query para todas as sedes.
+  2. Reduzir a carga de 200 queries para **exatamente 3 queries por requisição**, diminuindo o tempo de resposta da listagem de jogos em até 80%.
+
+#### B. O Problema das "Chatty APIs" (Excesso de Roundtrips no Cliente)
+- **Diagnóstico:** Para abrir a tela de uma partida no `flag_referee_app` ou no `flag_admin_web`, o aplicativo precisa disparar **4 requisições HTTP sequenciais**:
+  1. `GET /api/v1/games/{id}` (dados cadastrais do jogo)
+  2. `GET /api/v1/games/{id}/participants` (oficiais e mesa)
+  3. `GET /api/v1/games/{id}/checkin` (súmula de atletas escalados e camisas)
+  4. `GET /api/v1/games/{id}/plays` (lance a lance e histórico)
+- **Impacto em Redes Móveis / Campo:** Em estádios ou campos abertos onde árbitros operam sob 3G/4G instável, 4 roundtrips HTTP multiplicam a latência e o risco de falhas por timeout.
+- **Solução de Otimização:**
+  - Criar um **Endpoint Agregador de Alta Performance (Match Center Facade)**:
+    - `GET /api/v1/games/{id}/match-center`
+    - Retorna em um único payload compacto: metadados do jogo + placar consolidado + comissão de arbitragem + lista de check-in ativa + últimos 10 lances.
+    - O cliente monta a tela com **1 único roundtrip HTTP**, com suporte nativo a offline caching.
+
+---
+
+### 3.5. Aderência a Melhores Práticas REST (Maturidade Richardson, RPC vs REST e Caching)
+
+Ao confrontar o modelo de recursos com as diretrizes consolidadas da indústria (RESTful Maturity Level 2/3, Google Cloud API Design, RFC 7232 e RFC 7807), destacam-se as seguintes não-conformidades:
+
+```mermaid
+graph LR
+    subgraph Antipatterns["Anti-padrões Mapeados"]
+        A1["Profundidade Excessiva<br/>/teams/{t}/competitions/{c}/roster/{a}"]
+        A2["RPC disfarçado em POST<br/>/finish, /reactivate, /walkover, /approve"]
+        A3["Sem Caching HTTP<br/>Zero suporte a ETag / 304 Not Modified"]
+        A4["Inconsistência de IDs<br/>{athleteId} vs {personId} vs {id}"]
+        A5["Falta de Concorrência Otimista<br/>Risco de lost updates na súmula"]
+    end
+    subgraph Target["Padrão Canônico Otimizado"]
+        T1["Rotas Planas (Max 2 níveis)<br/>/competitions/{c}/roster/{personId}"]
+        T2["Transições de Estado Uniformes<br/>PATCH /resource/{id}/status"]
+        T3["HTTP Caching com ETag<br/>Conditional GET (304) para feeds estáveis"]
+        T4["Nomenclatura Canônica<br/>Sempre {id} ou {recursoId}"]
+        T5["Header If-Match / ETag<br/>Concorrência otimista à prova de conflito"]
+    end
+    Antipatterns ==> Target
+```
+
+1. **Profundidade Excessiva de URIs (Deep Nesting):**
+   - Rota atual: `/api/v1/teams/{teamId}/competitions/{competitionId}/roster/{athleteId}` possui 4 níveis de aninhamento. 
+   - A boa prática estabelece no máximo 2 níveis de profundidade (`/parent/{parentId}/collection/{id}`). A hierarquia deve ser aplanada para:
+     `PUT /api/v1/rosters/{rosterId}/entries/{personId}` ou `PUT /api/v1/competitions/{competitionId}/roster/{personId}`.
+2. **Proliferação de Verbos RPC em POST:**
+   - Existem 12 endpoints no estilo ação RPC:
+     `/finish`, `/reactivate` (em 5 entidades diferentes), `/deactivate`, `/walkover`, `/approve`, `/reject`.
+   - *Melhor prática:* Transições de ciclo de vida são mutações do recurso:
+     `PATCH /api/v1/games/{id}` com `{"status": "FINISHED"}` ou `PATCH /api/v1/teams/{id}/status` com `{"status": "INACTIVE"}`.
+     Reduz 12 rotas avulsas para 3 padrões canônicos reutilizáveis em todo o ecossistema.
+3. **Ausência Total de Caching HTTP (`ETag` e `304 Not Modified`):**
+   - Atualmente, nenhuma resposta do backend inclui cabeçalhos `ETag` nem `Cache-Control`.
+   - Endpoints com dados quase estáticos (`/standings`, `/competitions`, `/venues`, `/teams`) forçam o download completo de JSON mesmo quando nada mudou.
+   - *Oportunidade:* Habilitar `ShallowEtagHeaderFilter` no Spring Boot. Feeds do app público e do web admin economizam até 90% do consumo de dados via status `304 Not Modified`.
+4. **Falta de Concorrência Otimista no Nível HTTP:**
+   - Durante a operação de jogo, se dois árbitros ou o operador de mesa alteram a súmula ou placar ao mesmo tempo, a última escrita sobrescreve a primeira silenciosamente (*Lost Update*).
+   - *Melhor prática:* Suportar cabeçalho `If-Match: "<ETag>"` nos endpoints de mutação de súmula e status de jogo. Se a versão divergir, o backend responde `412 Precondition Failed`, impedindo corrupção de dados da partida.
+
+---
+
+### 3.6. Racionalização de Superfície: De 78 para 48 Rotas Canônicas (-38%)
+
+Ao aplicar as regras de deduplicação, aplanamento e eliminação de rotas redundantes, a superfície da API do `flag_backend` é simplificada drasticamente:
+
+| Domínio de Recursos | Rotas Atuais | Rotas Canônicas Propostas | Principais Simplificações |
+|---|:---:|:---:|---|
+| **Equipes (Teams)** | 14 rotas | 7 rotas | Remoção das rotas legadas `/organizations/{id}/teams`, unificação da mutação em `/teams/{id}`, eliminação de `/deactivate` e `/reactivate` em favor de `PATCH /teams/{id}/status`. |
+| **Vínculos & Filiações** | 10 rotas | 6 rotas | Eliminação de `/organizations/{id}/clubs` e `PUT /institutions/{id}/organizations`, centralizando tudo no fluxo auditado de `institution_affiliations`. |
+| **Partidas & Placar** | 17 rotas | 9 rotas | Eliminação dos endpoints `/score/events` e redundâncias de placar; unificação de pontuações via `/plays`; criação do agregador `/games/{id}/match-center`. |
+| **Elencos (Roster)** | 12 rotas | 6 rotas | Aplanamento de URIs hiper-aninhadas; inclusão de batch no elenco-base; unificação de mutações. |
+| **Competições & Estrutura** | 25 rotas | 20 rotas | Aplanamento de rodadas e conferências; eliminação de endpoints RPC `/finish` e `/reactivate`. |
+| **Total Global** | **78 rotas** | **48 rotas** | **Redução de 38% na superfície de exposição**, com ganho monumental de manutenibilidade, previsibilidade e testabilidade. |
+
+---
+
 ## 4. Matriz de Impacto no Ecossistema
 
 | Componente | Mudanças Propostas | Benefício Arquitetural |
