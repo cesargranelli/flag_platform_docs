@@ -3,7 +3,7 @@
 > **Projeto:** Flag Platform (Ecossistema America)  
 > **Data:** 30 de Outubro de 2026  
 > **Autoridade Arquitetural:** ADR-001, Domain-Driven Design (DDD) & Modulith  
-> **Status:** Diagnóstico Completo e Proposta de Normalização Estrutural  
+> **Status:** Fase 1 Concluída e Publicada em Staging (Liquibase 020 Ativo)  
 
 ---
 
@@ -241,14 +241,23 @@ timeline
     Fase 3 : Enriquecimento de Estrutura : Permitir venues vinculadas a institutions (CTs de Clubes) : FKs de conferences e divisions em competition_team
 ```
 
-### Proposta de Próximo Passo Prático (Fase 1):
-1. **Migration Liquibase 020:**
-   - Garantir que se algum `persons.nickname` existir e estiver nulo em `team_roster`, ele seja copiado para `team_roster.nickname`.
-   - Executar `ALTER TABLE persons DROP COLUMN nickname`.
-   - Executar `ALTER TABLE teams DROP COLUMN organization_id`.
-2. **Refatoração no Backend Java:**
-   - Remover `nickname` de `PersonEntity`, `PersonResponse`, `PersonRequest`.
-   - Remover `organizationId` de `TeamEntity`, `TeamResponse`, `CreateTeamRequest`.
-   - Limpar métodos redundantes `findAllByOrganizationId` em `TeamRepository`.
-3. **Alinhamento nos Apps:**
-   - Garantir que `flag_admin_web`, `flag_public_app` e `flag_referee_app` leiam e exibam o apelido e número estritamente de `RosterEntry` / `team_roster`.
+### Execução Concluída (Fase 1 — Normalização Canônica):
+1. **Migration Liquibase 020 (`020-normalize-schema-persons-teams.yaml`):**
+   - Backfill idempotente: qualquer `persons.nickname` residual foi migrado para `team_roster.nickname`.
+   - `ALTER TABLE persons DROP COLUMN nickname`.
+   - `ALTER TABLE teams DROP CONSTRAINT fk_team_organization` e `DROP COLUMN organization_id`.
+   - Aplicado e validado em staging contra o Oracle ADB 23ai.
+2. **Refatoração no Backend Java (`flag_backend`):**
+   - Removido `nickname` de `PersonEntity`, `PersonInfo`, `PersonResponse`, `CreatePersonRequest`, `UpdatePersonRequest` e `CreatePersonBatchItem`.
+   - Removido `organizationId` e `organizationName` de `TeamEntity`, `TeamResponse`, `CreateTeamRequest` e `UpdateTeamRequest`.
+   - `TeamRepository` saneado: removidas queries diretas por `organizationId`. A rota legada consulta através das agremiações filiadas da organização (`institutionOrgRepo`).
+   - `RosterService` e `CheckInService` operam com `nickname`, `positions` e `jersey_number` exclusivamente em `RosterEntryEntity`.
+3. **Alinhamento nos Clientes:**
+   - `flag_admin_web`, `flag_public_app` e `flag_referee_app` atualizados e validados com `flutter analyze` reportando **0 erros e 0 avisos**.
+   - Endpoint ao vivo validado: `GET https://api.america.app.br/api/v1/teams` retorna os times 100% associados à sua agremiação (`institutionId` / `institutionName`).
+
+---
+
+## 6. Próximos Passos (Fase 2 e Fase 3)
+- **Fase 2:** Extinção de tabelas duplicadas (`institution_organizations` unificada em `institution_affiliations`, e descontinuação de `score_events` em favor de `plays`).
+- **Fase 3:** Praças esportivas (`venues`) com suporte a CTs de clubes (`institution_id`), e estruturação de chaves estrangeiras em `competition_team` (`conference_id`, `division_id`).
