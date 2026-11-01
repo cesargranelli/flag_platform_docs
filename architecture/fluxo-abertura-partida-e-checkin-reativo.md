@@ -66,19 +66,22 @@ Para agilizar a conferência física dos atletas na beira do campo, a lista de a
 
 ---
 
-### 2.3. Resolução de Apelidos e Numeração por Inferência
+### 2.3. Resolução de Apelidos e Numeração a Partir da Base de Dados
+
+#### Diretriz Arquitetural Mandatória:
+**O aplicativo móvel (`flag_referee_app`) é puramente apresentacional e NUNCA manipula ou fatia strings para inferir ou inventar apelidos no cliente.** O `nickname` deve vir consolidado diretamente da base de dados / API.
 
 #### Backend (`flag_backend`):
 1. **Migration 025 (`025-infer-roster-nickname-and-jersey-numbers.yaml`)**:
-   - `nickname`: Se nulo em `team_roster`, é inferido do primeiro nome registrado em `persons.name` (`SUBSTR(name, 1, INSTR(name || ' ', ' ') - 1)` no Oracle / `SPLIT_PART` no H2/PostgreSQL).
-   - `jersey_number`: Se nulo em elenco de competição (`competition_id IS NOT NULL`), é herdado do elenco-base (`competition_id IS NULL`) para a mesma equipe e pessoa.
+   - `nickname`: Atualizado diretamente na base de dados (`team_roster.nickname`) a partir do primeiro nome registrado em `persons.name` (`SUBSTR(name, 1, INSTR(name || ' ', ' ') - 1)` no Oracle / `SPLIT_PART` no H2/PostgreSQL) para todos os registros que estavam nulos.
+   - `jersey_number`: Consolidado na base de dados em elencos de competição (`competition_id IS NOT NULL`), herdando do elenco-base (`competition_id IS NULL`) da mesma equipe/atleta quando nulo.
 2. **Serviços Backend**:
-   - `CheckInService`: Retorna `rosterAthlete.nickname` com fallback determinístico de primeiro nome e `number` com fallback para `rosterAthlete.number`.
-   - `RosterService`: Herda deterministicamente `number` e `nickname` do elenco base ao listar atletas do time na competição.
+   - `CheckInService`: Entrega `athleteNickname` diretamente do registro de `team_roster`.
+   - `RosterService`: Retorna `nickname` e `number` com herança do elenco base da base de dados quando aplicável.
 
 #### Frontend (`flag_referee_app`):
-- `CheckIn` model: Contém o getter `inferredNickname` (retorna `athleteNickname` se preenchido ou extrai o primeiro nome de `athleteName`) e `displayName`.
-- `AthleteCheckInCard`: Exibe o `displayName` como título principal e o nome completo no subtítulo (apenas quando forem distintos), garantindo leitura rápida no tablet ou celular sob luz solar.
+- `CheckIn` model: Não possui métodos de inferência ou fatiamento de strings. Utiliza `displayName => hasNickname ? athleteNickname!.trim() : athleteName`.
+- `AthleteCheckInCard`: Se houver apelido vindo da base de dados, exibe o apelido como título e o nome completo no subtítulo. Se não houver apelido cadastrado na base, exibe diretamente o nome do atleta no título sem manipulação artificial.
 
 ---
 
@@ -88,7 +91,7 @@ Para agilizar a conferência física dos atletas na beira do campo, a lista de a
 |-----------|--------|-------------|
 | Feedback visual na abertura de jogo | Concluído | Loading nos cards e no modal de abertura com tratamento de erro |
 | Segregação pendentes vs confirmados no check-in | Concluído | Lista reativa em 0ms com banner de conclusão |
-| Inferência de nickname (primeiro nome) | Concluído | Backend (Migration 025 + CheckInService) + Frontend (`inferredNickname`) |
+| Nickname vindo da base de dados | Concluído | Migration 025 grava no banco; app consome sem manipulação de strings |
 | Herança de número da camisa | Concluído | Migration 025 + RosterService + fallback `effectiveNumber` |
 | Flutter Analyze | 0 erros / 0 avisos | Validado no `flag_referee_app` |
 | Governança de Documentação (Regra 6) | Concluído | Registrado e versionado no `flag_platform_docs` |
