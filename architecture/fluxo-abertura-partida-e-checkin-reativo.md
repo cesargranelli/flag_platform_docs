@@ -85,13 +85,25 @@ Para agilizar a conferência física dos atletas na beira do campo, a lista de a
 
 ---
 
+### 2.4. Seleção Ágil de Atletas em Campo (`_AthletePillChip`)
+
+No modal de registro de jogadas (`PlayDialog`):
+- Os botões/cards verticais volumosos anteriores (56px) foram substituídos por **Chips / Pills compactos** (`_AthletePillChip`, ~34px) organizados em `Wrap` fluido:
+  - **Foco no Número da Camisa**: Badge oval em alto contraste com `#95`, `#7`, `#12` em negrito (`FontWeight.w800`).
+  - **Apelido do Atleta**: Exibe o `displayName` (apelido do banco) em vez de nomes extensos com sobrenomes.
+  - **Agrupamento Dinâmico**: Permite visualizar 20+ atletas sem necessidade de rolagem excessiva, com seleção rápida por toque no tablet ou celular de campo.
+  - **Feedback Ativo**: O chip ativo recebe fundo preenchido na cor primária e o badge de seleção exibe `#95 Douglas` com botão de limpeza `(X)`.
+
+---
+
 ## 3. Matriz de Conformidade
 
 | Requisito | Status | Verificação |
 |-----------|--------|-------------|
 | Feedback visual na abertura de jogo | Concluído | Loading nos cards e no modal de abertura com tratamento de erro |
 | Segregação pendentes vs confirmados no check-in | Concluído | Lista reativa em 0ms com banner de conclusão |
-| Nickname vindo da base de dados | Concluído | Migration 025 grava no banco; app consome sem manipulação de strings |
-| Herança de número da camisa | Concluído | Migration 025 + RosterService + fallback `effectiveNumber` |
+| Nickname vindo da base de dados | Concluído | 100% dos 4.546 registros em team_roster com nickname no Oracle |
+| Herança e consolidação de camisa na base | Concluído | Atualizado na base de dados e comitado no backend |
+| Chips/Pills no registro de jogadas | Concluído | _AthletePillChip compacto com foco no número e apelido |
 | Flutter Analyze | 0 erros / 0 avisos | Validado no `flag_referee_app` |
 | Governança de Documentação (Regra 6) | Concluído | Registrado e versionado no `flag_platform_docs` |
