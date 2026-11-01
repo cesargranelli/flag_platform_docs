@@ -16,7 +16,7 @@ Isso causava:
 
 ## 2. Decisão Arquitetural e Modelagem
 
-### 2.1. Alterações no Banco de Dados (Liquibase Migration 023)
+### 2.1. Alterações no Banco de Dados (Liquibase Migrations 023 e 024)
 Arquivo: `src/main/resources/db/changelog/changesets/023-roster-modality-and-clean-segregation.yaml`
 1. **Adição da coluna `modality`** na tabela `rosters`:
    - `modality VARCHAR(20) DEFAULT 'FLAG_5X5' NOT NULL`
@@ -24,6 +24,8 @@ Arquivo: `src/main/resources/db/changelog/changesets/023-roster-modality-and-cle
    - Para elencos atrelados a uma competição (`competition_id IS NOT NULL`), o campo `modality` herda diretamente de `competitions.modality`.
    - Para elencos-base (`competition_id IS NULL`), foi inferida a modalidade predominante com base nas competições disputadas pelo time na temporada.
 3. **Saneamento e desduplicação de vínculos (`team_roster`)**:
+   - Arquivo: `src/main/resources/db/changelog/changesets/024-clean-segregated-rosters-raw-fix.yaml`
+   - No Oracle ADB 23ai, as colunas do tipo UUID (`roster_id` e `person_id`) são armazenadas internamente como `RAW(16)`. Em comandos SQL puros via Liquibase, literais UUID exigem conversão binária explícita via `HEXTORAW('...')` sem hífens para corresponder aos dados no disco.
    - Remoção de atletas espelhados indevidamente entre 5x5 e 8x8:
      - **Lizards**: 52 atletas removidos do 5x5 (exclusivos de 8x8) e 30 removidos do 8x8.
        - Elenco 5x5 final: 30 atletas.
