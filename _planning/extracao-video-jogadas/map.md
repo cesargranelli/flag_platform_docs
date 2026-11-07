@@ -1,6 +1,6 @@
 # Mapa — Extração de Dados em Vídeo para Registro de Jogadas (`extracao-video-jogadas`)
 
-Esforço de pesquisa, arquitetura e implementação da solução de Visão Computacional e Inteligência Multimodal para detecção, rastreamento e extração automática de jogadas a partir de filmagens de partidas de Flag Football.
+Esforço de arquitetura, pesquisa e implementação da solução de Visão Computacional para detecção, rastreamento e extração automática de jogadas a partir de filmagens de partidas de Flag Football gravadas ou transmitidas no YouTube.
 
 Especificação detalhada consolidada em [`modelo-extracao-dados-video-jogadas.md`](../../architecture/modelo-extracao-dados-video-jogadas.md).
 
@@ -8,24 +8,25 @@ Especificação detalhada consolidada em [`modelo-extracao-dados-video-jogadas.m
 
 ---
 
-## Contexto
+## Contexto da Arquitetura
 
-- **Demanda:** A anotação em tempo real de jogadas durante partidas de Flag Football exige atenção contínua e operadores experientes na mesa de arbitragem. Ao mesmo tempo, partidas são filmadas ou transmitidas ao vivo, gerando um acervo rico em vídeo que pode ser explorado por IA.
-- **Objetivo:** Criar um pipeline capaz de analisar vídeos de partidas, identificar campo, atletas, movimentações e momentos críticos (snap, passe, flag pull, touchdown), mapeando-os diretamente para o catálogo unificado de 38 jogadas da Flag Platform.
-- **Modos de Operação:**
-  1. *Pós-jogo (Batch)*: Geração da súmula e play-by-play a partir de gravações completas com interface de revisão ágil.
-  2. *Live Assist*: Notificação quase em tempo real no `flag_referee_app` com sugestão pré-preenchida do último lance para aprovação com 1 toque.
+- **Backend Java (OCI):** Gerencia regras de negócio, agenda as análises e recebe o resultado via Webhook.
+- **Microsserviço de Visão (Python FastAPI):** Processa o stream de vídeo do YouTube sob demanda (sem download de arquivos completos em disco).
+- **Engine Visual:** Ultralytics YOLOv8 (Nano/Small) com rastreador ByteTrack ou BoT-SORT nativo.
+- **Espelhamento em Tempo Real:** O backend Java persiste no Oracle ADB e espelha no Firestore, alimentando os aplicativos móveis Flutter (`flag_referee_app` e `flag_public_app`) reativamente.
+- **Otimização Operacional:** Amostragem travada em 10 FPS e resolução em 720p HD; capacidade de gerenciar fila com pico de até 4 vídeos simultâneos.
+- **Infraestrutura:** Avaliação entre Serverless GPU (Modal.com ou RunPod) e instância com GPU dedicada na OCI sob demanda.
 
 ---
 
-## Ordem de Execução
+## Ordem de Execução (Fase 0 - Pós-Jogo / Batch)
 
-1. **VID-01 — Desenho do modelo e pipeline de extração de jogadas em vídeo** (arquitetura, esquema de dados e definição técnica). Detalhada em [`issues/01-desenho-modelo-extracao-video.md`](issues/01-desenho-modelo-extracao-video.md).
-2. **VID-02 — Coleta de dataset de referência e etiquetagem inicial** (vídeos com ângulos variados de Flag 5x5 e 8x8).
-3. **VID-03 — PoC de calibração espacial de campo e homografia** (conversão de pixels do vídeo em jardas 2D do campo).
-4. **VID-04 — PoC de detecção de atletas, uniformes e dorsais** (matching visual com os elencos da súmula).
-5. **VID-05 — PoC de inferência de jogada com modelo multimodal** (clipe curto de jogada gerando JSON de `PlayResponse`).
-6. **VID-06 — Interface de conferência e revisão humana** (player de vídeo com marcação de jogadas e confirmação rápida).
+1. **VID-01 — Desenho da arquitetura, contratos de API e modelo de dados** (consolidado em `architecture/`).
+2. **VID-02 — Scaffold do microsserviço Python (`flag_vision_service`)** com FastAPI e pipeline de captura em stream (`yt-dlp` + `OpenCV`).
+3. **VID-03 — Integração com YOLOv8 e ByteTrack para detecção e tracking** com amostragem a 10 FPS / 720p.
+4. **VID-04 — Implementação da Homografia de Campo (2D Mapping)** para conversão métrica de pixels em jardas reais.
+5. **VID-05 — Implementação do Webhook de retorno e agregação de lances para o Backend Java**.
+6. **VID-06 — Benchmarking de infraestrutura de execução (Serverless GPU vs. OCI GPU sob demanda)**.
 
 ---
 
@@ -33,16 +34,17 @@ Especificação detalhada consolidada em [`modelo-extracao-dados-video-jogadas.m
 
 | ID | Tipo | Título | Critérios de Aceitação | Status |
 |:---:|:---:|---|---|:---:|
-| **VID-01** | research | Desenho do modelo de extração de dados em vídeo para registro de jogadas | Especificação técnica completa consolidada em `architecture/`; pipeline de visão e multimodal detalhado; modelo de dados alinhado ao backend; mapa do esforço criado em `_planning/`. | open |
-| **VID-02** | task | Coleta e catalogação de dataset de referência de vídeos de Flag Football | Repositório de amostras de vídeo (táticas, laterais e transmissões ao vivo) com trechos de lances conhecidos mapeados para teste de modelos. | open |
-| **VID-03** | research | PoC de detecção de campo e homografia espacial (pixel -> jarda) | Script/serviço que identifica linhas do campo e converte posições de jogadores em coordenadas de jardas reais (0 a 50/100 yd). | open |
-| **VID-04** | research | PoC de clustering de cores de time e OCR de dorsais | Identificação automática do time em ataque/defesa por cor de uniforme e leitura dos números das camisas com cruzamento no roster da partida. | open |
-| **VID-05** | feature | Pipeline multimodal de inferência de jogadas (Video-to-Play JSON) | Receber clipe de vídeo (ex.: 5 a 10s) e gerar payload compatível com `PlayResponse` (tipo de jogada, jardas, passador, recebedor, fita). | open |
-| **VID-06** | design | Desenho da interface de conferência humana (Human-in-the-Loop) | Fluxo de validação com reprodução de vídeo sincronizada aos eventos do jogo no painel admin / referee app. | open |
+| **VID-01** | research | Desenho da arquitetura e contratos do microsserviço de visão | Especificação técnica completa consolidada; contratos HTTP (disparo + webhook) validados; topologia de integração definida. | claimed |
+| **VID-02** | task | Setup do microsserviço FastAPI e ingestão de stream do YouTube | Aplicação FastAPI com endpoint `/process-video`; captura direta da URL do YouTube com `yt-dlp` + `OpenCV` em 720p sem salvar no disco; fila assíncrona para até 4 vídeos. | open |
+| **VID-03** | task | Pipeline YOLOv8 Nano/Small + ByteTrack para rastreamento de atletas e bola | Executar inferência a 10 FPS com IDs consistentes ao longo do lance; métricas de FPS e uso de memória documentadas. | open |
+| **VID-04** | research | Calibração de campo e mapeamento homográfico (pixel -> jarda) | Detecção de linhas demarcatórias e projeção métrica das posições dos atletas e da linha de scrimmage em jardas. | open |
+| **VID-05** | feature | Agregação de jogadas e disparo do Webhook para o backend Java | Transformar trajetórias e ações atômicas em eventos compatíveis com `PlayResponse` e disparar POST no callback da partida. | open |
+| **VID-06** | ops | Prova de conceito de infraestrutura em Serverless GPU (Modal / RunPod / OCI) | Testar custos e tempos de inferência de uma partida completa de 2h nas opções de GPU sob demanda. | open |
 
 ---
 
 ## Fora de Escopo
 
-- Substituição mandatória e 100% autônoma do árbitro sem supervisão humana na primeira fase.
-- Transmissão com hardware dedicado proprietário (o sistema deve funcionar com vídeos padrão de smartphones ou câmeras convencionais).
+- Substituição mandatória e 100% autônoma do árbitro sem supervisão humana na Fase 0.
+- Download de arquivos brutos de vídeo em disco local na VM Java.
+- Hardware proprietário para gravação em campo (o modelo utiliza filmagens convencionais de YouTube).

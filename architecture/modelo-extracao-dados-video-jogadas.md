@@ -1,193 +1,209 @@
 # Especificação Técnica: Modelo de Extração de Dados em Vídeo para Registro de Jogadas
 
 > **Documento Oficial de Arquitetura & Inteligência Visual**  
-> **Status:** Proposto / Em Desenho  
-> **Aplica-se a:** `flag_platform_docs`, `flag_backend`, `flag_referee_app`, `flag_public_app`  
+> **Status:** Proposto / Em Desenho (Fase 0 - Batch/Pós-Jogo)  
+> **Aplica-se a:** `flag_platform_docs`, `flag_backend`, `flag_referee_app`, `flag_public_app`, `flag_vision_service` (novo microsserviço)  
 > **Data:** Novembro de 2026  
-> **Tracker:** [`_planning/extracao-video-jogadas/map.md`](../_planning/extracao-video-jogadas/map.md) · ID: `VID-01`
+> **Tracker:** [`_planning/extracao-video-jogadas/map.md`](../_planning/extracao-video-jogadas/map.md) · IDs: `VID-01`, `VID-02`, `VID-03`
 
 ---
 
-## 1. Visão Geral e Motivação
+## 1. Visão Geral e Arquitetura do Sistema Atual
 
-Na operação esportiva atual da Flag Platform, o registro do *Play-by-Play* (jogada a jogada) e da súmula eletrônica é realizado em tempo real por operadores de mesa ou árbitros através do `flag_referee_app`. Embora o aplicativo tenha sido progressivamente otimizado para operação de baixo atrito, o registro humano manual em campo apresenta desafios intrínsecos:
-1. **Perda de Detalhes Finos:** Em jogadas rápidas, identificar simultaneamente o passador, recebedor, defensor que retirou a fita (*flag pull*), a jarda exata da queda e as infrações gera sobrecarga cognitiva.
-2. **Dependência de Operadores Dedicados:** Nem todos os jogos ou torneios menores contam com operadores de mesa experientes disponíveis.
-3. **Existência de Acervo de Vídeo Subutilizado:** A grande maioria dos jogos já é gravada (transmissões ao vivo no YouTube, câmeras táticas elevadas na linha de 50 jardas, gravações de equipes ou smartphones em tripés).
-
-**Objetivo Central:** Desenhar a arquitetura e o modelo de **Extração de Dados em Vídeo para Registro de Jogadas**, transformando filmagens de partidas de Flag Football em fluxos de eventos estruturados do catálogo oficial da Flag Platform, reduzindo a necessidade de anotação manual e enriquecendo as estatísticas oficiais.
+A Flag Platform opera hoje em uma topologia híbrida de alta performance:
+1. **Backend Principal:** Aplicação Java (Spring Boot) em Máquina Virtual na Oracle Cloud Infrastructure (OCI), responsável pelas regras de negócio oficiais, autenticação e banco relacional de produção (Oracle Autonomous Database 23ai).
+2. **Portal Web Administrativo:** Desenvolvido em Flutter Web e distribuído globalmente via Cloudflare (Pages / CDN).
+3. **Aplicativos Móveis (2x):**
+   - [`flag_referee_app`](../../flag_referee_app): Operação de mesa, cronômetro oficial e súmula eletrônica.
+   - [`flag_public_app`](../../flag_public_app): Acompanhamento público em tempo real para torcedores e atletas.
+4. **Espelhamento em Tempo Real:** Sincronização automática do backend Java com o **Firebase Firestore**, permitindo aos apps Flutter reagirem instantaneamente aos eventos de jogo.
 
 ---
 
-## 2. Casos de Uso e Modos de Operação
+## 2. Fase 0: Processamento em Lote Pós-Jogo (Batch Processing)
+
+O objetivo prioritário da Fase 0 é automatizar a extração tática de partidas já gravadas disponíveis no YouTube:
 
 ```mermaid
-flowchart TD
-    VideoSource["Fonte de Vídeo\n(Live Stream / Câmera Elevada / Arquivo MP4)"] --> Pipeline["Pipeline de Extração Visual & IA"]
-    Pipeline --> Inference["Inferência de Jogada & Roster Matching"]
-    Inference --> HumanReview["Interface de Revisão Rápida\n(Human-in-the-Loop)"]
-    HumanReview --> Platform["Plataforma Oficial Flag Platform\n(Play-by-Play, Súmula, Stats)"]
+sequenceDiagram
+    autonumber
+    actor Admin as Organizador / Delegado
+    participant Java as Backend Java (OCI)
+    participant Python as Microsserviço Python (FastAPI / GPU)
+    participant YouTube as YouTube Video Stream
+    participant Firestore as Firebase Firestore
+    participant Flutter as Apps Flutter (Referee / Public)
+
+    Admin->>Java: 1. Solicita análise de vídeo (gameId, youtubeUrl)
+    Java->>Python: 2. POST /api/v1/jobs/process-video (disparo assíncrono)
+    Python-->>Java: 3. 202 Accepted (jobId em fila)
+    Python->>YouTube: 4. Captura stream direto (yt-dlp + OpenCV 720p @ 10fps)
+    Note over Python: Executa YOLOv8 + ByteTrack / BoT-SORT<br/>Homografia de campo & agregação de lances
+    Python->>Java: 5. POST Webhook /api/v1/games/{id}/plays/batch-import
+    Java->>Java: 6. Validação de regras e persistência no Oracle ADB
+    Java->>Firestore: 7. Espelhamento automático (Admin SDK)
+    Firestore-->>Flutter: 8. Atualização reativa da timeline do jogo
 ```
 
-O modelo é projetado para operar em dois modos:
-
-1. **Modo Pós-Jogo (Batch / On-Demand):**
-   - Upload de vídeo completo (ou link de transmissão gravada).
-   - Processamento assíncrono em nuvem ou cluster GPU.
-   - Geração da linha do tempo completa do jogo para validação do delegado/arbitragem com reprodução sincronizada (*clique no evento leva ao timestamp exato do vídeo*).
-2. **Modo Em Tempo Real / Near-Real-Time (Live Assist):**
-   - Ingestão do stream de vídeo (RTMP / HLS / WebRTC).
-   - Detecção de cada jogada individual entre 3 e 10 segundos após o término do lance.
-   - O `flag_referee_app` recebe sugestões automáticas na tela: *"Detectado: Passe Completo #7 para #11, avanço de 12 jardas, fita retirada por #24. Confirmar?"*.
+### Principais Diretrizes da Fase 0:
+- **Consumo Direto de Stream (Sem Download em Disco):** Análise do fluxo de vídeo diretamente da URL do YouTube usando `yt-dlp` combinado com `OpenCV` (`cv2.VideoCapture`), eliminando a necessidade de armazenar arquivos brutos de 2h (~2GB a 6GB) no disco do servidor.
+- **Volume e Concorrência:** Capacidade para gerenciar filas com pico de até **4 vídeos simultâneos** em processamento.
+- **Otimização de Performance e Custo:**
+  - Amostragem reduzida para **10 FPS** (taxa ideal para rastreamento de futebol americano/flag sem redundância temporal).
+  - Resolução travada em **720p HD** (equilíbrio perfeito entre clareza para leitura de dorsais/fitas e consumo de VRAM da GPU).
 
 ---
 
-## 3. Pipeline Arquitetural de Extração Visual
+## 3. Stack Tecnológica de IA (100% Open-Source / Free Software)
 
-O pipeline divide o problema em camadas bem delimitadas, desde o sinal visual bruto até o evento de domínio:
-
-```mermaid
-flowchart LR
-    A["1. Ingestão & Amostragem"] --> B["2. Calibração Espacial (Homografia)"]
-    B --> C["3. Detecção & Rastreamento"]
-    C --> D["4. Identificação (Roster & Cores)"]
-    D --> E["5. Detecção de Ações Atômicas"]
-    E --> F["6. Motor de Regras de Domínio"]
-    F --> G["7. Evento Estruturado (PlayResponse)"]
-```
-
-### 3.1. Ingestão e Pré-processamento
-- **Entrada:** Arquivo de vídeo (H.264/H.265) ou Stream RTMP com resolução mínima recomendada de 1080p a 30/60 fps.
-- **Segmentação de Lances (Play Slicing):** Identificação dos momentos de bola viva vs. bola morta para não processar tempos ociosos (intervalos, substituições, comemorações).
-  - O início do lance é ancorado na formação das equipes e no movimento de *snap*.
-  - O término é ancorado na retirada de fita (*flag pull*), passe incompleto no solo, avanço para fora de campo ou apito do árbitro.
-
-### 3.2. Calibração Espacial e Homografia de Campo (2D Mapping)
-- **Desafio:** Câmeras com ângulos oblíquos (perspectiva lateral ou diagonal) geram distorções de distância.
-- **Solução:** 
-  - Detecção automática das linhas demarcatórias do campo (endzones, linhas de 5 jardas, meio de campo, linhas laterais e cones).
-  - Matriz de Homografia ($H$) mapeando coordenadas em pixels $(u, v)$ para o plano métrico tático do campo de Flag Football $(x, y)$ em jardas reais:
-  $$\begin{bmatrix} x \\ y \\ 1 \end{bmatrix} \sim H \begin{bmatrix} u \\ v \\ 1 \end{bmatrix}$$
-  - Permite calcular com precisão métrica: linha de scrimmage de saída, jarda final da jogada e saldo líquido de jardas conquistadas.
-
-### 3.3. Detecção e Rastreamento de Objetos (Detection & Tracking)
-- **Detecção:** Identificação frame a frame de:
-  - Atletas de ambos os times (`player`).
-  - Árbitros (`referee` - camisa listrada).
-  - Bola (`ball` - American football).
-  - Fitas na cintura (`flags` - cores contrastantes com o short).
-- **Rastreamento Temporal (Multi-Object Tracking):** Algoritmos baseados em detecção e reidentificação contínua (ex.: BoT-SORT / ByteTrack) para manter IDs estáveis ao longo de todo o lance.
-
-### 3.4. Reconhecimento de Identidade e Atletas (Roster Matching)
-- **Separação de Equipes:** Agrupamento por cor predominante do uniforme via *Color Clustering* (K-Means/HSV no torso dos atletas), segregando automaticamente o Time A do Time B.
-- **OCR de Dorsais (Números das Camisas):**
-  - Detecção da região do dorsal e peito.
-  - OCR especializado com agregação temporal de múltiplos frames para lidar com dobras e oclusões de tecido.
-  - Cruzamento com a lista de atletas relacionados na súmula da partida (`game.homeRoster` e `game.awayRoster`).
-
-### 3.5. Detecção de Ações Atômicas (Action Recognition & Pose)
-Ações fundamentais que compõem uma jogada de Flag Football:
-1. `SNAP`: Movimento de início entre o centralizador e o quarterback.
-2. `BALL_RELEASE`: Momento e posição em que a bola sai da mão do passador.
-3. `BALL_TRAJECTORY`: Vetor de voo da bola em direção a uma área do campo.
-4. `CATCH_SUCCESS`: Recepção completada e posse assegurada antes da saída de campo ou toque no chão.
-5. `CATCH_FAIL`: Bola tocando o solo ou saindo de campo sem posse.
-6. `FLAG_PULL`: Deslocamento abrupto ou remoção de uma das fitas presas ao cinto do portador da bola.
-7. `TOUCHDOWN_ENTRY`: Portador da bola cruzando o plano da linha de gol da endzone adversária com a bola.
-8. `REFEREE_SIGNAL`: Reconhecimento de gestos do árbitro de campo (ex.: braços para cima = Touchdown, braços cruzados na altura do peito = Incompleto, mãos na cintura = Impedimento/Falta).
-
-### 3.6. Motor de Regras e Inferência de Jogada
-Correlaciona as ações atômicas detectadas com o **Catálogo Oficial de 38 Jogadas da Flag Platform** (definido em [`otimizacao-fluxo-registro-jogadas.md`](otimizacao-fluxo-registro-jogadas.md)):
-
-```
-Ações Detectadas:
-  [Snap na Jarda 20] + [Passe de #12 para #84 na Jarda 35] + [Flag Pull de #21 na Jarda 38]
-Inferência de Domínio:
-  Tipo: PASS_COMPLETE (CMP)
-  Time em Posse: Mandante
-  Passador (QB): #12
-  Recebedor (WR): #84
-  Defensor (PULL): #21
-  Jarda Inicial: 20 -> Jarda Final: 38 (+18 jardas)
-  Resultado: 1ª Descida Conquistada (FIRST_DOWN)
-```
+| Camada | Tecnologia | Função e Justificativa |
+|---|---|---|
+| **API do Microsserviço** | **Python (FastAPI)** | Assíncrono, leve e padrão da indústria para servir modelos de Machine Learning. |
+| **Captura de Stream** | **yt-dlp + OpenCV** | Extrai a URL direta do stream de vídeo H.264/DASH em memória e alimenta `cv2.VideoCapture`. |
+| **Engine de Visão Computacional** | **Ultralytics YOLOv8** | Modelos `yolov8n` (Nano) ou `yolov8s` (Small) para balancear altíssima velocidade e consumo mínimo de GPU. |
+| **Rastreamento Multi-Objeto (MOT)** | **ByteTrack / BoT-SORT** | Nativos do ecossistema Ultralytics; preservam os IDs dos atletas frame a frame mesmo sob oclusões. |
+| **Calibração Espacial** | **OpenCV (Homografia)** | Conversão matemática das coordenadas em pixels $(u, v)$ para a posição métrica do campo $(x, y)$ em jardas. |
+| **Comunicação Inter-serviços** | **HTTP Webhooks (JSON)** | Desacoplamento total: Java notifica o início e Python devolve os eventos processados. |
 
 ---
 
-## 4. Esquema de Dados do Evento Extraído
+## 4. Contrato de Comunicação entre Java e Python
 
-A saída da extração visual é formatada no padrão exato consumido pelo backend da Flag Platform:
+### 4.1. Disparo de Processamento (Java $\to$ Python)
+`POST https://vision.america.app.br/api/v1/jobs/process-video`
 
 ```json
 {
   "gameId": "b18a28f5-303a-4467-96bf-bc5d3f2ea4d1",
-  "source": "VIDEO_AI_INFERENCE",
-  "confidenceScore": 0.94,
-  "videoMetadata": {
-    "videoUrl": "https://pub.america.app.br/videos/2026/game-b18a28f5.mp4",
-    "timestampStartMs": 142300,
-    "timestampEndMs": 151800,
-    "thumbnailUrl": "https://pub.america.app.br/videos/2026/thumbs/play-042.jpg"
-  },
-  "play": {
-    "playType": "PASS_COMPLETE",
-    "possessionTeamId": "f784d09c-e366-4d15-8fa1-01639d6b9d88",
-    "quarter": 2,
-    "down": 2,
-    "distanceToFirstDown": 15,
-    "fieldPosition": 20,
-    "targetYard": 38,
-    "netYards": 18,
-    "isFirstDown": true,
-    "isTurnover": false,
-    "primaryAthlete": {
-      "number": 84,
-      "role": "RECEIVER",
-      "athleteId": "e2381289-450a-4122-bd12-bb207869aa41"
+  "youtubeUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+  "webhookCallbackUrl": "https://api.america.app.br/api/v1/games/b18a28f5-303a-4467-96bf-bc5d3f2ea4d1/plays/batch-import",
+  "gameContext": {
+    "modality": "FLAG_5X5",
+    "homeTeam": {
+      "id": "team-001",
+      "name": "São Paulo Spartans",
+      "primaryColor": "#001F5B",
+      "rosterNumbers": [7, 11, 12, 21, 24, 84]
     },
-    "passerAthlete": {
-      "number": 12,
-      "role": "PASSER",
-      "athleteId": "c9284091-bb21-4192-9111-a8b291048821"
-    },
-    "defensiveAthlete": {
-      "number": 21,
-      "role": "FLAG_PULLER",
-      "athleteId": "a1847192-8821-4b10-9831-aa9837162981"
+    "awayTeam": {
+      "id": "team-002",
+      "name": "Rio Sharks",
+      "primaryColor": "#FFFFFF",
+      "rosterNumbers": [1, 3, 10, 15, 22, 99]
     }
+  },
+  "options": {
+    "samplingFps": 10,
+    "resolution": "720p",
+    "trackBall": true
   }
+}
+```
+
+### 4.2. Resposta Imediata da Fila (Python $\to$ Java)
+`Status: 202 Accepted`
+
+```json
+{
+  "jobId": "job-vision-78f921e0",
+  "gameId": "b18a28f5-303a-4467-96bf-bc5d3f2ea4d1",
+  "status": "QUEUED",
+  "estimatedQueueTimeSeconds": 45,
+  "createdAt": "2026-11-07T15:15:00Z"
+}
+```
+
+### 4.3. Retorno Assíncrono via Webhook (Python $\to$ Java)
+`POST {webhookCallbackUrl}`
+
+```json
+{
+  "jobId": "job-vision-78f921e0",
+  "gameId": "b18a28f5-303a-4467-96bf-bc5d3f2ea4d1",
+  "status": "COMPLETED",
+  "summary": {
+    "totalPlaysDetected": 48,
+    "averageConfidence": 0.92,
+    "processingTimeSeconds": 312
+  },
+  "plays": [
+    {
+      "sequenceNumber": 1,
+      "playType": "PASS_COMPLETE",
+      "timestampStartMs": 142000,
+      "timestampEndMs": 149500,
+      "possessionTeamId": "team-001",
+      "down": 1,
+      "fieldPosition": 20,
+      "targetYard": 35,
+      "netYards": 15,
+      "isFirstDown": true,
+      "isTurnover": false,
+      "passerNumber": 7,
+      "receiverNumber": 11,
+      "flagPullerNumber": 22,
+      "confidence": 0.94
+    }
+  ]
 }
 ```
 
 ---
 
-## 5. Abordagens Tecnológicas e Stack Candidata
+## 5. Estratégia de Infraestrutura e Custos de GPU
 
-| Componente | Opção Especializada (Modular) | Opção Multimodal (Video-LLM) | Abordagem Híbrida Recomendada |
-|---|---|---|---|
-| **Corte de Jogadas (Slicing)** | Detecção de movimento óptico + apito de áudio | Segmentação temporal de vídeo com Gemini Flash | **Híbrida:** Modelo leve de áudio/movimento corta lances; LLM analisa os recortes |
-| **Calibração de Campo** | OpenCV Keypoints + Homografia RANSAC | Estimativa aproximada via prompt de coordenadas | **Especializada:** Homografia matemática geométrica para precisão exata de jardas |
-| **Detecção de Atletas & Bola** | YOLOv11 / RT-DETR + BoT-SORT | Tokens visuais integrados no VLM | **Híbrida:** YOLOv11 rastreia posições e coordenadas; VLM interpreta o contexto |
-| **Identificação dos Jogadores** | PaddleOCR / TrOCR no dorsal | Reconhecimento visual multimodal com base na súmula | **Híbrida:** Detecção OCR assistida pela lista fechada de números do roster da partida |
-| **Classificação da Jogada** | Máquina de Estados Finita (FSM) baseada em regras | Ingestão do clipe no Gemini 2.0 Flash com catálogo de jogadas | **Multimodal:** O VLM recebe o clipe curto (8s) + contexto e emite o JSON estruturado |
+Para processar até 4 vídeos simultâneos sem manter custos fixos ociosos, são avaliadas duas abordagens:
+
+```mermaid
+flowchart TD
+    OptionA["Abordagem A: Serverless GPU\n(RunPod / Modal.com)"]
+    OptionB["Abordagem B: VM com GPU na OCI\n(NVIDIA A10 / T4 sob demanda)"]
+    
+    OptionA --> ProsA["Vantagens:\n- Custo Zero quando ocioso (desliga em 0s)\n- Escala automática para 4 instâncias paralelas no pico\n- Cobrança por segundo de inferência"]
+    OptionB --> ProsB["Vantagens:\n- Mesma rede privada do backend Java OCI\n- Sem tráfego externo para nuvens terceiras\n- Custo previsível se mantida ligada"]
+```
+
+### Comparativo Econômico e Operacional:
+
+1. **Abordagem A: Serverless GPU (Modal.com ou RunPod Serverless):**
+   - **Modelo de Custo:** Pagamento estritamente por segundo de GPU utilizada (ex.: ~US$ 0,20 a 0,40 por hora de GPU NVIDIA T4/L4).
+   - **Comportamento em Pico:** Quando 4 vídeos chegam de uma vez, o provedor instancia 4 containers paralelos automaticamente. Cada vídeo de 2h a 10 FPS demora cerca de 10 a 15 minutos para ser analisado.
+   - **Recomendação:** Ideal para a **Fase 0**, pois torneios ocorrem em fins de semana e a infraestrutura permanece com custo **zero** de segunda a sexta.
+
+2. **Abordagem B: Instância OCI com GPU sob Demanda (NVIDIA A10 / T4):**
+   - **Modelo de Custo:** Cobrança por hora de VM ativa na OCI.
+   - **Gestão:** O backend Java pode usar a OCI CLI/SDK para ligar a VM quando um lote de vídeos for submetido e desligá-la ao término da fila de processamento.
 
 ---
 
-## 6. Governança e Human-in-the-Loop (Interface de Revisão)
+## 6. Pipeline de Implementação do Microsserviço Python
 
-A inteligência visual atua como **copiloto / assistente** da arbitragem e da organização:
+O repositório do serviço (`flag_vision_service`) será estruturado com:
 
-1. **Indicador de Confiança:** Cada jogada possui um `confidenceScore` (0.00 a 1.00). Jogadas com confiança acima de 90% podem ser auto-aprovadas em modo batch ou pré-selecionadas na tela de conferência.
-2. **Player Sincronizado:** O operador ou delegado assiste aos lances com bounding boxes opcionais e confirma com 1 clique.
-3. **Loop de Realimentação (Fine-Tuning Ativo):** Correções manuais de números de camisas ou tipos de jogada geram anotações rotuladas para melhoria contínua dos modelos de visão.
+```
+flag_vision_service/
+├── app/
+│   ├── api/
+│   │   ├── endpoints.py        # Endpoints FastAPI (/process-video, /health)
+│   │   └── webhooks.py         # Cliente HTTP de envio de callbacks para o Java
+│   ├── core/
+│   │   ├── config.py           # Configurações de fila, concorrência e chaves
+│   │   └── youtube_stream.py   # Wrapper yt-dlp + cv2.VideoCapture sem download
+│   ├── vision/
+│   │   ├── yolo_detector.py    # YOLOv8 (detecção de atletas, bola, árbitro)
+│   │   ├── tracker.py          # ByteTrack / BoT-SORT
+│   │   ├── field_calibrator.py # Homografia de campo (pixels -> jardas)
+│   │   └── play_inferer.py     # Agregação temporal de lances e regras de domínio
+│   └── main.py                 # Ponto de entrada FastAPI com Uvicorn
+├── Dockerfile                  # Base NVIDIA CUDA / PyTorch
+├── requirements.txt            # fastapi, uvicorn, ultralytics, yt-dlp, opencv-python
+└── README.md
+```
 
 ---
 
-## 7. Fases do Roadmap do Esforço (`VID`)
+## 7. Próximos Passos Imediatos (`VID-01` $\to$ `VID-03`)
 
-1. **VID-01:** Desenho arquitetural, esquema de dados e definição do pipeline (este documento).
-2. **VID-02:** Dataset de calibração e filmagens de referência (Flag Football 5x5 / 8x8 nacional).
-3. **VID-03:** Prova de Conceito (PoC) de segmentação de lances e homografia de campo (pixels -> jardas).
-4. **VID-04:** PoC de identificação de atletas (OCR dorsal + cor do uniforme vs. roster oficial).
-5. **VID-05:** Pipeline multimodal de inferência de jogadas (clipe curto -> `PlayResponse` JSON).
-6. **VID-06:** Interface de revisão no `flag_admin_web` / `flag_referee_app` com player sincronizado.
+1. **VID-01:** Concluir e aprovar este desenho de arquitetura.
+2. **VID-02:** Criação do repositório base `flag_vision_service` com FastAPI, leitor `yt-dlp` em stream e YOLOv8 Nano.
+3. **VID-03:** Teste de bancada com URL real de jogo no YouTube para aferir FPS, precisão de tracking e consumo de memória.
