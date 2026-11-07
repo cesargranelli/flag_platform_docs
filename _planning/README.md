@@ -98,6 +98,7 @@ _planning/
 | padronizacao-listagens | `LIST` | `padronizacao-listagens/` | em execução | LIST-01 | `LIST-02` |
 | governanca-operacional-agentes | `GOV` | `governanca-operacional-agentes/` | resolvido | GOV-01 | `GOV-02` |
 | escopo-perfis | `ESC` | `escopo-perfis/` | resolvido (2026-10-15) | ESC-07 | `ESC-08` — aguardando arquivamento |
+| extracao-video-jogadas | `VID` | `extracao-video-jogadas/` | em planejamento | VID-01 | `VID-02` |
 
 ### 5.2 Issues por repositório (`repos/`)
 
