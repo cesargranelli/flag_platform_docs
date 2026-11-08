@@ -2,7 +2,7 @@
 
 Esforço de arquitetura, pesquisa e implementação da solução de Visão Computacional para detecção, rastreamento e extração automática de jogadas a partir de filmagens de partidas de Flag Football gravadas ou transmitidas no YouTube.
 
-Especificação detalhada consolidada em [`modelo-extracao-dados-video-jogadas.md`](../../architecture/modelo-extracao-dados-video-jogadas.md).
+Especificação detalhada consolidada em [`modelo-extracao-dados-video-jogadas.md`](../../architecture/modelo-extracao-dados-video-jogadas.md) e [`analise-custos-infra-gpu-serverless.md`](../../architecture/analise-custos-infra-gpu-serverless.md).
 
 > **Regra:** As issues deste mapa são trabalhadas em ordem de maturidade técnica e validação experimental. As detalhadas têm arquivo em `issues/`; as demais ficam na tabela até serem fatiadas.
 
@@ -15,7 +15,7 @@ Especificação detalhada consolidada em [`modelo-extracao-dados-video-jogadas.m
 - **Engine Visual:** Ultralytics YOLOv8 (Nano/Small) com rastreador ByteTrack ou BoT-SORT nativo, homografia 2D de campo e máquina de estados para agregação de jogadas (`PlayAggregator`).
 - **Espelhamento em Tempo Real:** O backend Java persiste no Oracle ADB e espelha no Firestore, alimentando os aplicativos móveis Flutter (`flag_referee_app` e `flag_public_app`) reativamente.
 - **Otimização Operacional:** Amostragem travada em 10 FPS e resolução em 720p HD; capacidade de gerenciar fila com pico de até 4 vídeos simultâneos.
-- **Infraestrutura:** Avaliação entre Serverless GPU (Modal.com ou RunPod) e instância com GPU dedicada na OCI sob demanda.
+- **Infraestrutura:** Aprovado uso de **Serverless GPU via Modal.com** (com fallback RunPod) com custo zero em repouso e média de R$ 0,45 por jogo analisado.
 
 ---
 
@@ -26,7 +26,7 @@ Especificação detalhada consolidada em [`modelo-extracao-dados-video-jogadas.m
 3. **VID-03 — Integração com YOLOv8 e ByteTrack para detecção e tracking** com amostragem a 10 FPS / 720p. Detalhada em [`issues/03-pipeline-yolov8-bytetrack.md`](issues/03-pipeline-yolov8-bytetrack.md).
 4. **VID-04 — Implementação da Homografia de Campo (2D Mapping)** para conversão métrica de pixels em jardas reais. Detalhada em [`issues/04-homografia-campo-mapeamento-2d.md`](issues/04-homografia-campo-mapeamento-2d.md).
 5. **VID-05 — Implementação do Webhook de retorno e agregação de lances para o Backend Java**. Detalhada em [`issues/05-agregacao-jogadas-webhook-java.md`](issues/05-agregacao-jogadas-webhook-java.md).
-6. **VID-06 — Benchmarking de infraestrutura de execução (Serverless GPU vs. OCI GPU sob demanda)**.
+6. **VID-06 — Benchmarking de infraestrutura de execução (Serverless GPU vs. OCI GPU sob demanda)**. Detalhada em [`issues/06-analise-custos-infra-gpu-serverless.md`](issues/06-analise-custos-infra-gpu-serverless.md).
 
 ---
 
@@ -39,7 +39,7 @@ Especificação detalhada consolidada em [`modelo-extracao-dados-video-jogadas.m
 | **VID-03** | task | Pipeline YOLOv8 Nano/Small + ByteTrack para rastreamento de atletas e bola | Executar inferência a 10 FPS com IDs consistentes ao longo do lance; métricas de FPS e uso de memória documentadas. | resolved |
 | **VID-04** | research | Calibração de campo e mapeamento homográfico (pixel -> jarda) | Detecção de linhas demarcatórias e projeção métrica das posições dos atletas e da linha de scrimmage em jardas. | resolved |
 | **VID-05** | feature | Agregação de jogadas e disparo do Webhook para o backend Java | Transformar trajetórias e ações atômicas em eventos compatíveis com `PlayResponse` e disparar POST no callback da partida. | resolved |
-| **VID-06** | ops | Prova de conceito de infraestrutura em Serverless GPU (Modal / RunPod / OCI) | Testar custos e tempos de inferência de uma partida completa de 2h nas opções de GPU sob demanda. | open |
+| **VID-06** | ops | Prova de conceito de infraestrutura em Serverless GPU (Modal / RunPod / OCI) | Testar custos e tempos de inferência de uma partida completa de 2h nas opções de GPU sob demanda; script de deploy serverless implementado. | resolved |
 
 ---
 
