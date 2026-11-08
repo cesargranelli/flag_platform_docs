@@ -23,7 +23,7 @@ Especificação detalhada consolidada em [`modelo-extracao-dados-video-jogadas.m
 
 1. **VID-01 — Desenho da arquitetura, contratos de API e modelo de dados** (consolidado em `architecture/`). Detalhada em [`issues/01-desenho-modelo-extracao-video.md`](issues/01-desenho-modelo-extracao-video.md).
 2. **VID-02 — Setup do microsserviço Python (`flag_vision_service`)** com FastAPI e pipeline de captura em stream (`yt-dlp` + `OpenCV`). Detalhada em [`issues/02-setup-microsservico-coletor-youtube.md`](issues/02-setup-microsservico-coletor-youtube.md).
-3. **VID-03 — Integração com YOLOv8 e ByteTrack para detecção e tracking** com amostragem a 10 FPS / 720p.
+3. **VID-03 — Integração com YOLOv8 e ByteTrack para detecção e tracking** com amostragem a 10 FPS / 720p. Detalhada em [`issues/03-pipeline-yolov8-bytetrack.md`](issues/03-pipeline-yolov8-bytetrack.md).
 4. **VID-04 — Implementação da Homografia de Campo (2D Mapping)** para conversão métrica de pixels em jardas reais.
 5. **VID-05 — Implementação do Webhook de retorno e agregação de lances para o Backend Java**.
 6. **VID-06 — Benchmarking de infraestrutura de execução (Serverless GPU vs. OCI GPU sob demanda)**.
@@ -36,7 +36,7 @@ Especificação detalhada consolidada em [`modelo-extracao-dados-video-jogadas.m
 |:---:|:---:|---|---|:---:|
 | **VID-01** | research | Desenho da arquitetura e contratos do microsserviço de visão | Especificação técnica completa consolidada; contratos HTTP (disparo + webhook) validados; topologia de integração definida. | resolved |
 | **VID-02** | task | Setup do microsserviço FastAPI e ingestão de stream do YouTube | Aplicação FastAPI com endpoint `/process-video`; captura direta da URL do YouTube com `yt-dlp` + `OpenCV` em 720p sem salvar no disco; fila assíncrona para até 4 vídeos. | resolved |
-| **VID-03** | task | Pipeline YOLOv8 Nano/Small + ByteTrack para rastreamento de atletas e bola | Executar inferência a 10 FPS com IDs consistentes ao longo do lance; métricas de FPS e uso de memória documentadas. | open |
+| **VID-03** | task | Pipeline YOLOv8 Nano/Small + ByteTrack para rastreamento de atletas e bola | Executar inferência a 10 FPS com IDs consistentes ao longo do lance; métricas de FPS e uso de memória documentadas. | resolved |
 | **VID-04** | research | Calibração de campo e mapeamento homográfico (pixel -> jarda) | Detecção de linhas demarcatórias e projeção métrica das posições dos atletas e da linha de scrimmage em jardas. | open |
 | **VID-05** | feature | Agregação de jogadas e disparo do Webhook para o backend Java | Transformar trajetórias e ações atômicas em eventos compatíveis com `PlayResponse` e disparar POST no callback da partida. | open |
 | **VID-06** | ops | Prova de conceito de infraestrutura em Serverless GPU (Modal / RunPod / OCI) | Testar custos e tempos de inferência de uma partida completa de 2h nas opções de GPU sob demanda. | open |
