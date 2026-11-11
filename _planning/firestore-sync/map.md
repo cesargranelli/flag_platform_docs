@@ -56,6 +56,7 @@ por último.
 | **FS-07** | task | Escrita do espelho síncrona no thread da request | Ver [issue detalhada](issues/07-escrita-espelho-sincrona.md) | open |
 | **FS-08** | task | Backfill sem paginação (`findAll()` + N+1) | Ver [issue detalhada](issues/08-backfill-sem-paginacao.md) | open |
 | **FS-09** | atividade | Pré-requisito de deploy: credencial Firebase no container | Ver [issue detalhada](issues/09-prerequisito-deploy-credencial.md) | open |
+| **FS-10** | bug | App público não exibe a competição 8x8 — verificar espelhamento Firestore | Ver [issue detalhada](issues/10-app-publico-competicao-8x8.md) | resolved |
 
 ## Fora de escopo
 

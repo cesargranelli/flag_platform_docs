@@ -14,6 +14,7 @@ Pendências críticas observadas em produção (VM OCI `163.176.195.27:8080` →
 | [BACK-01](issues/BACK-01-institutions-ora-17004.md) | `POST /api/v1/institutions` retorna 500 (`ORA-17004`) | flag_backend | open |
 | [BACK-05](issues/BACK-05-competitions-ora-17023.md) | Leitura de `competitions` quebra com `ORA-17023` (`getBytes`) | flag_backend | open |
 | [BACK-06](issues/BACK-06-roster-single-null-id.md) | `POST .../roster` (single) 500 "The given id must not be null" | flag_backend | open |
+| [BACK-08](issues/BACK-08-recalculo-ora-12860-pdml.md) | Recálculo da classificação falha com `ORA-12860` (ADB `_high` + DML paralelo) | flag_backend, flag_platform_infra | resolved |
 
 ## Demais pendências
 
@@ -22,6 +23,8 @@ Pendências críticas observadas em produção (VM OCI `163.176.195.27:8080` →
 | [BACK-02](issues/BACK-02-404-mascarado-500.md) | bug | `404` mascarado como `500` (handlers ausentes) | flag_backend | open |
 | [BACK-03](issues/BACK-03-upload-sem-multipart.md) | bug | `POST /api/v1/upload` sem multipart → `500` | flag_backend | open |
 | [BACK-04](issues/BACK-04-regra-negocio-500.md) | bug | Regra de negócio/estado inválido responde 500 em vez de 409/404 | flag_backend | open |
+| [BACK-07](issues/BACK-07-recalculo-classificacao-update-status.md) | bug | Recálculo da classificação não dispara ao encerrar jogo via `updateStatus` | flag_backend | resolved |
+| [BACK-09](issues/BACK-09-recalculation-pending-falso-positivo.md) | bug | `recalculationPending` acusa falso-positivo em edições que não mudam resultado | flag_backend | resolved |
 
 ## Notas do esforço
 

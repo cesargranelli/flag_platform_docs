@@ -12,5 +12,5 @@ runbooks, KB) continua em `<repo>/docs/`.
 | flag_platform_infra | [infra/](infra/map.md) | `INFRA` | ativo |
 | flag_admin_web | `admin-web/` | `ADMIN` | a criar |
 | flag_referee_app | `referee-app/` | `REF` | a criar |
-| flag_public_app | `public-app/` | `PUB` | a criar |
+| flag_public_app | [public_app/](public_app/map.md) | `PUB` | ativo |
 | flag_platform_agent | `agent/` | `AGENT` | a criar |
